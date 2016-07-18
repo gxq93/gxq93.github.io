@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
-  <title>皆非</title>
+  <title>Archives: 2016/3 | 皆非</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta property="og:type" content="website">
 <meta property="og:title" content="皆非">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta property="og:url" content="http://yoursite.com/archives/2016/03/index.html">
 <meta property="og:site_name" content="皆非">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="皆非">
@@ -195,85 +195,48 @@
 
       <div class="body-wrap">
   
-    <article id="post-Intro" class="article article-type-post" itemscope itemprop="blogPost">
   
-    <div class="article-meta">
-      <a href="/2016/03/13/Intro/" class="article-date">
-  	<time datetime="2016-03-13T02:57:51.000Z" itemprop="datePublished">2016-03-13</time>
+    
+    
+      
+      
+      <section class="archives-wrap">
+        <div class="archive-year-wrap">
+          <a href="/archives/2016" class="archive-year">2016</a>
+        </div>
+        <div class="archives">
+    
+    <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      	<div class="article-meta">
+	      	<a href="/2016/03/13/Intro/" class="archive-article-date">
+  	<time datetime="2016-03-13T02:57:51.000Z" itemprop="datePublished">Mar 13</time>
 </a>
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
+        </div>
+    	 
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/03/13/Intro/">Intro</a>
+      <a class="archive-article-title" href="/2016/03/13/Intro/">Intro</a>
     </h1>
   
 
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>在硬盘进水丢了所有博客的文章之后我又回来了！<br>想想似乎从<code>jkyll</code>到<code>wordpress</code>再到<code>hexo</code>已经搭了四次环境了，每次忘记还得再去网上查，这次干脆就把流程也记一下，反正其他人第一篇文章也好像<br>都是写这个😀</p>
-<p>##前言<br>GitHub pages是github上用于对开源项目进行说明的网页。我们也可以根据GitHub Pages来生成个人的GitHub个人博客网站。通过GitHub Pages创建的博客属于静态博客网站，其中的内容都是HTML静态页面。<br>(这是我从坐我隔壁的人的博客上复制粘贴的)</p>
-<p>##步骤</p>
-<ul>
-<li>搭建环境</li>
-<li>安装hexo</li>
-<li>绑定Git库</li>
-<li>相关配置</li>
-<li>常用操作</li>
-</ul>
-<p>##第一步 搭建环境<br>1.安装Git…Mac的Xcode自带了</p>
-<p>2.安装<a href="https://nodejs.org/en/" target="_blank" rel="external">Node.js</a>，我好像翻了墙才下成功的</p>
-<p>##第二步 安装hexo<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo npm install -g hexo-cli</div></pre></td></tr></table></figure></p>
-<p>一定要加sudo认证，踩过坑。然后去你想去的目录，执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">hexo init</div></pre></td></tr></table></figure></p>
-<p>你的博客就建在当前那个目录下啦。</p>
-<p>##第三步 绑定Git库<br>之前你生成的博客只能在本地预览，因此你需建立与你用户名对应的仓库，仓库名必须为<code>your_user_name.github.io</code>比如我的就是<code>gxq93.github.io</code><br>，<br>这将让你的hexo博客与你的GitHub pages绑定，不买域名的话以后这就是你博客的地址啦。<br>接着我们来生成 <code>Git SSH Key</code><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cd ~/.ssh</div><div class="line">ls</div></pre></td></tr></table></figure></p>
-<p>如果没有这个文件夹或文件夹中没有<code>id_rsa</code>和<code>id_rsa.pub</code>这两个密钥和公钥，就执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssh -keygen</div></pre></td></tr></table></figure></p>
-<p>生成这对密钥，生成过程会提示你设置路径和密码，直接回车就是默认的<code>/.ssh</code>的路径以及没有密码<br>接着取出rsa<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cat ~/.ssh/id_rsa.pub</div></pre></td></tr></table></figure></p>
-<p>输出大概是这样</p>
-<p>然后把这坨东西复制到你github SSHkey设置上选择newSSHkey的key上，选择add，接着去验证一下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssh -T git@github.com</div></pre></td></tr></table></figure></p>
-<p>如果显示的如Hi gxq93! You’ve successfully authenticated, but GitHub does not provide shell access.<br>就表示绑定成功啦，去github SSHkey设置上你也可以看到你的钥匙变成绿色的了。<br>接着打开hexo的<code>_config.yml</code>的配置文件，设置<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">deploy:</div><div class="line">type: git</div><div class="line">repo: git@github.com:gxq93/gxq93.github.io.git</div><div class="line">branch: master</div></pre></td></tr></table></figure></p>
-<p>注意在冒号后面一定要加个空格！不然无法编译。</p>
-<p>接着部署发布<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">hexo generate</div><div class="line">hexo deploy</div></pre></td></tr></table></figure></p>
-<p>这两个也是平时发布必用的两个命令，接着你就会发现你的那个git库多了一些东西，至此搭建完成！</p>
-<p>##第四步 相关配置<br>很多人写了hexo的主题，你可以去网上搜一下，我之前用了<code>next</code>主题，现在改成了<code>yilia</code>，使用方法：<br>到你博客的目录下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git clone https://github.com/litten/hexo-theme-yilia.git themes/yilia</div></pre></td></tr></table></figure></p>
-<p>然后在<code>_config.yml</code>配置文件中设置<code>theme: yilia</code>发布一下就ok了。</p>
+        <div class="article-info info-on-right">
+          
+          
 
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-    
+        </div>
+        <div class="clearfix"></div>
+    </header>
   </div>
-  
 </article>
-
-
-
-
-
-
-
-
-
   
   
+    </div></section>
+  
+
+    
+
 </div>
       <footer id="footer">
   <div class="outer">
@@ -297,9 +260,9 @@
 		fancybox: true,
 		mathjax: true,
 		animate: true,
-		isHome: true,
+		isHome: false,
 		isPost: false,
-		isArchive: false,
+		isArchive: true,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false
