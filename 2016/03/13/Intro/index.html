@@ -14,7 +14,7 @@
 <meta property="og:description" content="前言在硬盘进水丢了所有博客的文章之后我又回来了！想想似乎从Jkyll到Octopress再到Hexo已经搭了四次环境了，每次忘记还得再去网上查，这次干脆就把流程也记一下，反正其他人第一篇文章也好像都是写这个😀">
 <meta property="og:image" content="http://yoursite.com/2016/03/13/Intro/ssh_rsa.jpg">
 <meta property="og:image" content="http://yoursite.com/2016/03/13/Intro/ssh_sucess.png">
-<meta property="og:updated_time" content="2016-07-19T08:39:46.000Z">
+<meta property="og:updated_time" content="2016-07-20T06:34:19.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Intro">
 <meta name="twitter:description" content="前言在硬盘进水丢了所有博客的文章之后我又回来了！想想似乎从Jkyll到Octopress再到Hexo已经搭了四次环境了，每次忘记还得再去网上查，这次干脆就把流程也记一下，反正其他人第一篇文章也好像都是写这个😀">
@@ -81,7 +81,7 @@
 						<li>Links</li>
 						
 						
-						<li>About</li>
+						<li>Über</li>
 						
 					</ul>
 				</div>
@@ -147,7 +147,7 @@
 				
 				<section class="switch-part switch-part4">
 				
-					<div id="js-aboutme">我是谁，我从哪里来，我到哪里去？我就是我，是颜色不一样的吃货…</div>
+					<div id="js-aboutme">less is more</div>
 				</section>
 				
 			</div>
@@ -267,7 +267,8 @@
 <p>这两个也是平时发布必用的两个命令，接着你就会发现你的那个git库多了一些东西，至此搭建完成！</p>
 <h2 id="第四步-相关配置"><a href="#第四步-相关配置" class="headerlink" title="第四步 相关配置"></a>第四步 相关配置</h2><p>很多人写了<code>hexo</code>的主题，你可以去网上搜一下，我之前用了<code>next</code>主题，现在改成了<code>yilia</code>，使用方法：<br>到你博客的目录下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git clone https://github.com/litten/hexo-theme-yilia.git themes/yilia</div></pre></td></tr></table></figure></p>
 <p>然后在<code>_config.yml</code>配置文件中设置<code>theme: yilia</code>发布一下就ok了。<br>但是其实因为作者的个人习惯，主题总是有一些不尽人意的地方，比如<code>yilia</code>中代码滑块问题，目录问题，可以另外修改配置。</p>
-<p>1.去除代码滑块<br>到<code>/themes/yilia/source/css/_partial/highlight.styl</code>，设置其中<code>$code-block</code>下的<code>overflow: auto</code>改成<code>overflow: inherit</code>，就能去除滑块</p>
+<p>1.去除代码滑块<br>到<code>/themes/yilia/source/css/_partial/highlight.styl</code>，增加一行<code>overflow: hidden</code>在如下位置<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">pre</div><div class="line">@extend $code-block</div><div class="line">color: code-word</div><div class="line">overflow: hidden//添加</div></pre></td></tr></table></figure></p>
+<p>并在68行代码处将<code>height: 15px</code>注释掉，即可去除滑块</p>
 <p>2.增加目录结构<br>因为<code>hexo</code>本身不支持目录结构，因此需要做些修改。到<code>/themes/yilia/layout/_partial/article.ejs</code>文件下在<code>&lt;%- post.content %&gt;</code>上面添加如下代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;% if(post.toc == true)&#123; %&gt;</div><div class="line">&lt;div id=&quot;toc&quot; class=&quot;toc-article&quot;&gt;</div><div class="line">&lt;strong class=&quot;toc-title&quot;&gt;文章目录&lt;/strong&gt;</div><div class="line">&lt;%- toc(post.content, &#123;list_number: false&#125;) %&gt;</div><div class="line">&lt;/div&gt;</div><div class="line">&lt;% &#125; %&gt;</div></pre></td></tr></table></figure></p>
 <p>修改后在文章开头设置<code>toc: true</code>，如<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">---</div><div class="line">title: Intro</div><div class="line">date: 2016-03-13 10:57:51</div><div class="line">tags:</div><div class="line">toc: true</div><div class="line">---</div></pre></td></tr></table></figure></p>
 <p>即可，无需像正常md格式添加<code>[TOC]</code></p>
@@ -286,6 +287,20 @@
   </div>
   
     
+<nav id="article-nav">
+  
+    <a href="/2016/04/20/使用Runtime修改UIAlertController属性/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          使用Runtime修改UIAlertController属性
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
   
 </article>
 

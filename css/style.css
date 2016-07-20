@@ -1466,12 +1466,12 @@ a {
   background: #272822;
   margin: 10px 0;
   padding: 10px 10px;
-  overflow: inherit;
+  overflow: auto;
   color: #4c4c4c;
   line-height: 22.400000000000002px;
 }
 .article-entry .highlight .gutter pre,
-.article-entry .gist .gist-file .gist-data .line-numbers {
+##height: 15px .gist .gist-file .gist-data .line-numbers {
   color: #666;
 }
 .article-entry pre,
@@ -1485,6 +1485,7 @@ a {
 }
 .article-entry pre {
   color: #fff;
+  overflow: hidden;
 }
 .article-entry pre code {
   background: none;
@@ -1535,9 +1536,8 @@ a {
 }
 .article-entry .highlight .line {
   font-size: 15px;
-  height: 15px;
 }
-.article-entry .gist {
+##height: 15px .gist {
   margin: 0 -20px;
   border-style: solid;
   border-color: #ddd;
@@ -1545,29 +1545,29 @@ a {
   background: #272822;
   padding: 15px 20px 15px 0;
 }
-.article-entry .gist .gist-file {
+##height: 15px .gist .gist-file {
   border: none;
   font-family: "Source Code Pro", Consolas, Monaco, Menlo, Consolas, monospace;
   margin: 0;
 }
-.article-entry .gist .gist-file .gist-data {
+##height: 15px .gist .gist-file .gist-data {
   background: none;
   border: none;
 }
-.article-entry .gist .gist-file .gist-data .line-numbers {
+##height: 15px .gist .gist-file .gist-data .line-numbers {
   background: none;
   border: none;
   padding: 0 20px 0 0;
 }
-.article-entry .gist .gist-file .gist-data .line-data {
+##height: 15px .gist .gist-file .gist-data .line-data {
   padding: 0 !important;
 }
-.article-entry .gist .gist-file .highlight {
+##height: 15px .gist .gist-file .highlight {
   margin: 0;
   padding: 0;
   border: none;
 }
-.article-entry .gist .gist-file .gist-meta {
+##height: 15px .gist .gist-file .gist-meta {
   background: #272822;
   color: highlight-comment;
   font: 0.85em "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -1576,11 +1576,11 @@ a {
   margin-top: 1em;
   margin-left: 20px;
 }
-.article-entry .gist .gist-file .gist-meta a {
+##height: 15px .gist .gist-file .gist-meta a {
   color: #258fb8;
   font-weight: normal;
 }
-.article-entry .gist .gist-file .gist-meta a:hover {
+##height: 15px .gist .gist-file .gist-meta a:hover {
   text-decoration: underline;
 }
 pre .comment {
