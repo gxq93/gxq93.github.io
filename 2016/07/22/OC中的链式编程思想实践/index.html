@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <title>OC中的链式编程思想实践 | 皆非</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="在oc中方法的调用大部分都是通过[ ]，这与其他很多语言有很大的差异，而有些开发框架如Masonry则采用了链式编程的思想，这大大增加了代码的可读性和简洁性。今天有空就对这种思想简单的实践一下。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OC中的链式编程思想实践">
+<meta property="og:url" content="http://yoursite.com/2016/07/22/OC中的链式编程思想实践/index.html">
+<meta property="og:site_name" content="皆非">
+<meta property="og:description" content="在oc中方法的调用大部分都是通过[ ]，这与其他很多语言有很大的差异，而有些开发框架如Masonry则采用了链式编程的思想，这大大增加了代码的可读性和简洁性。今天有空就对这种思想简单的实践一下。">
+<meta property="og:updated_time" content="2016-07-22T07:43:25.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="OC中的链式编程思想实践">
+<meta name="twitter:description" content="在oc中方法的调用大部分都是通过[ ]，这与其他很多语言有很大的差异，而有些开发框架如Masonry则采用了链式编程的思想，这大大增加了代码的可读性和简洁性。今天有空就对这种思想简单的实践一下。">
+  
+    <link rel="alternative" href="/atom.xml" title="皆非" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			
+			<img lazy-src="/image/timg.jpeg" class="js-avatar">
+			
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">GuYi</a></h1>
+		</hgroup>
+
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						<div class="icon-wrap icon-link hide" data-idx="2">
+							<div class="loopback_l"></div>
+							<div class="loopback_r"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>Menu</li>
+						<li>Tags</li>
+						
+						<li>Links</li>
+						
+						
+						<li>Über</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">所有文章</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="#" title="github">github</a>
+					        
+								<a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
+					        
+								<a class="rss" target="_blank" href="#" title="rss">rss</a>
+					        
+								<a class="zhihu" target="_blank" href="#" title="zhihu">zhihu</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						
+					</div>
+				</section>
+				
+				
+				
+				<section class="switch-part switch-part3">
+					<div id="js-friends">
+					
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">奥巴马的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">卡卡的美丽传说</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">本泽马的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">吉格斯的博客</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">习大大大不同</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://localhost:4000/">托蒂的博客</a>
+			        
+			        </div>
+				</section>
+				
+
+				
+				
+				<section class="switch-part switch-part4">
+				
+					<div id="js-aboutme">less is more</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">GuYi</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+			
+				<img lazy-src="/image/timg.jpeg" class="js-avatar">
+			
+			</div>
+			<hgroup>
+			  <h1 class="header-author">GuYi</h1>
+			</hgroup>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">所有文章</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="#" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
+			        
+						<a class="rss" target="_blank" href="#" title="rss">rss</a>
+			        
+						<a class="zhihu" target="_blank" href="#" title="zhihu">zhihu</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+
+      <div class="body-wrap"><article id="post-OC中的链式编程思想实践" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/07/22/OC中的链式编程思想实践/" class="article-date">
+  	<time datetime="2016-07-22T07:30:06.000Z" itemprop="datePublished">2016-07-22</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      OC中的链式编程思想实践
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+        
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一-链式编程思想介绍"><span class="toc-text">一.链式编程思想介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二-通过block构造一个简单的计算器"><span class="toc-text">二.通过block构造一个简单的计算器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三-更符合逻辑的设计"><span class="toc-text">三.更符合逻辑的设计</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#四-为什么能用点语法"><span class="toc-text">四.为什么能用点语法</span></a></li></ol>
+        </div>
+        
+        <p>在oc中方法的调用大部分都是通过<code>[ ]</code>，这与其他很多语言有很大的差异，而有些开发框架如<code>Masonry</code>则采用了链式编程的思想，这大大增加了代码的可读性和简洁性。今天有空就对这种思想简单的实践一下。</p>
+<a id="more"></a>
+<h2 id="一-链式编程思想介绍"><a href="#一-链式编程思想介绍" class="headerlink" title="一.链式编程思想介绍"></a>一.链式编程思想介绍</h2><p>链式编程思想即将多个操作（多行代码）用过.语法链接在一起，形成单行代码，如<code>objc.method1().method2()</code>，跟c,java,swift等其他语言一样。</p>
+<p>在oc中链式编程主要的方式是方法都是返回自身，而实现的功能块都在这个方法中，而接下去返回的对象因为是调用者自身，因此可以不断的调用方法，从而形成链式的结构，如果想在方法中添加参数，一般都以block的形式传参，bolock返回方法调用者本身。</p>
+<h2 id="二-通过block构造一个简单的计算器"><a href="#二-通过block构造一个简单的计算器" class="headerlink" title="二.通过block构造一个简单的计算器"></a>二.通过block构造一个简单的计算器</h2><p>接下来通过构造一个简单的加减法计算器来对这种思想进行简单的实践。</p>
+<p>首先构造一个<code>NSObject</code>的子类计算器<code>CaculateMaker</code>，之后这个计算器将用来作为链式调用的对象。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">@interface CaculateMaker : NSObject</div><div class="line"></div><div class="line">@property (nonatomic,assign)int result;</div><div class="line"></div><div class="line">- (CaculateMaker *(^)(int))add;</div><div class="line">- (CaculateMaker *(^)(int))substrct;</div><div class="line">- (CaculateMaker *(^)(int))muilt;</div><div class="line">- (CaculateMaker *(^)(int))divide;</div><div class="line">- (void(^)(void))showResult;</div></pre></td></tr></table></figure></p>
+<p>属性<code>result</code>用来记录每一次计算后的结果，声明的五个方法分别是加减乘除四种运算和打印结果。可以看到前四种方法都是返回一个带参数<code>int</code>返回<code>CaculateMaker</code>对象的<code>block</code>，这个参数就是用来在链式结构中传入的参数，最后一个方法不需要参数，我只是需要打印最后的结果，因此也不需要再进行链式调用，链式至此结束，之后也不能再调用<code>CaculateMaker</code>的其他方法，因为这个block没有返回值。</p>
+<p>方法的实践：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">- (CaculateMaker *(^)(int))add &#123;</div><div class="line">    return ^(int num)&#123;</div><div class="line">        _result = _result + num;</div><div class="line">        return self;</div><div class="line">    &#125;;</div><div class="line">&#125;</div><div class="line">- (CaculateMaker *(^)(int))substrct &#123;</div><div class="line">    return ^(int num)&#123;</div><div class="line">        _result = _result - num;</div><div class="line">        return self;</div><div class="line">    &#125;;</div><div class="line">&#125;</div><div class="line">- (CaculateMaker *(^)(int))muilt &#123;</div><div class="line">    return ^(int num)&#123;</div><div class="line">        _result = _result * num;</div><div class="line">        return self;</div><div class="line">    &#125;;</div><div class="line">&#125;</div><div class="line">- (CaculateMaker *(^)(int))divide &#123;</div><div class="line">    return ^(int num)&#123;</div><div class="line">        _result = _result / num;</div><div class="line">        return self;</div><div class="line">    &#125;;</div><div class="line">&#125;</div><div class="line">- (void (^)(void))showResult &#123;</div><div class="line">    return ^()&#123;        </div><div class="line">        NSLog(@&quot;result is %d&quot;,_result);</div><div class="line">    &#125;;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>可以看到这些方法的实现都是大同小异，即返回一个<code>block</code>，计算的方法的<code>block</code>中都返回<code>CaculateMaker</code>自身，并在这个<code>blog</code>中将这个计算器保存的结果<code>result</code>进行相应的运算。<br>调用这个计算器是这样的<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">CaculateMaker *maker = [[CaculateMaker alloc]init];</div><div class="line">maker.result = 1;</div><div class="line">maker.add(1).add(3).substrct(1).muilt(3).divide(3).showResult();</div></pre></td></tr></table></figure></p>
+<p>在每一次.语法调用之后都会返回<code>maker</code>自身，这就是链式编程的主要思想，当然如果不想传参的话直接用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">- (CaculateMaker*)method &#123;</div><div class="line">    //do something//</div><div class="line">    return self;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>即可，只要方法最后返回是对象自身就好。</p>
+<h2 id="三-更符合逻辑的设计"><a href="#三-更符合逻辑的设计" class="headerlink" title="三.更符合逻辑的设计"></a>三.更符合逻辑的设计</h2><p>如果将这个计算器像上述方法调用，看上去逻辑还是不那么舒服。可以将这个计算器放到一个方法中对其进行调度，就像<code>Masonry</code>这么做的，我们想得到的只是最后的结果，把这条链式代码放到一个代码块中处理，返回结果，这样代码的意思就更明确了。</p>
+<p>创建一个<code>NSObject</code>的类目，创建一个方法将这个计算器以<code>block</code>方式传入并返回最终结果。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">+ (int)makeCaculate:(void (^)(CaculateMaker *))caculateMaker &#123;</div><div class="line">    CaculateMaker *maker = [[CaculateMaker alloc]init];</div><div class="line">    caculateMaker(maker);</div><div class="line">    return maker.result;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>然后对一个数字进行处理<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">int result = [NSObject makeCaculate:^(CaculateMaker *make) &#123;</div><div class="line">    make.result = 1;</div><div class="line">    make.add(1).add(3).substrct(1).muilt(3).divide(3);</div><div class="line">&#125;];</div><div class="line">NSLog(@&quot;result is %d&quot;,result);</div></pre></td></tr></table></figure></p>
+<p>这样的逻辑看上去就更清晰了。</p>
+<h2 id="四-为什么能用点语法"><a href="#四-为什么能用点语法" class="headerlink" title="四.为什么能用点语法"></a>四.为什么能用点语法</h2><p>在实践工程中，突然想到为什么这些方法能用.语法调用呢，我并没有声明属性或者变量，点语法一般用来代替存储器方法<code>set</code>和<code>get</code>方法，我这里只是普通的方法，然后调用了一下<code>self.viewDidLoad</code>居然真的能够调用，也就是不管返回值是否为空，调用不带参数的方法均能用点语法，但是如果调用无返回值的方法会报警告<code>&quot;property access result unused - getters should not be used for side effects&quot;</code>。因此思考其实点语法其实只是一个语法糖，用来代替存取<code>get</code>和<code>set</code>方法，其实隐式得调用了oc得方括号方法<code>[something set/get]</code>，而当你声明无参数方法后系统默认将其当作了读取方法<code>get</code>，因此可以使用点语法，这也使oc最终能够成功实现链式结构。</p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2016/07/20/GCD线程锁相关/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">GCD线程锁相关</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share_jia">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">Share to: &nbsp; </span>
+		<a class="jiathis_button_facebook"></a> 
+    <a class="jiathis_button_twitter"></a>
+    <a class="jiathis_button_plus"></a> 
+    <a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+    <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+
+
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2016 GuYi
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+
+<script>
+	var yiliaConfig = {
+		fancybox: true,
+		mathjax: true,
+		animate: true,
+		isHome: false,
+		isPost: true,
+		isArchive: false,
+		isTag: false,
+		isCategory: false,
+		open_in_new: false
+	}
+</script>
+<script src="http://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  </div>
+</body>
+</html>
