@@ -1,18 +1,14 @@
 ---
-title: WKWebview的坑
-date: 2016-05-13 14:56:05
+title: 使用WKWebview的相关事项
+date: 2016-03-13 14:56:05
 tags:
-toc: true
 ---
 
-本文纯属个人学习资料
-
-<!--more-->
-
-# WKWebView 特性
 * ``WKWebView``是现代``WebKit API``在``iOS8``和``OS X Yosemite``应用中的核心部分。它代替了``UIKit``中的``UIWebView``和``AppKit``中的``WebView``，提供了统一的跨双平台API。
 * 自诩拥有60fps滚动刷新率、内置手势、高效的app和web信息交换通道、和Safari相同的JavaScript引擎
 * 将``UIWebViewDelegate``与``UIWebView``重构成了14类与3个协议
+
+本文记录了一些相关的注意事项
 
 # WKWebKit Framework
 ## Classes
@@ -42,7 +38,7 @@ toc: true
 * 不能在``Storyboard``或者``Interface Builder``中创建。
 * ``HTML <a> tag``带着``target="_blank"``不会响应。
 * ``URL Scheme``和 ``AppStore links``无法使用
-```
+```objc
 // Using [bendytree/Objective-C-RegEx-Categories](https://github.com/bendytree/Objective-C-RegEx-Categories) to check URL String
 #import "RegExCategories.h"
 - (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
@@ -68,7 +64,7 @@ toc: true
 * JS的``alert``, ``confirm``, ``prompt``需要调用``WKUIDelegate``方法
 如果你想要展示对话框，你需要执行以下方法
 
-```
+```objc
 webView:runJavaScriptAlertPanelWithMessage:initiatedByFrame:completionHandler:
 webView:runJavaScriptConfirmPanelWithMessage:initiatedByFrame:completionHandler:
 webView:runJavaScriptTextInputPanelWithPrompt:defaultText:initiatedByFrame:completionHandler:
@@ -79,7 +75,7 @@ webView:runJavaScriptTextInputPanelWithPrompt:defaultText:initiatedByFrame:compl
 
 例子：
 
-```
+```objc
 - (void)webView:(WKWebView *)webView didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential *))completionHandler {
     NSString *hostName = webView.URL.host;
     NSString *authenticationMethod = [[challenge protectionSpace] authenticationMethod];
@@ -125,7 +121,7 @@ webView:runJavaScriptTextInputPanelWithPrompt:defaultText:initiatedByFrame:compl
 * 多个``WKWebView``之间的``cookie``传递
 使用``WKProcessPool``在``webviews``之间进行``cookie``传递
 
-```
+```objc
 self.processPool = [[WKProcessPool alloc] init];
 WKWebViewConfiguration *configuration1 = [[WKWebViewConfiguration alloc] init];
 configuration1.processPool = self.processPool;
@@ -146,7 +142,7 @@ iOS8
 3.在``Library``目录中删除``Cookies``, ``Caches``及``WebKit``的子目录。
 4.删除所有``WKWebViews``。
 iOS9
-```
+```objc
 // Optional data
 NSSet *websiteDataTypes = [NSSet setWithArray:@[
     WKWebsiteDataTypeDiskCache,
@@ -170,17 +166,17 @@ NSDate *dateFrom = [NSDate dateWithTimeIntervalSince1970:0];
 
 * iOS9上滚动速度bug
 在iOS 8以下代码没问题,它可以用更多的惯性滚动。
-```
+```objc
 webView.scrollView.decelerationRate = UIScrollViewDecelerationRateNormal;
 ```
 
-至于iOS 9，没有在``UIScrollView``代理中设置滚动速度，这段代码是没有意义的。``scrollViewWillBeginDragging``
+  至于iOS 9，没有在``UIScrollView``代理中设置滚动速度，这段代码是没有意义的。
 
-```
-- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+  ```objc
+  - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
     scrollView.decelerationRate = UIScrollViewDecelerationRateNormal;
-}
-```
+  }
+  ```
 
 * 不能禁用长按链接菜单
 CSS: ``-webkit-touch-callout: none; ``和JavaScript: ``document.documentElement.style.webkitTouchCallout='none'``;无法使用。
