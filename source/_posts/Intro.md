@@ -6,7 +6,7 @@ tags:
 
 ## 前言
 
-在硬盘进水丢了所有博客的文章之后我又回来了！想想似乎从``Jkyll``到``Octopress``再到``Hexo``已经搭了四次环境了，每次忘记还得再去网上查，这次干脆就把流程也记一下，反正其他人第一篇文章也好像都是写这个😀
+在硬盘进水丢了所有博客的文章之后我又回来了！想想似乎从Jkyll到Octopress再到Hexo已经搭了四次环境了，每次忘记还得再去网上查，这次干脆就把流程也记一下😀
 
 ## 介绍
 GitHub pages是github上用于对开源项目进行说明的网页。我们也可以根据GitHub Pages来生成个人的GitHub个人博客网站。通过GitHub Pages创建的博客属于静态博客网站，其中的内容都是HTML静态页面。(这是我从坐我隔壁的人的博客上复制粘贴的)
@@ -43,12 +43,12 @@ hexo init
 cd ~/.ssh
 ls
 ```
-如果没有这个文件夹或文件夹中没有``id_rsa``和``id_rsa.pub``这两个密钥和公钥，就执行
+如果没有这个文件夹或文件夹中没有id_rsa和id_rsa.pub这两个密钥和公钥，就执行
 ```shell
 ssh -keygen
 ```
 生成这对密钥，生成过程会提示你设置路径和密码，直接回车就是默认的``/.ssh``的路径以及没有密码
-接着取出``rsa``
+接着取出rsa
 ```shell
 cat ~/.ssh/id_rsa.pub
 ```
@@ -64,7 +64,7 @@ ssh -T git@github.com
 
 {% asset_img ssh_sucess.png %}
 
-接着打开hexo的``_config.yml``的配置文件，设置
+接着打开hexo的_config.yml的配置文件，设置
 ```shell
 deploy:
 type: git
@@ -80,13 +80,13 @@ hexo deploy
 ```
 这两个也是平时发布必用的两个命令，接着你就会发现你的那个git库多了一些东西，至此搭建完成！
 ## 第四步 相关配置
-很多人写了``hexo``的主题，你可以去网上搜一下，我之前用了``next``主题，现在改成了``yilia``，使用方法：
+很多人写了hexo的主题，你可以去网上搜一下，我之前用了next主题，现在改成了yilia，使用方法：
 到你博客的目录下
 ```
 git clone https://github.com/litten/hexo-theme-yilia.git themes/yilia
 ```
-然后在``_config.yml``配置文件中设置``theme: yilia``发布一下就ok了。
-但是其实因为作者的个人习惯，主题总是有一些不尽人意的地方，比如``yilia``中代码滑块问题，目录问题，可以另外修改配置。
+然后在_config.yml配置文件中设置``theme: yilia``发布一下就ok了。
+但是其实因为作者的个人习惯，主题总是有一些不尽人意的地方，比如yilia中代码滑块问题，目录问题，可以另外修改配置。
 
 1.去除代码滑块
 到``/themes/yilia/source/css/_partial/highlight.styl``，增加一行``overflow: hidden``在如下位置
@@ -99,7 +99,7 @@ overflow: hidden//添加
 并在68行代码处将``height: 15px``注释掉，即可去除滑块
 
 2.增加目录结构
-因为``hexo``本身不支持目录结构，因此需要做些修改。到``/themes/yilia/layout/_partial/article.ejs``文件下在``<%- post.content %>``上面添加如下代码
+因为hexo本身不支持目录结构，因此需要做些修改。到``/themes/yilia/layout/_partial/article.ejs``文件下在``<%- post.content %>``上面添加如下代码
 ```shell
 <% if(post.toc == true){ %>
 <div id="toc" class="toc-article">
@@ -120,14 +120,14 @@ toc: true
 即可，无需像正常md格式添加``[TOC]``
 
 3.设置上传本地图片
-对于那些想要更有规律地提供图片和其他资源以及想要将他们的资源分布在各个文章上的人来说，``hexo``提供了更组织化的方式来管理资源。这个稍微有些复杂但是管理资源非常方便的功能可以通过将``config.yml``文件中的``post_asset_folder``选项设为``true``，当资源文件管理功能打开后，``hexo``将会在你每一次通过``hexo new [layout] <title>``命令创建新文章时自动创建一个文件夹。这个资源文件夹将会有与这个``markdown``文件一样的名字。
+对于那些想要更有规律地提供图片和其他资源以及想要将他们的资源分布在各个文章上的人来说，hexo提供了更组织化的方式来管理资源。这个稍微有些复杂但是管理资源非常方便的功能可以通过将config.yml文件中的``post_asset_folder``选项设为true，当资源文件管理功能打开后，hexo将会在你每一次通过``hexo new [layout] <title>``命令创建新文章时自动创建一个文件夹。这个资源文件夹将会有与这个markdown文件一样的名字。
 
 使用图片标签
 ```
 {% asset_img example.png %}
 ```
 4.将文章存放在github上
-因为``hexo``只是将你文章的html推送到你相应的github库上，所以如果你想要换一台电脑编写你的博客或者像我这样电脑突然坏了的话，你是无法获取到你那些文章的``markdown``的，而如果每次写完你都将文章放到其他地方存取也是不太方便的，而正好``hexo``可以选择你那个库的分支来进行推送操作，所以我采用的方式就是在那个库上新建一个分支，写完文章将``source``文件夹推送更新到那个分支上，这样你的``source``文件和相应那些博客文件都放在同一个git库上管理，更加的方便，也不会出现像我之前那样因为电脑坏了所有的文章的``source``都没有的情况了😑
+因为hexo只是将你文章的html推送到你相应的github库上，所以如果你想要换一台电脑编写你的博客或者像我这样电脑突然坏了的话，你是无法获取到你那些文章的markdown的，而如果每次写完你都将文章放到其他地方存取也是不太方便的，而正好hexo可以选择你那个库的分支来进行推送操作，所以我采用的方式就是在那个库上新建一个分支，写完文章将``source``文件夹推送更新到那个分支上，这样你的``source``文件和相应那些博客文件都放在同一个git库上管理，更加的方便，也不会出现像我之前那样因为电脑坏了所有的文章的``source``都没有的情况了😑
 
 ## 第五步 常用操作
 新建文章
@@ -151,6 +151,6 @@ hexo clean
 <!--more-->
 ```
 
-最后贴出``hexo``及``yilia``网址
+最后贴出hexo及yilia网址
 [https://hexo.io/](https://hexo.io/)
 [https://github.com/litten/hexo-theme-yilia](https://github.com/litten/hexo-theme-yilia)
