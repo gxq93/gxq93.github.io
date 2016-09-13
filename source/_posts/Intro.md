@@ -53,7 +53,8 @@ ssh -keygen
 cat ~/.ssh/id_rsa.pub
 ```
 输出大概是这样
-{% asset_img ssh_rsa.png %}
+
+![](https://github.com/gxq93/gxq93.github.io/blob/source/source/_posts/Intro/ssh_rsa.png)
 
 
 然后把这坨东西复制到你github SSHkey设置上选择new SSHkey的key上，选择add，接着去验证一下
@@ -62,7 +63,7 @@ ssh -T git@github.com
 ```
 如果显示的如Hi gxq93! You've successfully authenticated, but GitHub does not provide shell access.就表示绑定成功了，去github SSHkey设置上你也可以看到你的钥匙变成绿色的了。
 
-{% asset_img ssh_sucess.png %}
+![](https://github.com/gxq93/gxq93.github.io/blob/source/source/_posts/Intro/ssh_sucess.png)
 
 接着打开hexo的_config.yml的配置文件，设置
 ```shell

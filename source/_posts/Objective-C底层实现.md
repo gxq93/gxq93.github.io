@@ -53,7 +53,7 @@ typedef struct objc_object *id;
 这是实例对象的结构，当创建实例对象时，分配的内存包含一个``objc_object``数据结构，然后是类到父类直到根类NSObject的实例变量的数据。NSObject类的``alloc``和``allocWithZone:``方法使用函数``class_createInstance``来创建objc_object数据结构。
 向一个Objective-C对象发送消息时，运行时库会根据实例对象的isa指针找到这个实例对象所属的类。Runtime库会在类的方法列表由super_class指针找到父类的方法列表直至根类NSObject中去寻找与消息对应的``selector``指向的方法。找到后即运行这个方法。(如下图)
 
-{% asset_img runtime1.png %}
+![](https://github.com/gxq93/gxq93.github.io/blob/source/source/_posts/Objective-C底层实现/runtime1.png)
 
 * 1、isa：实例对象->类->元类->（不经过父元类）直接到根元类（NSObject的元类），根元类的isa指向自己；
 * 2、 superclass：类->父类->...->根类NSObject，元类->父元类->...->根元类->根类,NSObject的superclass指向nil。
@@ -284,10 +284,10 @@ void printWorld(){
 void doSomething(){
     void (*func)()
     if(type == 0){
-    func = printHello();
+        func = printHello();
     }
     else {
-    func = printWorld();
+        func = printWorld();
     }
     func();
 }
@@ -373,7 +373,7 @@ struct objc_cache {
 如果某函数的最后一项操作是调用另外一个函数，那么就可以运用“尾调用优化”技术。编译器会生成调转至另一函数所需的指令码，而且不会向调用堆栈中推入新的“栈帧”（frame stack）。只有当某函数的最后一个操作仅仅是调用其他函数而不会将其返回值另作他用时，才能执行“尾调用优化”。这项优化对objc_msgSend非常关键，如果不这么做的话，那么每次调用Objective-C方法之前，都需要为调用objc_msgSend函数准备“栈帧”，大家在“栈踪迹”（stack trace）中可以看到这种“栈帧”。此外，若是不优化，还会过早地发生“栈溢出”（stack overflow）现象。
 ## 操作函数
 ### **method_**：
-**invoke**: 方法实现的返回值；
+**invoke**: 方法实现的返回值
 ```objc
 // 调用指定方法的实现
 id method_invoke ( id receiver, Method m, ... );
@@ -474,6 +474,7 @@ clang -rewrite-objc block.m
 ``` objc
 struct __main_block_impl_0 {
   struct __block_impl impl;
+
   struct __main_block_desc_0* Desc;
   __main_block_impl_0(void *fp, struct __main_block_desc_0 *desc, int flags=0) {
     impl.isa = &_NSConcreteStackBlock;
@@ -482,17 +483,22 @@ struct __main_block_impl_0 {
     Desc = desc;
   }
 };
+
 static void __main_block_func_0(struct __main_block_impl_0 *__cself) {
   printf("Block\n");
 }
+
 static struct __main_block_desc_0 {
   size_t reserved;
   size_t Block_size;
 } __main_block_desc_0_DATA = { 0, sizeof(struct __main_block_impl_0)};
+
 int main()
 {
   void (*block)(void) = ((void (*)())&__main_block_impl_0((void *)__main_block_func_0, &__main_block_desc_0_DATA));
+
   ((void (*)(__block_impl *))((__block_impl *)block)->FuncPtr)((__block_impl *)block);
+
   return 0;
 }
 ```
@@ -606,7 +612,9 @@ static void __main_block_func_0(struct __main_block_impl_0 *__cself)
 ```
 首先全局变量和静态全局变量因为是全局的，作用域很广，所以block捕获了它们进去之后，在block里面进行操作，block结束之后，它们的值依旧可以得以保存下来。
 如果block外面还有很多自动变量，静态变量，等等，这些变量在block里面并不会被使用到。那么这些变量并不会被block捕获进来，也就是说并不会在构造函数里面传入它们的值，block捕获外部变量仅仅只捕获block闭包里面会用到的值，其他用不到的值，它并不会去捕获。
+
 静态变量传递给block是内存地址值，所以能在block里面直接改变值。静态变量的这种做法似乎也适用于自动变量的访问，但是为什么没有这么做呢？
+
 实际上，在由于blcok语法生成的值block上，可以存有超过其变量作用域的被截获对象的自动变量，变量作用域结束的同时，原来的自动变量被废弃，因此block中超过变量作用域而存在的变量同静态变量一样，将不能通过指针访问原来的自动变量。而静态局部变量具有局部作用域，它只被初始化一次，自从第一次被初始化直到程序运行结束都一直存在，它和全局变量的区别在于全局变量对所有的函数都是可见的，而静态局部变量只对定义自己的函数体始终可见，所以简单来说就是**静态局部变量不会被销毁，所以可以通过指针来访问，自动变量会被销毁，所以不能通过指针访问**
 ### 捕获**__block**变量
 **__block**的使用就不多介绍了，他实际就是修饰用于指定将变量值设置到哪个存储域中。
@@ -615,7 +623,8 @@ static void __main_block_func_0(struct __main_block_impl_0 *__cself)
 static void __main_block_func_0(struct __main_block_impl_0 *__cself) {
     __Block_byref_i_0 *i = __cself->i; // bound by ref
     (i->__forwarding->i)++;
-    printf("%d",(i->__forwarding->i));}
+    printf("%d",(i->__forwarding->i));
+}
 
 static void __main_block_copy_0(struct __main_block_impl_0*dst, struct __main_block_impl_0*src) {_Block_object_assign((void*)&dst->i, (void*)src->i, 8/*BLOCK_FIELD_IS_BYREF*/);}
 
@@ -631,11 +640,14 @@ static struct __main_block_desc_0 {
 int main()
 {
     __attribute__((__blocks__(byref))) __Block_byref_i_0 i = {(void*)0,(__Block_byref_i_0 *)&i, 0, sizeof(__Block_byref_i_0), 1};
-    void (*block)(void) = ((void (*)())&__main_block_impl_0((void *)__main_block_func_0, &__main_block_desc_0_DATA, (__Block_byref_i_0 *)&i, 570425344));
-    ((void (*)(__block_impl *))((__block_impl *)block)->FuncPtr)((__block_impl *)block);
-    printf("%d",(i.__forwarding->i));
-    return 0;
 
+    void (*block)(void) = ((void (*)())&__main_block_impl_0((void *)__main_block_func_0, &__main_block_desc_0_DATA, (__Block_byref_i_0 *)&i, 570425344));
+
+    ((void (*)(__block_impl *))((__block_impl *)block)->FuncPtr)((__block_impl *)block);
+
+    printf("%d",(i.__forwarding->i));
+
+    return 0;
 }
 ```
 从源码我们能发现，带有**__block**的变量也被转化成了一个结构体**__Block_byref_i_0**,这个结构体有5个成员变量。第一个是isa指针，第二个是指向自身类型的**__forwarding**指针，通过**__forwarding**指针访问成员变量i，第三个是一个标记flag，第四个是它的大小，第五个是变量值，名字和变量名同名。
@@ -650,7 +662,7 @@ struct __Block_byref_i_0 {
 ```
 **__forwarding**指针的作用就是针对堆的Block，把原来**__forwarding**指针指向自己，换成指向_NSConcreteMallocBlock上复制之后的**__block**自己。然后堆上的变量的**__forwarding**再指向自己。这样不管**__block**怎么复制到堆上，还是在栈上，都可以通过``(i->__forwarding->i)``来访问到变量值。以下是访问**__block**的图解：
 
-{% asset_img forward.png %}
+![](![](https://github.com/gxq93/gxq93.github.io/blob/source/source/_posts/Objective-C底层实现/forward.png))
 
 而在block外访问**__block**修饰的变量也变成了``printf("%d",(i.__forwarding->i));``这样的形式。
 ### 捕获对象
@@ -658,14 +670,18 @@ struct __Block_byref_i_0 {
 ``` objc
 int main()
 {
-  id array = [[NSMutableArray alloc]init];    
-  void (^block)(void) = ^{        
-    [array addObject:@1];        
-    NSLog(@"array count = %ld",[array count]);       
-  };   
-  block();    
-  NSLog(@"array count = %ld",[array count]);   
-  return 0;
+    id array = [[NSMutableArray alloc]init];    
+
+    void (^block)(void) = ^{        
+        [array addObject:@1];        
+        NSLog(@"array count = %ld",[array count]);       
+    };   
+
+    block();    
+
+    NSLog(@"array count = %ld",[array count]);   
+
+    return 0;
 }
 ```
 
@@ -726,8 +742,11 @@ int main()
 而对对象的访问即通过``id array = __cself->array``获取。
 ## 循环引用
 在block中引用了持有block的对象的时候就会引起循环引用，由上一节block捕获对象可知，block捕获对象实质是在block结构体中拥有一个与捕获对象相同的实例变量，它会在结构体初始化时被赋值，而这个对象默认是用**__strong**修饰的，这就导致了循环应用。如果使用了**__weak**之后，表示 Block 对象的结构体中相对应的成员变量也将附有**__weak**修饰符，**__weak**修饰的变量不会持有对象，它用一张 weak 表（类似于引用计数表的散列表）来管理对象和变量。赋值的时候它会以赋值对象的地址作为 key，变量的地址为 value，注册到 weak 表中。一旦该对象被废弃，就通过对象地址在 weak 表中找到变量的地址，赋值为 nil，然后将该条记录从 weak 表中删除。
+
 在多线程情况下，可能weakSelf指向的对象会在block执行前被废弃，这在大部分情况下都是可以的，只会输出Self is nil，但在有些情况下(譬如weakSelf作为 KVO 的观察者被移除，或者block还没执行完self已经销毁)就会导致 crash。这时可以在 Block 内部再持有一次weakSelf指向的对象``typeof(weakSelf) strongSelf = weakSelf``，延长该对象的生命周期，这就是所谓的 weak-strong dance。
+
 每次使用**__weak**变量的时候，都会取出该变量指向的对象并retain，然后将该对象注册到autoreleasepool中，这是延长对象生命周期的关键，但这不会造成循环引用，当函数执行结束，变量超出作用域，过一会儿(一般一次RunLoop之后)，对象就被释放了。所以weak-strong dance的行为非常符合预期：延长捕获对象的生命周期，一旦block执行完，这个局部对象就被释放，而block也会被释放(如果被GCD之类的API copy过一次增加了引用计数，那最终也会被GCD释放)。
+
 每使用一次**_weak**变量就会把对象注册到autoreleasepool中，所以如果短时间内大量使用**_weak**变量的话，会导致注册到autoreleasepool中的对象大量增加，占用一定内存。而weak-strong dance恰好无意中解决了这个隐患，在执行block时，把**__weak**变量(weakSelf)赋值给一个临时变量(strongSelf)，之后一直都使用这个临时变量，所以**__weak**变量只使用了一次，也就只有一个对象注册到autoreleasepool中。
 # 协议
 ## 数据结构

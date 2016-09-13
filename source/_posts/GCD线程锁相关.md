@@ -23,11 +23,12 @@ static const NSInteger limitCount = 7;
             UIImageView *image = [[UIImageView alloc]initWithFrame:CGRectMake(x*width, y*height, width, height)];
             [self.view addSubview:image];
             [imageView addObject:image];
-    }
-}
+         }
+     }
     imageName = [NSMutableArray arrayWithCapacity:imageCount];
     for (int i=0; i<imageCount; i++) {
         [imageName addObject:urlStr];
+    }
 }
 ```
 
@@ -41,7 +42,7 @@ static const NSInteger limitCount = 7;
     dispatch_async(dispatch_get_main_queue(), ^{
         [self updateWithData:data atIndex:index];
     });
-    }
+}
 
 - (NSData*)requestDataAtIndex:(NSInteger)index {
     NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:imageName[index]]];
@@ -68,6 +69,7 @@ static const NSInteger limitCount = 7;
 ```
 
 运行结果如图，因为是串行队列图片按顺序一张一张加载。
+
 ￼![](http://www.z4a.net/images/2016/05/09/1ed39ccc88b0d963.gif)
 
 然后是并行队列:
@@ -82,6 +84,7 @@ static const NSInteger limitCount = 7;
 }
 ```
 运行结果可以看出图片是并发加载的
+
 ![](http://www.z4a.net/images/2016/05/09/fa59e219154607ea.gif)
 ￼
 然后把加载图片的async异步任务改成sync同步任务
@@ -97,6 +100,7 @@ static const NSInteger limitCount = 7;
 
 ```
 运行结果如图，图片同时加载出来
+
 ￼![](http://www.z4a.net/images/2016/05/09/sync.gif)
 
 # 线程锁
@@ -124,6 +128,7 @@ static const NSInteger limitCount = 7;
 }
 ```
 以上代码原因就是没有进行线程保护，从而导致如下结果没有达到预期需求。
+
 ￼![](http://www.z4a.net/images/2016/05/09/22cf0414115ce3b8.gif)
 ￼
 ## NSLock
@@ -156,6 +161,7 @@ NSLock *lock = [[NSLock alloc]init];
 ```
 
 运行结果如下图，很好的完成了需求，因为线程加了锁，所以图片是按顺序加载的。
+
 ￼![](http://www.z4a.net/images/2016/05/09/74853d81c8d3f6e0.gif)
 ￼
 但是不可忽视的是多线程中很容易发生死锁，如递归。可以使用NSRecursiveLock替换NSLock，它实际上定义的是一个递归锁，这个锁可以被同一线程多次请求，而不会引起死锁。这主要是用在循环或递归操作中。
