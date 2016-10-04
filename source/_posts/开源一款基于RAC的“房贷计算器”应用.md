@@ -1,17 +1,16 @@
 ---
-title: 开发一款基于ReactiveCocoa2.5框架的“房贷计算器”应用
-date: 2016-09-08 17:59:03
+title: 开源一款基于RAC的“房贷计算器”应用
+date: 2016-09-08 13:46:24
 tags:
+cover: http://img.pconline.com.cn/images/upload/upc/tx/wallpaper/1401/24/c1/30838200_1390545370683.jpg
 ---
-开发一款基于ReactiveCocoa2.5框架的“房贷计算器”应用
 # Intro
 最近公司要求开发一个小应用“房贷计算器”来引流，由于要求需要一礼拜内完成开发上线，因此时间有点仓促所以没有仔细构思就开始开发了，所以其实很多地方设计的极其不合理，后期也懒得再修改维护了，就开源一下，有问题的地方看客看了笑笑就好。附上[github地址](https://github.com/gxq93/HouseloanCalculator)
 响应式编程似乎很符合计算器的特点，因此项目导入了ReactiveCocoa2.5框架，接下来纪录一些自己对RAC的使用心得。
 # Tip1 RACCommand传达信号
 当要做如下图的小组件时，我个人的做法是放三个button上去，最后暴露出一个`signal`，每当点击到其中一个button时，把index发送出来。其实如果不用RAC的套路做，只要写个代理方法或者block就能很好的完成需求，但是既然要用RAC，就要按照响应式的思路来。
-![](https://github.com/gxq93/gxq93.github.io/blob/source/source/_posts/房贷计算器/pickView.png)
-但是如果普通的使用``[button rac_signalForControlEvents:UIControlEventTouchUpInside]
-``的方法，不好把index传出来，rac_signalForControlEvents的实现如下：
+{% asset_img segment.png %}
+但是如果普通的使用``[button rac_signalForControlEvents:]``的方法，不好把index传出来，rac_signalForControlEvents的实现如下：
 ``` objc
 return [[RACSignal createSignal:^(id<RACSubscriber> subscriber) {
     @strongify(self);
@@ -71,12 +70,12 @@ self.selectSignal = [self.selectSignal merge:button.rac_command.executionSignals
 因此指定信号的线程``RACSignal *signal = [self.buttonArray.rac_sequence signalWithScheduler:[RACScheduler immediateScheduler]];``在当前线程，才能达到你想要的效果。当然``[RACScheduler mainThreadScheduler]``是指定在主线程中执行，对于我的需求也是不满足的因为我是要让三个button先变成一个颜色再其中一个变特别的颜色，顺序执行。
 # Tip3 RACCommand代替acticon
 RACCommand在mvvm中是非常有用的，而在我这种小项目中，有时候也能起到小小的封装的效果，比如在下图中两个按钮和上面的蒙层点击都是触发remove方法。
-![](https://github.com/gxq93/gxq93.github.io/blob/source/source/_posts/房贷计算器/segment.png)
+{% asset_img pickView.png %}
 其实直接用同一个``acticon``就可以解决，而在RAC中可以这样
-``` objc
+``` objc 
 - (RACCommand *)removeCommand {
     if (!_removeCommand) {
-        _removeCommand = [[RACCommand alloc]initWithSignalBlock:^RACSignal *(id input) {
+    _removeCommand = [[RACCommand alloc]initWithSignalBlock:^RACSignal *(id input) {
         @weakify(self)
         return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
             @strongify(self);
@@ -111,7 +110,7 @@ static RACSignal *NSObjectRACSignalForSelector(NSObject *self, SEL selector, Pro
 其实整个项目最失败最蠢的设计就是我把每个cell上的信号combine在了一起从而进行计算。。。其实这是非常不合理的，因为不显示在屏幕上的cell都是懒加载的所以我就必须很蠢的把所有cell都加载到才能进行计算，这种设计是极不规范的，但是因为刚开始已经开始做了，并且没有时间修改了，所以只能将错就错。**其实应该让计算从一个数据源去取，而让cell和数据源绑定在一起**。
 而因为我这不合理的设计，导致了我的信号订阅得在tableView创建的方法中执行，而这个方法众所周知是不停调用的，这就导致了重复订阅的问题，而我想出来的方法是定义一个全局的disposable对象``@property(nonatomic,strong)RACDisposable *caculateDisposable;
 ``，在每次调用方法开始时先取消之前的订阅再次进行订阅。
-``` objc
+``` objc 
 if (self.caculateDisposable) {
     [self.caculateDisposable dispose];
 }

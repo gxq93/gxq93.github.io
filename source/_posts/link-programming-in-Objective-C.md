@@ -1,7 +1,8 @@
 ---
-title: 链式编程思想在OC中的实现
-date: 2016-07-22 15:30:06
+title: link programming in Objective-C
+date: 2016-4-13 13:34:02
 tags:
+cover: http://img.tuku.cn/file_big/201501/b54c1abfa8174e138eead1252b98db24.jpg
 ---
 在oc中方法的调用大部分都是通过``[ ]``，这与其他很多语言有很大的差异，而有些开发框架如``Masonry``则采用了链式编程的思想，这大大增加了代码的可读性和简洁性。今天有空就对这种思想简单的实践一下。
 

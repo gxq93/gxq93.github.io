@@ -1,9 +1,9 @@
 ---
-title: 使用WKWebview的相关事项
-date: 2016-03-13 14:56:05
+title: WKWebView使用Tips
+date: 2016-02-04 13:00:14
 tags:
+cover: http://desk.fd.zol-img.com.cn/t_s960x600c5/g5/M00/03/03/ChMkJ1bVPASIRLpXABShkzlZnEgAAMLkAKgToEAFKGr133.jpg
 ---
-
 * WKWebView是现代WebKit API在iOS8和OS X Yosemite应用中的核心部分。它代替了UIKit中的UIWebView和AppKit中的WebView，提供了统一的跨双平台API。
 * 自诩拥有60fps滚动刷新率、内置手势、高效的app和web信息交换通道、和Safari相同的JavaScript引擎
 * 将UIWebViewDelegate与UIWebView重构成了14类与3个协议
@@ -25,6 +25,7 @@ tags:
 * WKUserScript: 表示可以被网页接受的用户脚本。
 * WKWebViewConfiguration: 初始化webview的设置。
 * WKWindowFeatures: 指定加载新网页时的窗口属性。
+
 ## Protocols
 * WKNavigationDelegate: 提供了追踪主窗口网页加载过程和判断主窗口和子窗口是否进行页面加载新页面的相关方法。
 * WKScriptMessageHandler: 提供从网页中收消息的回调方法。
@@ -162,7 +163,7 @@ NSSet *websiteDataTypes = [WKWebsiteDataStore allWebsiteDataTypes];
 NSDate *dateFrom = [NSDate dateWithTimeIntervalSince1970:0];
 // Execute
 [[WKWebsiteDataStore defaultDataStore] removeDataOfTypes:websiteDataTypes modifiedSince:dateFrom completionHandler:^{
-// Done
+    // Done
 }];
 ```
 
@@ -171,15 +172,12 @@ NSDate *dateFrom = [NSDate dateWithTimeIntervalSince1970:0];
 ```objc
 webView.scrollView.decelerationRate = UIScrollViewDecelerationRateNormal;
 ```
-
-  至于iOS 9，没有在UIScrollView代理中设置滚动速度，这段代码是没有意义的。
-
-  ```objc
-  - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+至于iOS 9，没有在UIScrollView代理中设置滚动速度，这段代码是没有意义的。
+```objc
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
     scrollView.decelerationRate = UIScrollViewDecelerationRateNormal;
-  }
-  ```
-
+}
+```
 * 不能禁用长按链接菜单
 CSS: ``-webkit-touch-callout: none; ``和JavaScript: ``document.documentElement.style.webkitTouchCallout='none';``无法使用。
 iOS8.2之后修复了这个bug。
