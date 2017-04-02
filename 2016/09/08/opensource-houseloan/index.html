@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+    <!-- 
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.3.2 -->
+
+    <!-- Title -->
+    
+    <title>
+        
+            一款基于RAC的“房贷计算器”应用 | 
+        
+        Grommash
+    </title>
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" sizes="192x192" href="/img/favicon.png">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Meta & Info -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0097A7">
+    <meta name="author" content="GuYi">
+    <meta name="description" content="null">
+    <meta name="keywords" content="null,Objective-C,响应式编程">
+
+    <!--iOS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-title" content="Title">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="480">
+
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Grommash">
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://yoursite.com">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="一款基于RAC的“房贷计算器”应用 | Grommash">
+    <meta property="og:description" content="null">
+    <meta property="og:article:tag" content="Objective-C"> <meta property="og:article:tag" content="响应式编程"> 
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import CSS & jQuery -->
+    
+        <link rel="stylesheet" href="/css/material.min.css">
+        <link rel="stylesheet" href="/css/style.min.css">
+        <!-- Config CSS -->
+
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-color: #F5F5F5;
+      }
+
+      /* blog_info bottom background */
+      #scheme-Paradox .material-layout .something-else .mdl-card__supporting-text{
+        background-color: #fff;
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/queue.js"></script>
+    
+
+    <!-- UC Browser Compatible -->
+    <script>
+        var agent = navigator.userAgent.toLowerCase();
+        if(agent.indexOf('ucbrowser')>0) {
+            document.write("<link rel=\"stylesheet\" href=\"/css/uc.css\">");
+            alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+        }
+    </script>
+
+    
+
+    
+
+    <!-- Bing Background -->
+    
+
+    <!-- Custom Head -->
+    
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+    <!-- Left aligned menu below button -->
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Intro"><span class="post-toc-number">1.</span> <span class="post-toc-text">Intro</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Tip1-RACCommand传达信号"><span class="post-toc-number">2.</span> <span class="post-toc-text">Tip1 RACCommand传达信号</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Tip2-rac-sequence的线程问题"><span class="post-toc-number">3.</span> <span class="post-toc-text">Tip2 rac_sequence的线程问题</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Tip3-RACCommand代替acticon"><span class="post-toc-number">4.</span> <span class="post-toc-text">Tip3 RACCommand代替acticon</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Tip4-协议信号注意点"><span class="post-toc-number">5.</span> <span class="post-toc-text">Tip4 协议信号注意点</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Tip5-重复订阅问题"><span class="post-toc-number">6.</span> <span class="post-toc-text">Tip5 重复订阅问题</span></a></li></ol>
+
+        <!--
+        <li class="mdl-menu__item">
+            Some Action
+        </li>
+        -->
+    </ul>
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script>
+    var randomNum = Math.floor(Math.random() * 19 + 1);
+
+    $('.post_thumbnail-random').css('background-image', 'url(' + '/img/random/material-' + randomNum + '.png' + ')');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                一款基于RAC的“房贷计算器”应用
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/grommash_avatar.jpeg" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>GuYi</strong>
+        <span>9月 08, 2016</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/Objective-C/">Objective-C</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/响应式编程/">响应式编程</a>
+    </ul>
+    
+
+    <!-- Share -->
+    <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=一款基于RAC的“房贷计算器”应用&url=http://yoursite.com//2016/09/08/opensource-houseloan/index.html&pic=&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=一款基于RAC的“房贷计算器”应用&url=http://yoursite.com//2016/09/08/opensource-houseloan/index.html&via=GuYi" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Twitter
+            </li>
+        </a>
+    
+
+    <!-- Share Facebook -->
+    
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com//2016/09/08/opensource-houseloan/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Facebook
+            </li>
+        </a>
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://yoursite.com//2016/09/08/opensource-houseloan/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <h1 id="Intro"><a href="#Intro" class="headerlink" title="Intro"></a>Intro</h1><p>最近公司要求开发一个小应用“房贷计算器”来引流，由于要求需要一礼拜内完成开发上线，因此时间有点仓促所以没有仔细构思就开始开发了，所以其实很多地方设计的极其不合理，后期也懒得再修改维护了，就开源一下，有问题的地方看客看了笑笑就好。附上<a href="https://github.com/gxq93/HouseloanCalculator" target="_blank" rel="external">github地址</a><br>响应式编程似乎很符合计算器的特点，因此项目导入了ReactiveCocoa2.5框架，接下来纪录一些自己对RAC的使用心得。</p>
+<a id="more"></a>
+<h1 id="Tip1-RACCommand传达信号"><a href="#Tip1-RACCommand传达信号" class="headerlink" title="Tip1 RACCommand传达信号"></a>Tip1 RACCommand传达信号</h1><p>当要做如下图的小组件时，我个人的做法是放三个button上去，最后暴露出一个<code>signal</code>，每当点击到其中一个button时，把index发送出来。其实如果不用RAC的套路做，只要写个代理方法或者block就能很好的完成需求，但是既然要用RAC，就要按照响应式的思路来。</p>
+<img src="/2016/09/08/opensource-houseloan/segment.png" alt="segment.png" title="">
+<p>但是如果普通的使用<code>[button rac_signalForControlEvents:]</code>的方法，不好把index传出来，rac_signalForControlEvents的实现如下：<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="keyword">return</span> [[RACSignal createSignal:^(<span class="keyword">id</span>&lt;RACSubscriber&gt; subscriber) &#123;</div><div class="line">    @strongify(<span class="keyword">self</span>);</div><div class="line">    [<span class="keyword">self</span> addTarget:subscriber action:<span class="keyword">@selector</span>(sendNext:) forControlEvents:controlEvents];</div><div class="line">    [<span class="keyword">self</span>.rac_deallocDisposable addDisposable:[RACDisposable disposableWithBlock:^&#123;</div><div class="line">        [subscriber sendCompleted];</div><div class="line">    &#125;]];</div><div class="line">    <span class="keyword">return</span> [RACDisposable disposableWithBlock:^&#123;</div><div class="line">        @strongify(<span class="keyword">self</span>);</div><div class="line">        [<span class="keyword">self</span> removeTarget:subscriber action:<span class="keyword">@selector</span>(sendNext:) forControlEvents:controlEvents];</div><div class="line">    &#125;];</div><div class="line">&#125;]</div></pre></td></tr></table></figure></p>
+<p>可见默认<code>sendNext</code>的值是<code>sender</code>。如果使用<code>RACCommand</code>，要指定next就容易了很多。我的做法是给每个button创建一个command，在返回的信号中将index传出来<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line">button.rac_command = [[RACCommand alloc]initWithSignalBlock:^RACSignal *(<span class="keyword">id</span> input) &#123;</div><div class="line">    @weakify(<span class="keyword">self</span>)</div><div class="line">    <span class="keyword">return</span> [RACSignal createSignal:^RACDisposable *(<span class="keyword">id</span>&lt;RACSubscriber&gt; subscriber) &#123;</div><div class="line">        @strongify(<span class="keyword">self</span>)</div><div class="line">        [subscriber sendNext:@(i)];</div><div class="line">        [subscriber sendCompleted];</div><div class="line">        <span class="keyword">return</span> <span class="literal">nil</span>;</div><div class="line">    &#125;];</div><div class="line">&#125;];</div></pre></td></tr></table></figure></p>
+<p>最后将三个command返回的信号<code>merge</code>在一起<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="keyword">self</span>.selectSignal = [<span class="keyword">self</span>.selectSignal merge:button.rac_command.executionSignals.switchToLatest];</div><div class="line"><span class="comment">/* selectSignal初始化 */</span></div><div class="line">- (RACSignal *)selectSignal &#123;</div><div class="line">    <span class="keyword">if</span> (!_selectSignal) &#123;</div><div class="line">        _selectSignal = [RACSignal empty];</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> _selectSignal;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h1 id="Tip2-rac-sequence的线程问题"><a href="#Tip2-rac-sequence的线程问题" class="headerlink" title="Tip2 rac_sequence的线程问题"></a>Tip2 rac_sequence的线程问题</h1><p>对数组的rac_sequence进行操作，比如遍历时要注意在订阅后的操作对线程是否有要求，比如如果要对button字体颜色进行修改，如果直接使用<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line">[[<span class="keyword">self</span>.buttonArray.rac_sequence signal]subscribeNext:^(<span class="built_in">UIButton</span> *button) &#123;</div><div class="line">    [button setTitleColor:<span class="built_in">UIColorFromRGB</span>(<span class="number">0x666666</span>) forState:<span class="built_in">UIControlStateNormal</span>];</div><div class="line">&#125;];</div></pre></td></tr></table></figure></p>
+<p>是达不到你需要的效果的，因为<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line">- (RACSignal *)signal &#123;</div><div class="line">    <span class="keyword">return</span> [[<span class="keyword">self</span> signalWithScheduler:[RACScheduler scheduler]] setNameWithFormat:<span class="string">@"[%@] -signal"</span>, <span class="keyword">self</span>.name];</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>方法是在异步线程中完成的，也就是不在当前线程完成的。<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line">+ (<span class="keyword">instancetype</span>)scheduler &#123;</div><div class="line">    <span class="keyword">return</span> [<span class="keyword">self</span> schedulerWithPriority:RACSchedulerPriorityDefault];</div><div class="line">    <span class="comment">/* RACSchedulerPriorityDefault = DISPATCH_QUEUE_PRIORITY_DEFAULT */</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>因此指定信号的线程<code>RACSignal *signal = [self.buttonArray.rac_sequence signalWithScheduler:[RACScheduler immediateScheduler]];</code>在当前线程，才能达到你想要的效果。当然<code>[RACScheduler mainThreadScheduler]</code>是指定在主线程中执行，对于我的需求也是不满足的因为我是要让三个button先变成一个颜色再其中一个变特别的颜色，顺序执行。</p>
+<h1 id="Tip3-RACCommand代替acticon"><a href="#Tip3-RACCommand代替acticon" class="headerlink" title="Tip3 RACCommand代替acticon"></a>Tip3 RACCommand代替acticon</h1><p>RACCommand在mvvm中是非常有用的，而在我这种小项目中，有时候也能起到小小的封装的效果，比如在下图中两个按钮和上面的蒙层点击都是触发remove方法。</p>
+<img src="/2016/09/08/opensource-houseloan/pickView.png" alt="pickView.png" title="">
+<p>其实直接用同一个<code>acticon</code>就可以解决，而在RAC中可以这样<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line">- (RACCommand *)removeCommand &#123;</div><div class="line">    <span class="keyword">if</span> (!_removeCommand) &#123;</div><div class="line">    _removeCommand = [[RACCommand alloc]initWithSignalBlock:^RACSignal *(<span class="keyword">id</span> input) &#123;</div><div class="line">        @weakify(<span class="keyword">self</span>)</div><div class="line">        <span class="keyword">return</span> [RACSignal createSignal:^RACDisposable *(<span class="keyword">id</span>&lt;RACSubscriber&gt; subscriber) &#123;</div><div class="line">            @strongify(<span class="keyword">self</span>);</div><div class="line">            [<span class="keyword">self</span> removeFromSuperview];</div><div class="line">            [subscriber sendCompleted];</div><div class="line">            <span class="keyword">return</span> <span class="literal">nil</span>;</div><div class="line">        &#125;];</div><div class="line">    &#125;];</div><div class="line">&#125;</div><div class="line">    <span class="keyword">return</span> _removeCommand;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>定义一个command，而可以使三种动作都执行同一个command<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line">_cancelButton.rac_command = <span class="keyword">self</span>.removeCommand;</div><div class="line">_confirmButton.rac_command = <span class="keyword">self</span>.removeCommand;</div><div class="line">[tap.rac_gestureSignal subscribeNext:^(<span class="keyword">id</span> x) &#123;</div><div class="line">    [<span class="keyword">self</span>.removeCommand execute:<span class="literal">nil</span>];</div><div class="line">&#125;];</div></pre></td></tr></table></figure></p>
+<h1 id="Tip4-协议信号注意点"><a href="#Tip4-协议信号注意点" class="headerlink" title="Tip4 协议信号注意点"></a>Tip4 协议信号注意点</h1><p>在创建协议信号时应注意先创建信号如：<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line">[<span class="keyword">self</span> rac_signalForSelector:<span class="keyword">@selector</span>(pickerView:didSelectRow:inComponent:) fromProtocol:<span class="class"><span class="keyword">@protocol</span>(<span class="title">UIPickerViewDelegate</span>)]</span></div></pre></td></tr></table></figure></p>
+<p>再执行<code>self.pickView.delegate = self;</code>，因为这个方式实际调用了<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="keyword">static</span> RACSignal *<span class="built_in">NSObjectRACSignalForSelector</span>(<span class="built_in">NSObject</span> *<span class="keyword">self</span>, SEL selector, Protocol *protocol)</div></pre></td></tr></table></figure></p>
+<p>这个方法就是hook了你要调用的方法，然后进行method swizzing，因此你要使用hook后的方法，而不是先实现系统默认的方法，所以先实行RAC的方法，再调用协议方法。</p>
+<h1 id="Tip5-重复订阅问题"><a href="#Tip5-重复订阅问题" class="headerlink" title="Tip5 重复订阅问题"></a>Tip5 重复订阅问题</h1><p>其实整个项目最失败最蠢的设计就是我把每个cell上的信号combine在了一起从而进行计算。。。其实这是非常不合理的，因为不显示在屏幕上的cell都是懒加载的所以我就必须很蠢的把所有cell都加载到才能进行计算，这种设计是极不规范的，但是因为刚开始已经开始做了，并且没有时间修改了，所以只能将错就错。<strong>其实应该让计算从一个数据源去取，而让cell和数据源绑定在一起</strong>。<br>而因为我这不合理的设计，导致了我的信号订阅得在tableView创建的方法中执行，而这个方法众所周知是不停调用的，这就导致了重复订阅的问题，而我想出来的方法是定义一个全局的disposable对象<code>@property(nonatomic,strong)RACDisposable *caculateDisposable;</code>，在每次调用方法开始时先取消之前的订阅再次进行订阅。<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="keyword">if</span> (<span class="keyword">self</span>.caculateDisposable) &#123;</div><div class="line">    [<span class="keyword">self</span>.caculateDisposable dispose];</div><div class="line">&#125;</div><div class="line">@weakify(<span class="keyword">self</span>)</div><div class="line"><span class="keyword">self</span>.caculateDisposable = [[RACSignal combineLatest:<span class="keyword">self</span>.signalArray] subscribeNext:^(RACTuple *tuple) &#123;</div><div class="line">    @strongify(<span class="keyword">self</span>)</div><div class="line">    HCHeaderCell *headerCell = (HCHeaderCell*)tableView.visibleCells[<span class="number">0</span>];</div><div class="line">    [headerCell configCellContentWithRACTuple:tuple withType:<span class="keyword">self</span>.loadnType];</div><div class="line">&#125;];</div></pre></td></tr></table></figure></p>
+<p>看着就很别扭，但是暂时就这样吧。</p>
+
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+
+
+
+
+
+
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2016/09/30/CocoaPods-Swift3/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2016/04/13/link-programming-in-Objective-C/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/grommash_avatar.jpeg" alt="GuYi's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        guxinqi25@gmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="#" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/" target="_self">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2017/02/">二月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">十二月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/11/">十一月 2016<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/10/">十月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/09/">九月 2016<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/04/">四月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/03/">三月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/02/">二月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2015/12/">十二月 2015<span class="sidebar_archives-count">7</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+
+    <!-- Pages  -->
+    
+
+    <!-- Article Number  -->
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+        <a href="https://twitter.com/twitter" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-twitter.svg);">
+                <span class="visuallyhidden">Twitter</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Facebook -->
+    
+        <a href="https://www.facebook.com/facebook" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-facebook.svg);">
+                <span class="visuallyhidden">Facebook</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Google + -->
+    
+        <a href="https://www.google.com/" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-gplus.svg);">
+                <span class="visuallyhidden">Google Plus</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Weibo -->
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;
+            <script type="text/javascript">
+                var fd = new Date();
+                document.write(fd.getFullYear());
+            </script>
+            &nbsp;Grommash
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import File -->
+
+    <script src="/js/lazyload.min.js"></script>
+    <script src="/js/js.min.js"></script>
+
+
+
+    <script src="/js/nprogress.js"></script>
+
+
+<script type="text/javascript">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Swiftye -->
+
+
+<!-- Local Search-->
+
+
+<!-- Window Load-->
+<script>
+    $(window).load(function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+</script>
+
+<!-- MathJax Load-->
+
+
+                </main>
+            </div>
+        </body>
+    
+</html>

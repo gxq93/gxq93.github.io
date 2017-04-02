@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+    <!-- 
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.3.2 -->
+
+    <!-- Title -->
+    
+    <title>
+        
+            Objective-C内部实现剖析-block | 
+        
+        Grommash
+    </title>
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" sizes="192x192" href="/img/favicon.png">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Meta & Info -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0097A7">
+    <meta name="author" content="GuYi">
+    <meta name="description" content="null">
+    <meta name="keywords" content="null,Objective-C,Runtime">
+
+    <!--iOS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-title" content="Title">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="480">
+
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Grommash">
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://yoursite.com">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Objective-C内部实现剖析-block | Grommash">
+    <meta property="og:description" content="null">
+    <meta property="og:article:tag" content="Objective-C"> <meta property="og:article:tag" content="Runtime"> 
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import CSS & jQuery -->
+    
+        <link rel="stylesheet" href="/css/material.min.css">
+        <link rel="stylesheet" href="/css/style.min.css">
+        <!-- Config CSS -->
+
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-color: #F5F5F5;
+      }
+
+      /* blog_info bottom background */
+      #scheme-Paradox .material-layout .something-else .mdl-card__supporting-text{
+        background-color: #fff;
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/queue.js"></script>
+    
+
+    <!-- UC Browser Compatible -->
+    <script>
+        var agent = navigator.userAgent.toLowerCase();
+        if(agent.indexOf('ucbrowser')>0) {
+            document.write("<link rel=\"stylesheet\" href=\"/css/uc.css\">");
+            alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+        }
+    </script>
+
+    
+
+    
+
+    <!-- Bing Background -->
+    
+
+    <!-- Custom Head -->
+    
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+    <!-- Left aligned menu below button -->
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Block"><span class="post-toc-number">1.</span> <span class="post-toc-text">Block</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#数据结构"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">数据结构</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#实现原理"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">实现原理</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#cself"><span class="post-toc-number">1.2.1.</span> <span class="post-toc-text">__cself</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#构造函数"><span class="post-toc-number">1.2.2.</span> <span class="post-toc-text">构造函数</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#调用"><span class="post-toc-number">1.2.3.</span> <span class="post-toc-text">调用</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#捕获外部变量"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">捕获外部变量</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#捕获变量的瞬间值"><span class="post-toc-number">1.3.1.</span> <span class="post-toc-text">捕获变量的瞬间值</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#捕获-block变量"><span class="post-toc-number">1.3.2.</span> <span class="post-toc-text">捕获__block变量</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#捕获对象"><span class="post-toc-number">1.3.3.</span> <span class="post-toc-text">捕获对象</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#循环引用"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">循环引用</span></a></li></ol></li></ol>
+
+        <!--
+        <li class="mdl-menu__item">
+            Some Action
+        </li>
+        -->
+    </ul>
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script>
+    var randomNum = Math.floor(Math.random() * 19 + 1);
+
+    $('.post_thumbnail-random').css('background-image', 'url(' + '/img/random/material-' + randomNum + '.png' + ')');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                Objective-C内部实现剖析-block
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/grommash_avatar.jpeg" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>GuYi</strong>
+        <span>12月 22, 2015</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/Objective-C/">Objective-C</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/Runtime/">Runtime</a>
+    </ul>
+    
+
+    <!-- Share -->
+    <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=Objective-C内部实现剖析-block&url=http://yoursite.com//2015/12/22/runtime-3/index.html&pic=&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=Objective-C内部实现剖析-block&url=http://yoursite.com//2015/12/22/runtime-3/index.html&via=GuYi" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Twitter
+            </li>
+        </a>
+    
+
+    <!-- Share Facebook -->
+    
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com//2015/12/22/runtime-3/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Facebook
+            </li>
+        </a>
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://yoursite.com//2015/12/22/runtime-3/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <h1 id="Block"><a href="#Block" class="headerlink" title="Block"></a>Block</h1><p>在OC中Block的语法看上去特别别扭，但他实际上是作为最普通的C语言源代码来处理的，在实际编译时无法转换成我们能够理解的源代码，因此通过clang(LLVM编译器)先讲代码进行转化成C++代码。如创建一个<code>block.m</code>文件，加入内容<br><figure class="highlight c"><table><tr><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">void</span> (^block)(<span class="keyword">void</span>) = ^&#123;<span class="built_in">printf</span>(<span class="string">"Block\n"</span>);&#125;;</div><div class="line">    block();</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>使用clang命令行进行转换<br><figure class="highlight coq"><table><tr><td class="code"><pre><div class="line">clang -<span class="built_in">rewrite</span>-objc block.m</div></pre></td></tr></table></figure></p>
+<p>转换后将形成一个约520行左右的cpp文件，在这里我们将能看到我们想要的信息。接下去本文主要介绍一下block的实现原理。</p>
+<a id="more"></a>
+<p>转换后有关block的内容大致如下：<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="keyword">struct</span> __main_block_impl_0 &#123;</div><div class="line">    <span class="keyword">struct</span> __block_impl impl;</div><div class="line">    <span class="keyword">struct</span> __main_block_desc_0* Desc;</div><div class="line">    __main_block_impl_0(<span class="keyword">void</span> *fp, <span class="keyword">struct</span> __main_block_desc_0 *desc, <span class="keyword">int</span> flags=<span class="number">0</span>) &#123;</div><div class="line">        impl.isa = &amp;_NSConcreteStackBlock;</div><div class="line">        impl.Flags = flags;</div><div class="line">        impl.FuncPtr = fp;</div><div class="line">        Desc = desc;</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">static</span> <span class="keyword">void</span> __main_block_func_0(<span class="keyword">struct</span> __main_block_impl_0 *__cself) &#123;</div><div class="line">    printf(<span class="string">"Block\n"</span>);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">static</span> <span class="keyword">struct</span> __main_block_desc_0 &#123;</div><div class="line">    size_t reserved;</div><div class="line">    size_t Block_size;</div><div class="line">&#125; __main_block_desc_0_DATA = &#123; <span class="number">0</span>, <span class="keyword">sizeof</span>(<span class="keyword">struct</span> __main_block_impl_0)&#125;;</div><div class="line"></div><div class="line"><span class="keyword">int</span> main()</div><div class="line">&#123;</div><div class="line">    <span class="keyword">void</span> (*block)(<span class="keyword">void</span>) = ((<span class="keyword">void</span> (*)())&amp;__main_block_impl_0((<span class="keyword">void</span> *)__main_block_func_0, &amp;__main_block_desc_0_DATA));</div><div class="line"></div><div class="line">    ((<span class="keyword">void</span> (*)(__block_impl *))((__block_impl *)block)-&gt;FuncPtr)((__block_impl *)block);</div><div class="line"></div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h2><p>block的定义大致是这样的<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="keyword">struct</span> __block_impl &#123;</div><div class="line">    <span class="keyword">void</span> *isa;</div><div class="line">    <span class="keyword">int</span> Flags;</div><div class="line">    <span class="keyword">int</span> Reserved;</div><div class="line">    <span class="keyword">void</span> *FuncPtr;</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>可见block结构体中有isa指针，因此在OC中block也是当做对象来使用的。而这个isa指针指向的有三中类型：</p>
+<ul>
+<li>_NSConcreteStackBlock</li>
+<li>_NSConcreteGlobalBlock</li>
+<li>_NSConcreteMallocBlock</li>
+</ul>
+<p>而从其名字变可知其三种类对象内存分配的区域是不同的。下表说明了三种类的存储域：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">类</th>
+<th style="text-align:left">设置对象的存储域</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">_NSConcreteStackBlock</td>
+<td style="text-align:left">栈</td>
+</tr>
+<tr>
+<td style="text-align:left">_NSConcreteGlobalBlock</td>
+<td style="text-align:left">数据存储区（.data区）</td>
+</tr>
+<tr>
+<td style="text-align:left">_NSConcreteMallocBlock</td>
+<td style="text-align:left">堆</td>
+</tr>
+</tbody>
+</table>
+<p>如果block在记述全局变量的地方被设置或者block没有捕获外部变量，那就生成一个_NSConcreteGlobalBlock实例。其它情况都会生成一个_NSConcreteStackBlock实例，也就是说，它是在栈上的，所以一旦它所属的变量超出了变量作用域，该block就被废弃了。而当发生以下任一情况时：</p>
+<ul>
+<li>手动调用 Block 的实例方法copy</li>
+<li>Block 作为函数返回值返回</li>
+<li>将 Block 赋值给附有__strong修饰符的成员变量</li>
+<li>在方法名中含有usingBlock的 Cocoa 框架方法或 GCD 的 API 中传递 Block</li>
+</ul>
+<p>如果此时block在栈上，那就复制一份到堆上，并将复制得到的block实例的isa指针设为_NSConcreteMallocBlock：<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line">imply.isa = &amp;__NSConcreteMallocBlock;</div></pre></td></tr></table></figure></p>
+<h2 id="实现原理"><a href="#实现原理" class="headerlink" title="实现原理"></a>实现原理</h2><p>通过刚刚那个小小的例子来逐步分析一下block的实现原理。<br>首先例子中block语句<code>^{printf(&quot;Block\n&quot;);};</code>被转换成了<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="keyword">static</span> <span class="keyword">void</span> __main_block_func_0(<span class="keyword">struct</span> __main_block_impl_0 *__cself)</div><div class="line">&#123;</div><div class="line">    printf(<span class="string">"Block\n"</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>通过block的匿名函数实际被作为简单的C语言函数来处理，而block所属于的函数名(main)和在该函数出现的顺序值(0)来给clang转换的函数命名，该函数的参数__cself相当于OC中的self，指向block值的变量。</p>
+<h3 id="cself"><a href="#cself" class="headerlink" title="__cself"></a>__cself</h3><p>__cself是__main_block_impl_0结构体的指针，声明如下：<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="keyword">struct</span> __main_block_impl_0 &#123;</div><div class="line">    <span class="keyword">struct</span> __block_impl impl;</div><div class="line">    <span class="keyword">struct</span> __main_block_desc_0* Desc;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>第一个成员变量impl即block对象的函数指针，第二个Desc指针：<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="keyword">static</span> <span class="keyword">struct</span> __main_block_desc_0 &#123;</div><div class="line">    size_t reserved;</div><div class="line">    size_t Block_size;</div><div class="line">&#125; __main_block_desc_0_DATA = &#123; <span class="number">0</span>, <span class="keyword">sizeof</span>(<span class="keyword">struct</span> __main_block_impl_0)&#125;;</div></pre></td></tr></table></figure></p>
+<p>记录了今后版本升级所需的区域和block的大小。<br>而__main_block_impl_0结构体实际还包含了其构造函数<code>__main_block_impl_0(void *fp, struct __main_block_desc_0 *desc, int flags=0)</code><br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line">__main_block_impl_0(<span class="keyword">void</span> *fp, <span class="keyword">struct</span> __main_block_desc_0 *desc, <span class="keyword">int</span> flags=<span class="number">0</span>) &#123;</div><div class="line">    impl.isa = &amp;_NSConcreteStackBlock;</div><div class="line">    impl.Flags = flags;</div><div class="line">    impl.FuncPtr = fp;</div><div class="line">    Desc = desc;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="构造函数"><a href="#构造函数" class="headerlink" title="构造函数"></a>构造函数</h3><p>接下来我们看一下__main_block_impl_0结构体的构造函数，<code>impl.isa = &amp;_NSConcreteStackBlock;</code>声明了block的类型为_NSConcreteStackBlock，当构造函数调用时，即执行<code>void (^block)(void) = ^{printf(&quot;Block\n&quot;);};</code>这步时：<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="keyword">void</span> (*block)(<span class="keyword">void</span>) = ((<span class="keyword">void</span> (*)())&amp;__main_block_impl_0((<span class="keyword">void</span> *)__main_block_func_0, &amp;__main_block_desc_0_DATA));</div></pre></td></tr></table></figure></p>
+<p>构造函数就会进行这样的初始化<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line">impl.isa = &amp;_NSConcreteStackBlock;</div><div class="line">impl.Flags = <span class="number">0</span>;</div><div class="line">impl.FuncPtr = __main_block_func_0;</div><div class="line">Desc = __main_block_desc_0_DATA;</div></pre></td></tr></table></figure></p>
+<p>这样整个block就声明完成了</p>
+<h3 id="调用"><a href="#调用" class="headerlink" title="调用"></a>调用</h3><p>调用block，即<code>block();</code>这一步转换后是这样的：<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line">((<span class="keyword">void</span> (*)(__block_impl *))((__block_impl *)block)-&gt;FuncPtr)((__block_impl *)block);</div></pre></td></tr></table></figure></p>
+<p>这就是简单的使用函数指针调用函数，由block语法转换的__main_block_func_0函数的指针被赋值在成员变量FuncPtr中，另外也说明了__main_block_func_0函数的参数__cself指向block值，在源码中可以看出block正是作为参数进行了传递。</p>
+<h2 id="捕获外部变量"><a href="#捕获外部变量" class="headerlink" title="捕获外部变量"></a>捕获外部变量</h2><p>Block 捕获外部变量其实可分为三种情况：</p>
+<ul>
+<li>捕获变量的瞬时值</li>
+<li>捕获__block变量</li>
+<li>捕获对象</li>
+</ul>
+<p>说到外部变量，我们要先说一下C语言中变量有哪几种。一般可以分为一下5种：</p>
+<ul>
+<li>自动变量</li>
+<li>函数参数(block中先不考虑这种情况)</li>
+<li>静态变量</li>
+<li>静态全局变量</li>
+<li>全局变量</li>
+</ul>
+<h3 id="捕获变量的瞬间值"><a href="#捕获变量的瞬间值" class="headerlink" title="捕获变量的瞬间值"></a>捕获变量的瞬间值</h3><p>将全局变量、静态全局变量、静态变量在block中捕获__main_block_func_0函数大致是这样的：<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="keyword">static</span> <span class="keyword">void</span> __main_block_func_0(<span class="keyword">struct</span> __main_block_impl_0 *__cself)</div><div class="line">&#123;</div><div class="line">    global_i ++;</div><div class="line">    static_global_j ++;</div><div class="line">    (*static_k) ++;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>首先全局变量和静态全局变量因为是全局的，作用域很广，所以block捕获了它们进去之后，在block里面进行操作，block结束之后，它们的值依旧可以得以保存下来。<br>如果block外面还有很多自动变量，静态变量，等等，这些变量在block里面并不会被使用到。那么这些变量并不会被block捕获进来，也就是说并不会在构造函数里面传入它们的值，block捕获外部变量仅仅只捕获block闭包里面会用到的值，其他用不到的值，它并不会去捕获。<br>静态变量传递给block是内存地址值，所以能在block里面直接改变值。静态变量的这种做法似乎也适用于自动变量的访问，但是为什么没有这么做呢？<br>实际上，在由于blcok语法生成的值block上，可以存有超过其变量作用域的被截获对象的自动变量，变量作用域结束的同时，原来的自动变量被废弃，因此block中超过变量作用域而存在的变量同静态变量一样，将不能通过指针访问原来的自动变量。而静态局部变量具有局部作用域，它只被初始化一次，自从第一次被初始化直到程序运行结束都一直存在，它和全局变量的区别在于全局变量对所有的函数都是可见的，而静态局部变量只对定义自己的函数体始终可见，所以简单来说就是<strong>静态局部变量不会被销毁，所以可以通过指针来访问，自动变量会被销毁，所以不能通过指针访问</strong></p>
+<h3 id="捕获-block变量"><a href="#捕获-block变量" class="headerlink" title="捕获__block变量"></a>捕获__block变量</h3><p>__block的使用就不多介绍了，他实际就是修饰用于指定将变量值设置到哪个存储域中。<br>使用__block修饰自动变量转化后的代码主要的变换是这样的：<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="keyword">static</span> <span class="keyword">void</span> __main_block_func_0(<span class="keyword">struct</span> __main_block_impl_0 *__cself) &#123;</div><div class="line">    __Block_byref_i_0 *i = __cself-&gt;i; <span class="comment">/* bound by ref */</span></div><div class="line">    (i-&gt;__forwarding-&gt;i)++;</div><div class="line">    printf(<span class="string">"%d"</span>,(i-&gt;__forwarding-&gt;i));</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">static</span> <span class="keyword">void</span> __main_block_copy_0(<span class="keyword">struct</span> __main_block_impl_0*dst, <span class="keyword">struct</span> __main_block_impl_0*src) &#123;_Block_object_assign((<span class="keyword">void</span>*)&amp;dst-&gt;i, (<span class="keyword">void</span>*)src-&gt;i, <span class="number">8</span><span class="comment">/*BLOCK_FIELD_IS_BYREF*/</span>);&#125;</div><div class="line"></div><div class="line"><span class="keyword">static</span> <span class="keyword">void</span> __main_block_dispose_0(<span class="keyword">struct</span> __main_block_impl_0*src) &#123;_Block_object_dispose((<span class="keyword">void</span>*)src-&gt;i, <span class="number">8</span><span class="comment">/*BLOCK_FIELD_IS_BYREF*/</span>);&#125;</div><div class="line"></div><div class="line"><span class="keyword">static</span> <span class="keyword">struct</span> __main_block_desc_0 &#123;</div><div class="line">    size_t reserved;</div><div class="line">    size_t Block_size;</div><div class="line">    <span class="keyword">void</span> (*<span class="keyword">copy</span>)(<span class="keyword">struct</span> __main_block_impl_0*, <span class="keyword">struct</span> __main_block_impl_0*);</div><div class="line">    <span class="keyword">void</span> (*dispose)(<span class="keyword">struct</span> __main_block_impl_0*);</div><div class="line">&#125; __main_block_desc_0_DATA = &#123; <span class="number">0</span>, <span class="keyword">sizeof</span>(<span class="keyword">struct</span> __main_block_impl_0), __main_block_copy_0, __main_block_dispose_0&#125;;</div><div class="line"></div><div class="line"><span class="keyword">int</span> main()</div><div class="line">&#123;</div><div class="line">    __attribute__((__blocks__(<span class="keyword">byref</span>))) __Block_byref_i_0 i = &#123;(<span class="keyword">void</span>*)<span class="number">0</span>,(__Block_byref_i_0 *)&amp;i, <span class="number">0</span>, <span class="keyword">sizeof</span>(__Block_byref_i_0), <span class="number">1</span>&#125;;</div><div class="line"></div><div class="line">    <span class="keyword">void</span> (*block)(<span class="keyword">void</span>) = ((<span class="keyword">void</span> (*)())&amp;__main_block_impl_0((<span class="keyword">void</span> *)__main_block_func_0, &amp;__main_block_desc_0_DATA, (__Block_byref_i_0 *)&amp;i, <span class="number">570425344</span>));</div><div class="line"></div><div class="line">    ((<span class="keyword">void</span> (*)(__block_impl *))((__block_impl *)block)-&gt;FuncPtr)((__block_impl *)block);</div><div class="line"></div><div class="line">    printf(<span class="string">"%d"</span>,(i.__forwarding-&gt;i));</div><div class="line"></div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>从源码我们能发现，带有__block的变量也被转化成了一个结构体__Block_byref_i_0,这个结构体有5个成员变量。第一个是isa指针，第二个是指向自身类型的__forwarding指针，通过__forwarding指针访问成员变量i，第三个是一个标记flag，第四个是它的大小，第五个是变量值，名字和变量名同名。<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="keyword">struct</span> __Block_byref_i_0 &#123;</div><div class="line">    <span class="keyword">void</span> *__isa;</div><div class="line">    __Block_byref_i_0 *__forwarding;</div><div class="line">    <span class="keyword">int</span> __flags;</div><div class="line">    <span class="keyword">int</span> __size;</div><div class="line">    <span class="keyword">int</span> i;</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>__forwarding指针的作用就是针对堆的Block，把原来__forwarding指针指向自己，换成指向_NSConcreteMallocBlock上复制之后的__block自己。然后堆上的变量的__forwarding再指向自己。这样不管__block怎么复制到堆上，还是在栈上，都可以通过<code>(i-&gt;__forwarding-&gt;i)</code>来访问到变量值。以下是访问__block的图解：</p>
+<img src="/2015/12/22/runtime-3/forward.png" alt="forward.png" title="">
+<p>而在block外访问__block修饰的变量也变成了<code>printf(&quot;%d&quot;,(i.__forwarding-&gt;i));</code>这样的形式。</p>
+<h3 id="捕获对象"><a href="#捕获对象" class="headerlink" title="捕获对象"></a>捕获对象</h3><p>将以下代码进行clang转换<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="keyword">int</span> main()</div><div class="line">&#123;</div><div class="line">    <span class="keyword">id</span> array = [[<span class="built_in">NSMutableArray</span> alloc]init];    </div><div class="line">    <span class="keyword">void</span> (^block)(<span class="keyword">void</span>) = ^&#123;        </div><div class="line">        [array addObject:@<span class="number">1</span>];        </div><div class="line">        <span class="built_in">NSLog</span>(<span class="string">@"array count = %ld"</span>,[array count]);       </div><div class="line">    &#125;;   </div><div class="line">    block();    </div><div class="line">    <span class="built_in">NSLog</span>(<span class="string">@"array count = %ld"</span>,[array count]);   </div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>得到大致的代码：<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="keyword">struct</span> __main_block_impl_0 &#123;</div><div class="line">    <span class="keyword">struct</span> __block_impl impl;</div><div class="line">    <span class="keyword">struct</span> __main_block_desc_0* Desc;</div><div class="line">    <span class="keyword">id</span> array;</div><div class="line"></div><div class="line">    __main_block_impl_0(<span class="keyword">void</span> *fp, <span class="keyword">struct</span> __main_block_desc_0 *desc, <span class="keyword">id</span> _array, <span class="keyword">int</span> flags=<span class="number">0</span>) : array(_array) &#123;</div><div class="line">        impl.isa = &amp;_NSConcreteStackBlock;</div><div class="line">        impl.Flags = flags;</div><div class="line">        impl.FuncPtr = fp;</div><div class="line">        Desc = desc;</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">static</span> <span class="keyword">void</span> __main_block_func_0(<span class="keyword">struct</span> __main_block_impl_0 *__cself) &#123;</div><div class="line">    <span class="keyword">id</span> array = __cself-&gt;array; <span class="comment">/* bound by copy */</span></div><div class="line"></div><div class="line">    ((<span class="keyword">void</span> (*)(<span class="keyword">id</span>, SEL, ObjectType))(<span class="keyword">void</span> *)objc_msgSend)((<span class="keyword">id</span>)array, sel_registerName(<span class="string">"addObject:"</span>), (<span class="keyword">id</span>)((<span class="built_in">NSNumber</span> *(*)(Class, SEL, <span class="keyword">int</span>))(<span class="keyword">void</span> *)objc_msgSend)(objc_getClass(<span class="string">"NSNumber"</span>), sel_registerName(<span class="string">"numberWithInt:"</span>), <span class="number">1</span>));</div><div class="line"></div><div class="line">    <span class="built_in">NSLog</span>((<span class="built_in">NSString</span> *)&amp;__NSConstantStringImpl__var_folders_c3_9y1j0l292kqf2y4tcv868b4w0000gn_T_block_06bc3c_mi_0,((<span class="built_in">NSUInteger</span> (*)(<span class="keyword">id</span>, SEL))(<span class="keyword">void</span> *)objc_msgSend)((<span class="keyword">id</span>)array, sel_registerName(<span class="string">"count"</span>)));</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">static</span> <span class="keyword">void</span> __main_block_copy_0(<span class="keyword">struct</span> __main_block_impl_0*dst, <span class="keyword">struct</span> __main_block_impl_0*src) &#123;_Block_object_assign((<span class="keyword">void</span>*)&amp;dst-&gt;array, (<span class="keyword">void</span>*)src-&gt;array, <span class="number">3</span><span class="comment">/*BLOCK_FIELD_IS_OBJECT*/</span>);&#125;</div><div class="line"></div><div class="line"><span class="keyword">static</span> <span class="keyword">void</span> __main_block_dispose_0(<span class="keyword">struct</span> __main_block_impl_0*src) &#123;_Block_object_dispose((<span class="keyword">void</span>*)src-&gt;array, <span class="number">3</span><span class="comment">/*BLOCK_FIELD_IS_OBJECT*/</span>);&#125;</div><div class="line"></div><div class="line"><span class="keyword">static</span> <span class="keyword">struct</span> __main_block_desc_0 &#123;</div><div class="line">    size_t reserved;</div><div class="line">    size_t Block_size;</div><div class="line">    <span class="keyword">void</span> (*<span class="keyword">copy</span>)(<span class="keyword">struct</span> __main_block_impl_0*, <span class="keyword">struct</span> __main_block_impl_0*);</div><div class="line">    <span class="keyword">void</span> (*dispose)(<span class="keyword">struct</span> __main_block_impl_0*);</div><div class="line">&#125; __main_block_desc_0_DATA = &#123; <span class="number">0</span>, <span class="keyword">sizeof</span>(<span class="keyword">struct</span> __main_block_impl_0), __main_block_copy_0, __main_block_dispose_0&#125;;</div><div class="line"></div><div class="line"><span class="keyword">int</span> main()</div><div class="line">&#123;</div><div class="line">    <span class="keyword">id</span> array = ((<span class="built_in">NSMutableArray</span> *(*)(<span class="keyword">id</span>, SEL))(<span class="keyword">void</span> *)objc_msgSend)((<span class="keyword">id</span>)((<span class="built_in">NSMutableArray</span> *(*)(<span class="keyword">id</span>, SEL))(<span class="keyword">void</span> *)objc_msgSend)((<span class="keyword">id</span>)objc_getClass(<span class="string">"NSMutableArray"</span>), sel_registerName(<span class="string">"alloc"</span>)), sel_registerName(<span class="string">"init"</span>));</div><div class="line"></div><div class="line">    <span class="keyword">void</span> (*block)(<span class="keyword">void</span>) = ((<span class="keyword">void</span> (*)())&amp;__main_block_impl_0((<span class="keyword">void</span> *)__main_block_func_0, &amp;__main_block_desc_0_DATA, array, <span class="number">570425344</span>));</div><div class="line"></div><div class="line">    ((<span class="keyword">void</span> (*)(__block_impl *))((__block_impl *)block)-&gt;FuncPtr)((__block_impl *)block);</div><div class="line"></div><div class="line">    <span class="built_in">NSLog</span>((<span class="built_in">NSString</span> *)&amp;__NSConstantStringImpl__var_folders_c3_9y1j0l292kqf2y4tcv868b4w0000gn_T_block_06bc3c_mi_1,((<span class="built_in">NSUInteger</span> (*)(<span class="keyword">id</span>, SEL))(<span class="keyword">void</span> *)objc_msgSend)((<span class="keyword">id</span>)array, sel_registerName(<span class="string">"count"</span>)));</div><div class="line"></div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>可以看出block中的__self指针即__main_block_impl_0结构体多了一个对象id array，大部分block的实现与使用__block相同，有一个不同就是在block copy和dispose函数中最后一个参数不同，编译器自动给参数增加了备注：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">截获目标</th>
+<th style="text-align:left">修饰参数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">对象</td>
+<td style="text-align:left">BLOCK_FIELD_IS_OBJECT</td>
+</tr>
+<tr>
+<td style="text-align:left">__block变量</td>
+<td style="text-align:left">BLOCK_FIELD_IS_BYREF</td>
+</tr>
+</tbody>
+</table>
+<p>而对对象的访问即通过<code>id array = __cself-&gt;array</code>获取。</p>
+<h2 id="循环引用"><a href="#循环引用" class="headerlink" title="循环引用"></a>循环引用</h2><p>在block中引用了持有block的对象的时候就会引起循环引用，由上一节block捕获对象可知，block捕获对象实质是在block结构体中拥有一个与捕获对象相同的实例变量，它会在结构体初始化时被赋值，而这个对象默认是用__strong修饰的，这就导致了循环应用。如果使用了__weak之后，表示 Block 对象的结构体中相对应的成员变量也将附有__weak修饰符，__weak修饰的变量不会持有对象，它用一张 weak 表（类似于引用计数表的散列表）来管理对象和变量。赋值的时候它会以赋值对象的地址作为key，变量的地址为value，注册到weak表中。一旦该对象被废弃，就通过对象地址在weak表中找到变量的地址，赋值为nil，然后将该条记录从weak表中删除。<br>在多线程情况下，可能weakSelf指向的对象会在block执行前被废弃，这在大部分情况下都是可以的，只会输出Self is nil，但在有些情况下(譬如weakSelf作为KVO的观察者被移除，或者block还没执行完self已经销毁)就会导致crash。这时可以在Block内部再持有一次weakSelf指向的对象<code>typeof(weakSelf) strongSelf = weakSelf</code>，延长该对象的生命周期，这就是所谓的 weak-strong dance。<br>每次使用__weak变量的时候，都会取出该变量指向的对象并retain，然后将该对象注册到autoreleasepool中，这是延长对象生命周期的关键，但这不会造成循环引用，当函数执行结束，变量超出作用域，过一会儿(一般一次RunLoop之后)，对象就被释放了。所以weak-strong dance的行为非常符合预期：延长捕获对象的生命周期，一旦block执行完，这个局部对象就被释放，而block也会被释放(如果被GCD之类的API copy过一次增加了引用计数，那最终也会被GCD释放)。<br>每使用一次__weak变量就会把对象注册到autoreleasepool中，所以如果短时间内大量使用__weak变量的话，会导致注册到autoreleasepool中的对象大量增加，占用一定内存。而weak-strong dance恰好无意中解决了这个隐患，在执行block时，把__weak变量(weakSelf)赋值给一个临时变量(strongSelf)，之后一直都使用这个临时变量，所以__weak变量只使用了一次，也就只有一个对象注册到autoreleasepool中。</p>
+
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+
+
+
+
+
+
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2015/12/25/runtime-4/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2015/12/12/runtime-2/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/grommash_avatar.jpeg" alt="GuYi's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        guxinqi25@gmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="#" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/" target="_self">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2017/02/">二月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">十二月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/11/">十一月 2016<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/10/">十月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/09/">九月 2016<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/04/">四月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/03/">三月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/02/">二月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2015/12/">十二月 2015<span class="sidebar_archives-count">7</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+
+    <!-- Pages  -->
+    
+
+    <!-- Article Number  -->
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+        <a href="https://twitter.com/twitter" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-twitter.svg);">
+                <span class="visuallyhidden">Twitter</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Facebook -->
+    
+        <a href="https://www.facebook.com/facebook" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-facebook.svg);">
+                <span class="visuallyhidden">Facebook</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Google + -->
+    
+        <a href="https://www.google.com/" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-gplus.svg);">
+                <span class="visuallyhidden">Google Plus</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Weibo -->
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;
+            <script type="text/javascript">
+                var fd = new Date();
+                document.write(fd.getFullYear());
+            </script>
+            &nbsp;Grommash
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import File -->
+
+    <script src="/js/lazyload.min.js"></script>
+    <script src="/js/js.min.js"></script>
+
+
+
+    <script src="/js/nprogress.js"></script>
+
+
+<script type="text/javascript">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Swiftye -->
+
+
+<!-- Local Search-->
+
+
+<!-- Window Load-->
+<script>
+    $(window).load(function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+</script>
+
+<!-- MathJax Load-->
+
+
+                </main>
+            </div>
+        </body>
+    
+</html>

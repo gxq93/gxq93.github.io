@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+    <!-- 
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.3.2 -->
+
+    <!-- Title -->
+    
+    <title>
+        
+            Objective-C内部实现剖析-类和对象 | 
+        
+        Grommash
+    </title>
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" sizes="192x192" href="/img/favicon.png">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Meta & Info -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0097A7">
+    <meta name="author" content="GuYi">
+    <meta name="description" content="null">
+    <meta name="keywords" content="null,Objective-C,Runtime">
+
+    <!--iOS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-title" content="Title">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="480">
+
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Grommash">
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://yoursite.com">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Objective-C内部实现剖析-类和对象 | Grommash">
+    <meta property="og:description" content="null">
+    <meta property="og:article:tag" content="Objective-C"> <meta property="og:article:tag" content="Runtime"> 
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import CSS & jQuery -->
+    
+        <link rel="stylesheet" href="/css/material.min.css">
+        <link rel="stylesheet" href="/css/style.min.css">
+        <!-- Config CSS -->
+
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-color: #F5F5F5;
+      }
+
+      /* blog_info bottom background */
+      #scheme-Paradox .material-layout .something-else .mdl-card__supporting-text{
+        background-color: #fff;
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/queue.js"></script>
+    
+
+    <!-- UC Browser Compatible -->
+    <script>
+        var agent = navigator.userAgent.toLowerCase();
+        if(agent.indexOf('ucbrowser')>0) {
+            document.write("<link rel=\"stylesheet\" href=\"/css/uc.css\">");
+            alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+        }
+    </script>
+
+    
+
+    
+
+    <!-- Bing Background -->
+    
+
+    <!-- Custom Head -->
+    
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+    <!-- Left aligned menu below button -->
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Runtime"><span class="post-toc-number">1.</span> <span class="post-toc-text">Runtime</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#类和对象"><span class="post-toc-number">2.</span> <span class="post-toc-text">类和对象</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#数据结构"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">数据结构</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#操作函数"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">操作函数</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#class"><span class="post-toc-number">2.2.1.</span> <span class="post-toc-text">class_:</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#object"><span class="post-toc-number">2.2.2.</span> <span class="post-toc-text">object_:</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#动态创建-销毁类、对象"><span class="post-toc-number">2.2.3.</span> <span class="post-toc-text">动态创建/销毁类、对象</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#实例变量和属性"><span class="post-toc-number">3.</span> <span class="post-toc-text">实例变量和属性</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#数据结构："><span class="post-toc-number">3.1.</span> <span class="post-toc-text">数据结构：</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#成员变量Ivar"><span class="post-toc-number">3.1.1.</span> <span class="post-toc-text">成员变量Ivar</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#属性"><span class="post-toc-number">3.1.2.</span> <span class="post-toc-text">属性</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#操作函数："><span class="post-toc-number">3.2.</span> <span class="post-toc-text">操作函数：</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#ivar-："><span class="post-toc-number">3.2.1.</span> <span class="post-toc-text">ivar_：</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#property-："><span class="post-toc-number">3.2.2.</span> <span class="post-toc-text">property_：</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#属性相关的内容"><span class="post-toc-number">4.</span> <span class="post-toc-text">属性相关的内容</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#实例变量与属性"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">实例变量与属性</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#属性特质-attribute"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">属性特质(attribute)</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#访问实例变量"><span class="post-toc-number">4.3.</span> <span class="post-toc-text">访问实例变量</span></a></li></ol></li></ol>
+
+        <!--
+        <li class="mdl-menu__item">
+            Some Action
+        </li>
+        -->
+    </ul>
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script>
+    var randomNum = Math.floor(Math.random() * 19 + 1);
+
+    $('.post_thumbnail-random').css('background-image', 'url(' + '/img/random/material-' + randomNum + '.png' + ')');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                Objective-C内部实现剖析-类和对象
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/grommash_avatar.jpeg" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>GuYi</strong>
+        <span>12月 10, 2015</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/Objective-C/">Objective-C</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/Runtime/">Runtime</a>
+    </ul>
+    
+
+    <!-- Share -->
+    <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=Objective-C内部实现剖析-类和对象&url=http://yoursite.com//2015/12/10/runtime-1/index.html&pic=&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=Objective-C内部实现剖析-类和对象&url=http://yoursite.com//2015/12/10/runtime-1/index.html&via=GuYi" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Twitter
+            </li>
+        </a>
+    
+
+    <!-- Share Facebook -->
+    
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com//2015/12/10/runtime-1/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Facebook
+            </li>
+        </a>
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://yoursite.com//2015/12/10/runtime-1/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <h1 id="Runtime"><a href="#Runtime" class="headerlink" title="Runtime"></a>Runtime</h1><p>OC实质是围绕类的动态配置和消息传递，通过操作函数来配置类信息，通过<code>msgSend</code>函数传递消息。作为面向对象语言，“对象”(object)就是“基本构造单元”(building block)，开发者可以通过对象来存储并传递数据，在对象之间传递数据并执行任务的过程就叫做“消息传递”。</p>
+<p>当应用程序运行起来之后，为其提供相关支持的代码叫做“Objective-C运行期环境”，它提供了一些使得对象之间能够传递信息的重要函数，并且包含创建类实例所用的全部逻辑。这篇文章主要介绍了runtime中对象和类所扮演的角色。</p>
+<a id="more"></a>
+<h1 id="类和对象"><a href="#类和对象" class="headerlink" title="类和对象"></a>类和对象</h1><h2 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h2><p>在OC中类和对象是这样定义的<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="comment">/* An opaque type that represents an Objective-C class. */</span></div><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> objc_class *Class;</div><div class="line"><span class="comment">/* Represents an instance of a class. */</span></div><div class="line"><span class="keyword">struct</span> objc_object &#123;</div><div class="line">    Class isa  OBJC_ISA_AVAILABILITY;</div><div class="line">&#125;;</div><div class="line"><span class="comment">/* A pointer to an instance of a class. */</span></div><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> objc_object *<span class="keyword">id</span>;</div></pre></td></tr></table></figure></p>
+<p>其中<code>objc_class</code>是一个结构体，里面包含的内容如下，<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="keyword">struct</span> objc_class &#123;</div><div class="line">    Class isa  OBJC_ISA_AVAILABILITY;</div><div class="line">    <span class="keyword">if</span> !__OBJC2__</div><div class="line">    Class super_class            <span class="comment">/* 父类 */</span></div><div class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *name             <span class="comment">/* 类名 */</span></div><div class="line">    <span class="keyword">long</span> version                 <span class="comment">/* 类的版本信息，默认为0 */</span></div><div class="line">    <span class="keyword">long</span> info                    <span class="comment">/* 类信息，供运行期使用的一些位标识 */</span></div><div class="line">    <span class="keyword">long</span> instance_size                      <span class="comment">/* 类的实例变量大小 */</span></div><div class="line">    <span class="keyword">struct</span> objc_ivar_list *ivars            <span class="comment">/* 类的成员变量链表 */</span></div><div class="line">    <span class="keyword">struct</span> objc_method_list **methodLists   <span class="comment">/* 方法定义的链表 */</span></div><div class="line">    <span class="keyword">struct</span> objc_cache *cache                <span class="comment">/* 方法缓存 */</span></div><div class="line">    <span class="keyword">struct</span> objc_protocol_list *protocols    <span class="comment">/* 协议链表 */</span></div><div class="line">    endif</div><div class="line">&#125; OBJC2_UNAVAILABLE;</div></pre></td></tr></table></figure></p>
+<p>可以看出类的本质是一个结构体，在这个结构体中有两个<code>Class</code>类型的参数<code>isa</code>和<code>super_class</code>，这两个参数是实现函数的重要映射，决定找到存放在哪个类的方法实现。（isa用于自省确定所属类，super_class确定继承关系）。</p>
+<p>实例对象的isa指针指向类，类的isa指针指向其元类（<code>metaClass</code>）。对象就是一个含isa指针的结构体。类存储实例对象的方法列表，元类中只记录类名，类方法列表等，元类也是类对象。<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="comment">/* An opaque type that represents an Objective-C class. */</span></div><div class="line"><span class="comment">/* typedef struct objc_class *Class; */</span></div><div class="line"><span class="comment">/* Represents an instance of a class. */</span></div><div class="line"><span class="keyword">struct</span> objc_object &#123;</div><div class="line">    Class isa  OBJC_ISA_AVAILABILITY;</div><div class="line">&#125;;</div><div class="line"><span class="comment">/* A pointer to an instance of a class. */</span></div><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> objc_object *<span class="keyword">id</span>;</div></pre></td></tr></table></figure></p>
+<p>这是实例对象的结构，当创建实例对象时，分配的内存包含一个<code>objc_object</code>数据结构，然后是类到父类直到根类NSObject的实例变量的数据。NSObject类的<code>alloc</code>和<code>allocWithZone:</code>方法使用函数<code>class_createInstance</code>来创建objc_object数据结构。</p>
+<p>向一个Objective-C对象发送消息时，运行时库会根据实例对象的isa指针找到这个实例对象所属的类。Runtime库会在类的方法列表由super_class指针找到父类的方法列表直至根类NSObject中去寻找与消息对应的<code>selector</code>指向的方法。找到后即运行这个方法。(如下图)</p>
+<img src="/2015/12/10/runtime-1/runtime1.png" alt="runtime1.png" title="">
+<ul>
+<li>1、isa：实例对象-&gt;类-&gt;元类-&gt;（不经过父元类）直接到根元类（NSObject的元类），根元类的isa指向自己；</li>
+<li>2、 superclass：类-&gt;父类-&gt;…-&gt;根类NSObject，元类-&gt;父元类-&gt;…-&gt;根元类-&gt;根类,NSObject的superclass指向nil。</li>
+</ul>
+<h2 id="操作函数"><a href="#操作函数" class="headerlink" title="操作函数"></a>操作函数</h2><p>类和对象的操作函数名只要以类对象<code>class_</code>为前缀，实例对象<code>object_</code>为前缀。</p>
+<h3 id="class"><a href="#class" class="headerlink" title="class_:"></a><strong>class_</strong>:</h3><p><strong>get</strong>:类名，父类，元类；实例变量，成员变量；属性；实例方法，类方法，方法实现<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="comment">/* 获取类的类名 */</span></div><div class="line"><span class="keyword">const</span> <span class="keyword">char</span> * class_getName ( Class cls );</div><div class="line"><span class="comment">/* 获取类的父类 */</span></div><div class="line">Class class_getSuperclass ( Class cls );</div><div class="line"><span class="comment">/* 获取实例大小 */</span></div><div class="line">size_t class_getInstanceSize ( Class cls );</div><div class="line"><span class="comment">/* 获取类中指定名称实例成员变量的信息 */</span></div><div class="line">Ivar class_getInstanceVariable ( Class cls, <span class="keyword">const</span> <span class="keyword">char</span> *name );</div><div class="line"><span class="comment">/* 获取类成员变量的信息 */</span></div><div class="line">Ivar class_getClassVariable ( Class cls, <span class="keyword">const</span> <span class="keyword">char</span> *name );</div><div class="line"><span class="comment">/* 获取指定的属性 */</span></div><div class="line">objc_property_t class_getProperty ( Class cls, <span class="keyword">const</span> <span class="keyword">char</span> *name );</div><div class="line"><span class="comment">/*方法：具体内容下文讲 */</span></div><div class="line"><span class="comment">/* 获取实例方法 */</span></div><div class="line">Method class_getInstanceMethod ( Class cls, SEL name );</div><div class="line"><span class="comment">/* 获取类方法 */</span></div><div class="line">Method class_getClassMethod ( Class cls, SEL name );</div><div class="line"><span class="comment">/* 获取方法的具体实现 */</span></div><div class="line">IMP class_getMethodImplementation ( Class cls, SEL name );</div><div class="line">IMP class_getMethodImplementation_stret ( Class cls, SEL name );</div></pre></td></tr></table></figure></p>
+<p><strong>copy</strong>:成员变量列表；属性列表；方法列表；协议列表<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="comment">/* 获取整个成员变量列表 */</span></div><div class="line">Ivar * class_copyIvarList ( Class cls, <span class="keyword">unsigned</span> <span class="keyword">int</span> *outCount );</div><div class="line"><span class="comment">/* 获取属性列表 */</span></div><div class="line">objc_property_t * class_copyPropertyList ( Class cls, <span class="keyword">unsigned</span> <span class="keyword">int</span> *outCount );</div><div class="line"><span class="comment">/* 获取所有方法的列表 */</span></div><div class="line">Method * class_copyMethodList ( Class cls, <span class="keyword">unsigned</span> <span class="keyword">int</span> *outCount );</div><div class="line"><span class="comment">/* 获取类实现的协议列表 */</span></div><div class="line">Protocol * class_copyProtocolList ( Class cls, <span class="keyword">unsigned</span> <span class="keyword">int</span> *outCount );</div></pre></td></tr></table></figure></p>
+<p><strong>add</strong>:成员变量；属性；方法；协议(添加成员变量只能在运行时创建的类，且不能为元类)<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="comment">/* 添加成员变量 */</span></div><div class="line"><span class="built_in">BOOL</span> class_addIvar ( Class cls, <span class="keyword">const</span> <span class="keyword">char</span> *name, size_t size, uint8_t alignment, <span class="keyword">const</span> <span class="keyword">char</span> *types );</div><div class="line"><span class="comment">/* 添加属性 */</span></div><div class="line"><span class="built_in">BOOL</span> class_addProperty ( Class cls, <span class="keyword">const</span> <span class="keyword">char</span> *name, <span class="keyword">const</span> objc_property_attribute_t *attributes, <span class="keyword">unsigned</span> <span class="keyword">int</span> attributeCount );</div><div class="line"><span class="comment">/* 添加方法 */</span></div><div class="line"><span class="built_in">BOOL</span> class_addMethod ( Class cls, SEL name, IMP imp, <span class="keyword">const</span> <span class="keyword">char</span> *types );</div><div class="line"><span class="comment">/* 添加协议 */</span></div><div class="line"><span class="built_in">BOOL</span> class_addProtocol ( Class cls, Protocol *protocol );</div></pre></td></tr></table></figure></p>
+<p><strong>replace</strong>：属性；方法<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="comment">/* 替换类的属性 */</span></div><div class="line"><span class="keyword">void</span> class_replaceProperty ( Class cls, <span class="keyword">const</span> <span class="keyword">char</span> *name, <span class="keyword">const</span> objc_property_attribute_t *attributes, <span class="keyword">unsigned</span> <span class="keyword">int</span> attributeCount );</div><div class="line"><span class="comment">/* 替代方法的实现 */</span></div><div class="line">IMP class_replaceMethod ( Class cls, SEL name, IMP imp, <span class="keyword">const</span> <span class="keyword">char</span> *types );</div></pre></td></tr></table></figure></p>
+<p><strong>respond</strong>:响应方法判断（内省）<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="comment">/* 类实例是否响应指定的selector */</span></div><div class="line"><span class="built_in">BOOL</span> class_respondsToSelector ( Class cls, SEL sel );</div></pre></td></tr></table></figure></p>
+<p><strong>isMetaClass</strong>:元类判断（内省）<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="comment">/* 判断给定的Class是否是一个元类 */</span></div><div class="line"><span class="built_in">BOOL</span> class_isMetaClass ( Class cls );</div></pre></td></tr></table></figure></p>
+<p><strong>conform</strong>：遵循协议判断（内省）<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="comment">/* 返回类是否实现指定的协议 */</span></div><div class="line"><span class="built_in">BOOL</span> class_conformsToProtocol ( Class cls, Protocol *protocol );</div></pre></td></tr></table></figure></p>
+<h3 id="object"><a href="#object" class="headerlink" title="object_:"></a><strong>object_</strong>:</h3><p><strong>get</strong>:实例变量；成员变量；类名；类；元类；关联对象<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="comment">/* 获取对象实例变量 */</span></div><div class="line">Ivar object_getInstanceVariable ( <span class="keyword">id</span> obj, <span class="keyword">const</span> <span class="keyword">char</span> *name, <span class="keyword">void</span> **outValue );</div><div class="line"><span class="comment">/* 获取对象中实例变量的值 */</span></div><div class="line"><span class="keyword">id</span> object_getIvar ( <span class="keyword">id</span> obj, Ivar ivar );</div><div class="line"><span class="comment">/* 获取对象的类名 */</span></div><div class="line"><span class="keyword">const</span> <span class="keyword">char</span> * object_getClassName ( <span class="keyword">id</span> obj );</div><div class="line"><span class="comment">/* 获取对象的类 */</span></div><div class="line">Class object_getClass ( <span class="keyword">id</span> obj );</div><div class="line">Class objc_getClass ( <span class="keyword">const</span> <span class="keyword">char</span> *name );</div><div class="line"><span class="comment">/* 返回指定类的元类 */</span></div><div class="line">Class objc_getMetaClass ( <span class="keyword">const</span> <span class="keyword">char</span> *name );</div><div class="line"><span class="comment">/* 获取关联对象 */</span></div><div class="line"><span class="keyword">id</span> objc_getAssociatedObject(<span class="keyword">self</span>, &amp;myKey);</div></pre></td></tr></table></figure></p>
+<p><strong>copy</strong>:对象；类；类列表；协议列表<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="comment">/* 获取指定对象的一份拷贝 */</span></div><div class="line"><span class="keyword">id</span> object_copy ( <span class="keyword">id</span> obj, size_t size );</div><div class="line"><span class="comment">/* 创建并返回一个指向所有已注册类的指针列表 */</span></div><div class="line">Class * objc_copyClassList ( <span class="keyword">unsigned</span> <span class="keyword">int</span> *outCount );</div></pre></td></tr></table></figure></p>
+<p><strong>set</strong>:实例变量；类；类列表；协议；关联对象<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="comment">/* 设置类实例的实例变量的值 */</span></div><div class="line">Ivar object_setInstanceVariable ( <span class="keyword">id</span> obj, <span class="keyword">const</span> <span class="keyword">char</span> *name, <span class="keyword">void</span> *value );</div><div class="line"><span class="comment">/* 设置对象中实例变量的值 */</span></div><div class="line"><span class="keyword">void</span> object_setIvar ( <span class="keyword">id</span> obj, Ivar ivar, <span class="keyword">id</span> value );</div><div class="line"><span class="comment">/* 设置关联对象 */</span></div><div class="line"><span class="keyword">void</span> objc_setAssociatedObject(<span class="keyword">self</span>, &amp;myKey, anObject, OBJC_ASSOCIATION_RETAIN);</div></pre></td></tr></table></figure></p>
+<p><strong>dispose</strong>:对象<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="comment">/* 释放指定对象占用的内存 */</span></div><div class="line"><span class="keyword">id</span> object_dispose ( <span class="keyword">id</span> obj );</div></pre></td></tr></table></figure></p>
+<h3 id="动态创建-销毁类、对象"><a href="#动态创建-销毁类、对象" class="headerlink" title="动态创建/销毁类、对象"></a>动态创建/销毁类、对象</h3><p>动态创建/销毁类：<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="comment">/* 创建一个新类和元类 */</span></div><div class="line">Class objc_allocateClassPair ( Class superclass, <span class="keyword">const</span> <span class="keyword">char</span> *name, size_t extraBytes );</div><div class="line"><span class="comment">/* 销毁一个类及其相关联的类 */</span></div><div class="line"><span class="keyword">void</span> objc_disposeClassPair ( Class cls );</div><div class="line"><span class="comment">/* 在应用中注册由objc_allocateClassPair创建的类 */</span></div><div class="line"><span class="keyword">void</span> objc_registerClassPair ( Class cls );</div></pre></td></tr></table></figure></p>
+<p>动态创建/销毁对象：<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="comment">/* 创建类实例 */</span></div><div class="line"><span class="keyword">id</span> class_createInstance ( Class cls, size_t extraBytes );</div><div class="line"><span class="comment">/* 在指定位置创建类实例 */</span></div><div class="line"><span class="keyword">id</span> objc_constructInstance ( Class cls, <span class="keyword">void</span> *bytes );</div><div class="line"><span class="comment">/* 销毁类实例 */</span></div><div class="line"><span class="keyword">void</span> * objc_destructInstance ( <span class="keyword">id</span> obj );</div></pre></td></tr></table></figure></p>
+<h1 id="实例变量和属性"><a href="#实例变量和属性" class="headerlink" title="实例变量和属性"></a>实例变量和属性</h1><p>“属性”(property)是OC的一项特性，用于封装对象中的数据。OC对象通常会把其所需要的数据保存为各种实例变量。实例变量一般通过“存取方法”(access method)来访问。其中，“获取方法”(getter)用于读取变量值，而“设置方法”(setter)用于写入变量值。而属性可以更容易地依照类对象来访问存放于其中的数据。</p>
+<h2 id="数据结构："><a href="#数据结构：" class="headerlink" title="数据结构："></a>数据结构：</h2><h3 id="成员变量Ivar"><a href="#成员变量Ivar" class="headerlink" title="成员变量Ivar"></a>成员变量Ivar</h3><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> objc_ivar *Ivar;</div><div class="line"><span class="keyword">struct</span> objc_ivar &#123;</div><div class="line">    <span class="keyword">char</span> *ivar_name                 OBJC2_UNAVAILABLE;  <span class="comment">/* 变量名 */</span></div><div class="line">    <span class="keyword">char</span> *ivar_type                 OBJC2_UNAVAILABLE;  <span class="comment">/* 变量类型 */</span></div><div class="line">    <span class="keyword">int</span> ivar_offset                 OBJC2_UNAVAILABLE;  <span class="comment">/* 基地址偏移字节 */</span></div><div class="line">    <span class="meta">#ifdef __LP64__</span></div><div class="line">    <span class="keyword">int</span> space                       OBJC2_UNAVAILABLE;</div><div class="line">    <span class="meta">#endif</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h3><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> objc_property *objc_property_t;</div></pre></td></tr></table></figure>
+<p><code>objc_property_attribute_t</code>（属性的特性有：返回值、是否为atomic、getter/setter名字、是否为dynamic、背后使用的ivar名字、是否为弱引用等）<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> &#123;</div><div class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *name;           <span class="comment">/* 特性名 */</span></div><div class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *value;          <span class="comment">/* 特性值 */</span></div><div class="line">&#125; objc_property_attribute_t;</div></pre></td></tr></table></figure></p>
+<h2 id="操作函数："><a href="#操作函数：" class="headerlink" title="操作函数："></a>操作函数：</h2><h3 id="ivar-："><a href="#ivar-：" class="headerlink" title="ivar_："></a><strong>ivar_</strong>：</h3><p><strong>get</strong>:成员变量名，成员变量类型编码，成员变量的偏移量<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="comment">/* 获取成员变量名 */</span></div><div class="line"><span class="keyword">const</span> <span class="keyword">char</span> * ivar_getName ( Ivar v );</div><div class="line"><span class="comment">/* 获取成员变量类型编码 */</span></div><div class="line"><span class="keyword">const</span> <span class="keyword">char</span> * ivar_getTypeEncoding ( Ivar v );</div><div class="line"><span class="comment">/* 获取成员变量的偏移量 */</span></div><div class="line">ptrdiff_t ivar_getOffset ( Ivar v );</div></pre></td></tr></table></figure></p>
+<h3 id="property-："><a href="#property-：" class="headerlink" title="property_："></a><strong>property_</strong>：</h3><p><strong>get</strong>:属性名，属性特性描述字符串，属性中指定的特性，属性的特性列表<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="comment">/* 获取属性名 */</span></div><div class="line"><span class="keyword">const</span> <span class="keyword">char</span> * property_getName ( objc_property_t property );</div><div class="line"><span class="comment">/* 获取属性特性描述字符串 */</span></div><div class="line"><span class="keyword">const</span> <span class="keyword">char</span> * property_getAttributes ( objc_property_t property );</div><div class="line"><span class="comment">/* 获取属性中指定的特性 */</span></div><div class="line"><span class="keyword">char</span> * property_copyAttributeValue ( objc_property_t property, <span class="keyword">const</span> <span class="keyword">char</span> *attributeName );</div><div class="line"><span class="comment">/* 获取属性的特性列表 */</span></div><div class="line">objc_property_attribute_t * property_copyAttributeList ( objc_property_t property, <span class="keyword">unsigned</span> <span class="keyword">int</span> *outCount );</div></pre></td></tr></table></figure></p>
+<h1 id="属性相关的内容"><a href="#属性相关的内容" class="headerlink" title="属性相关的内容"></a>属性相关的内容</h1><h2 id="实例变量与属性"><a href="#实例变量与属性" class="headerlink" title="实例变量与属性"></a>实例变量与属性</h2><p>Objective-C中不提倡使用<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">Person</span>:<span class="title">NSObject</span> </span>&#123;</div><div class="line">    <span class="built_in">NSString</span> *_firstName;</div><div class="line">    <span class="built_in">NSString</span> *_secondName;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>虽然这样可以定义实例变量的作用域，但是对象布局在编译期就已经固定了，只要访问<code>_firstName</code>变量的代码，编译器就把其替换为偏移量（offset），这个偏移量是硬编码，表示该变量距离存放对象的内存区域的起始地址有多远，如果又加了一个实例变量，如：<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">Person</span>:<span class="title">NSObject</span> </span>&#123;</div><div class="line">    <span class="built_in">NSString</span> *_family;</div><div class="line">    <span class="built_in">NSString</span> *_firstName;</div><div class="line">    <span class="built_in">NSString</span> *_secondName;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><code>_firestName</code>的偏移量就指向了<code>_family</code>，那么在修改定义后就必须重新编译，否则就会出错。Objective-C做法是把实例变量当作一种存储偏移量所用的“特殊变量”，交给“类对象”来管理，偏移量会在运行期查找，如果类的定义变了，存储的偏移量也就变了。<br>这个问题还有一种方法，尽量不要直接访问实例变量，而通过存取方法来做，也就是属性。虽然属性最终还是通过实例变量来实现，但是它更简洁。如果使用属性的话，编译器会自动编写访问这些属性所需方法，这个过程叫做“自动合成”。这个过程在编译期执行，除了生成方法代码外，编译器还自动向类中添加适当类型的实例变量，并在属性名前加前缀<code>_</code>。<br>也可以通过<code>@synthesize</code>语法来定义实例变量的名字<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="keyword">@synthesize</span> firesName = _myFirstName;</div></pre></td></tr></table></figure></p>
+<p>这会将生成的实例名字命名为<code>_myFirstName</code></p>
+<h2 id="属性特质-attribute"><a href="#属性特质-attribute" class="headerlink" title="属性特质(attribute)"></a>属性特质(attribute)</h2><p>属性有各种特质影响编译期所产生的存取方法</p>
+<ul>
+<li>原子性（atomic/nonatomic）</li>
+<li>读／写权限(readwrite/readonly)</li>
+<li>内存管理语义(assign/strong/weak/copy/unsafe_unretained)</li>
+<li>方法名<br>getter=&lt; name &gt;   如：<code>@property(nonatomic,getter=isOn) BOOL on;</code><br>setter=&lt; name &gt;</li>
+</ul>
+<p>上述特质可通过前文runtime方法得到。</p>
+<h2 id="访问实例变量"><a href="#访问实例变量" class="headerlink" title="访问实例变量"></a>访问实例变量</h2><p>在对象之外访问实例变量应该通过属性来访问，而在对象内部则可根据情况分类讨论。<br>如果直接访问实例变量，由于不经过方法派发，访问速度会比访问属性更快，编译器所产生的代码会直接访问保存对象实例的那块内存，但是直接访问实例变量不会触发“设置方法”，比如如果在ARC下直接访问一个声明为copy的属性，那么并不会拷贝这个属性，只会保留新值释放旧值。因此通过getter方法定义的懒加载方法也不会被调用。也不会触发<code>KVO</code>。<br>因此可以在写入实例变量时通过“设置方法”来做，而在读取实例变量时直接访问（懒加载除外）。</p>
+
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+
+
+
+
+
+
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2015/12/12/runtime-2/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2015/12/07/Intro/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/grommash_avatar.jpeg" alt="GuYi's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        guxinqi25@gmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="#" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/" target="_self">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2017/02/">二月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">十二月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/11/">十一月 2016<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/10/">十月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/09/">九月 2016<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/04/">四月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/03/">三月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/02/">二月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2015/12/">十二月 2015<span class="sidebar_archives-count">7</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+
+    <!-- Pages  -->
+    
+
+    <!-- Article Number  -->
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+        <a href="https://twitter.com/twitter" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-twitter.svg);">
+                <span class="visuallyhidden">Twitter</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Facebook -->
+    
+        <a href="https://www.facebook.com/facebook" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-facebook.svg);">
+                <span class="visuallyhidden">Facebook</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Google + -->
+    
+        <a href="https://www.google.com/" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-gplus.svg);">
+                <span class="visuallyhidden">Google Plus</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Weibo -->
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;
+            <script type="text/javascript">
+                var fd = new Date();
+                document.write(fd.getFullYear());
+            </script>
+            &nbsp;Grommash
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import File -->
+
+    <script src="/js/lazyload.min.js"></script>
+    <script src="/js/js.min.js"></script>
+
+
+
+    <script src="/js/nprogress.js"></script>
+
+
+<script type="text/javascript">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Swiftye -->
+
+
+<!-- Local Search-->
+
+
+<!-- Window Load-->
+<script>
+    $(window).load(function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+</script>
+
+<!-- MathJax Load-->
+
+
+                </main>
+            </div>
+        </body>
+    
+</html>

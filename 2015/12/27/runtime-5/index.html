@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+    <!-- 
+        © Material Theme
+        https://github.com/viosey/hexo-theme-material
+        Version: 1.3.2 -->
+
+    <!-- Title -->
+    
+    <title>
+        
+            Objective-C内部实现剖析-通知 | 
+        
+        Grommash
+    </title>
+
+    <!-- Favicons -->
+    <link rel="icon shortcut" type="image/ico" href="/img/favicon.png">
+    <link rel="icon" sizes="192x192" href="/img/favicon.png">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Meta & Info -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0097A7">
+    <meta name="author" content="GuYi">
+    <meta name="description" content="null">
+    <meta name="keywords" content="null,Objective-C,Runtime">
+
+    <!--iOS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-title" content="Title">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="480">
+
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Grommash">
+
+    <!-- The Open Graph protocol -->
+    <meta property="og:url" content="http://yoursite.com">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Objective-C内部实现剖析-通知 | Grommash">
+    <meta property="og:description" content="null">
+    <meta property="og:article:tag" content="Objective-C"> <meta property="og:article:tag" content="Runtime"> 
+
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/css/ie-blocker.css">
+
+        
+            <script src="/js/ie-blocker.zhCN.js"></script>
+        
+    <![endif]-->
+
+    <!-- Import CSS & jQuery -->
+    
+        <link rel="stylesheet" href="/css/material.min.css">
+        <link rel="stylesheet" href="/css/style.min.css">
+        <!-- Config CSS -->
+
+
+<!-- Other Styles -->
+<style>
+  body, html {
+    font-family: Roboto, "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  }
+
+  a {
+    color: #00838F;
+  }
+
+  .mdl-card__media,
+  #search-label,
+  #search-form-label:after,
+  #scheme-Paradox .hot_tags-count,
+  #scheme-Paradox .sidebar_archives-count,
+  #scheme-Paradox .sidebar-colored .sidebar-header,
+  #scheme-Paradox .sidebar-colored .sidebar-badge{
+    background-color: #0097A7 !important;
+  }
+
+  /* Sidebar User Drop Down Menu Text Color */
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
+  #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
+    color: #0097A7 !important;
+  }
+
+  #post_entry-right-info,
+  .sidebar-colored .sidebar-nav li:hover > a,
+  .sidebar-colored .sidebar-nav li:hover > a i,
+  .sidebar-colored .sidebar-nav li > a:hover,
+  .sidebar-colored .sidebar-nav li > a:hover i,
+  .sidebar-colored .sidebar-nav li > a:focus i,
+  .sidebar-colored .sidebar-nav > .open > a,
+  .sidebar-colored .sidebar-nav > .open > a:hover,
+  .sidebar-colored .sidebar-nav > .open > a:focus,
+  #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
+    color: #0097A7 !important;
+  }
+
+  .toTop {
+    background: #757575 !important;
+  }
+
+  .material-layout .material-post>.material-nav,
+  .material-layout .material-index>.material-nav,
+  .material-nav a {
+    color: #757575;
+  }
+
+  #scheme-Paradox .MD-burger-layer {
+    background-color: #757575;
+  }
+
+  #scheme-Paradox #post-toc-trigger-btn {
+    color: #757575;
+  }
+
+  .post-toc a:hover {
+    color: #00838F;
+    text-decoration: underline;
+  }
+</style>
+
+
+<!-- Theme Background Related-->
+
+    <style>
+      body{
+        background-color: #F5F5F5;
+      }
+
+      /* blog_info bottom background */
+      #scheme-Paradox .material-layout .something-else .mdl-card__supporting-text{
+        background-color: #fff;
+      }
+    </style>
+
+
+
+
+<!-- Fade Effect -->
+
+    <style>
+      .fade {
+        transition: all 800ms linear;
+        -webkit-transform: translate3d(0,0,0);
+        -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+        -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        opacity: 1;
+      }
+
+      .fade.out{
+        opacity: 0;
+      }
+    </style>
+
+
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/queue.js"></script>
+    
+
+    <!-- UC Browser Compatible -->
+    <script>
+        var agent = navigator.userAgent.toLowerCase();
+        if(agent.indexOf('ucbrowser')>0) {
+            document.write("<link rel=\"stylesheet\" href=\"/css/uc.css\">");
+            alert('由于 UC 浏览器使用极旧的内核，而本网站使用了一些新的特性。\n为了您能更好的浏览，推荐使用 Chrome 或 Firefox 浏览器。');
+        }
+    </script>
+
+    
+
+    
+
+    <!-- Bing Background -->
+    
+
+    <!-- Custom Head -->
+    
+</head>
+
+
+    
+        <body id="scheme-Paradox" class="lazy">
+            <div class="material-layout  mdl-js-layout has-drawer is-upgraded">
+                
+
+                <!-- Main Container -->
+                <main class="material-layout__content" id="main">
+
+                    <!-- Top Anchor -->
+                    <div id="top"></div>
+
+                    
+                        <!-- Hamburger Button -->
+                        <button class="MD-burger-icon sidebar-toggle">
+                            <span class="MD-burger-layer"></span>
+                        </button>
+                    
+
+                    <!-- Post TOC -->
+
+    
+    <!-- Back Button -->
+    <!--
+    <div class="material-back" id="backhome-div" tabindex="0">
+        <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon"
+           href="#" onclick="window.history.back();return false;"
+           target="_self"
+           role="button"
+           data-upgraded=",MaterialButton,MaterialRipple">
+            <i class="material-icons" role="presentation">arrow_back</i>
+            <span class="mdl-button__ripple-container">
+                <span class="mdl-ripple"></span>
+            </span>
+        </a>
+    </div>
+    -->
+
+    <!-- Left aligned menu below button -->
+    <button id="post-toc-trigger-btn"
+        class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="material-icons">format_list_numbered</i>
+    </button>
+
+    <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn">
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#简述"><span class="post-toc-number">1.</span> <span class="post-toc-text">简述</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#观察者模式"><span class="post-toc-number">2.</span> <span class="post-toc-text">观察者模式</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#NSNotification的伪实现"><span class="post-toc-number">3.</span> <span class="post-toc-text">NSNotification的伪实现</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#API"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">API</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#实现"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">实现</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#NSNotification的线程问题"><span class="post-toc-number">4.</span> <span class="post-toc-text">NSNotification的线程问题</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#NSNotificationCenter的线程安全性"><span class="post-toc-number">5.</span> <span class="post-toc-text">NSNotificationCenter的线程安全性</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#block方式的NSNotification"><span class="post-toc-number">6.</span> <span class="post-toc-text">block方式的NSNotification</span></a></li></ol>
+
+        <!--
+        <li class="mdl-menu__item">
+            Some Action
+        </li>
+        -->
+    </ul>
+
+
+
+
+<!-- Layouts -->
+
+    <!-- Post Module -->
+    <div class="material-post_container">
+
+        <div class="material-post mdl-grid">
+            <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
+
+                <!-- Post Header(Thumbnail & Title) -->
+                
+    <!-- Paradox Post Header -->
+    
+        
+            <!-- Random Thumbnail -->
+            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+            <script>
+    var randomNum = Math.floor(Math.random() * 19 + 1);
+
+    $('.post_thumbnail-random').css('background-image', 'url(' + '/img/random/material-' + randomNum + '.png' + ')');
+</script>
+
+        
+    
+            <p class="article-headline-p">
+                Objective-C内部实现剖析-通知
+            </p>
+        </div>
+
+
+
+
+
+                
+                    <!-- Paradox Post Info -->
+                    <div class="mdl-color-text--grey-700 mdl-card__supporting-text meta">
+
+    <!-- Author Avatar -->
+    <div id="author-avatar">
+        <img src="/img/grommash_avatar.jpeg" width="44px" height="44px" alt="Author Avatar"/>
+    </div>
+    <!-- Author Name & Date -->
+    <div>
+        <strong>GuYi</strong>
+        <span>12月 27, 2015</span>
+    </div>
+
+    <div class="section-spacer"></div>
+
+    <!-- Favorite -->
+    <!--
+        <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
+            <i class="material-icons" role="presentation">favorite</i>
+            <span class="visuallyhidden">favorites</span>
+        </button>
+    -->
+
+    <!-- Qrcode -->
+    
+
+    <!-- Tags (bookmark) -->
+    
+    <button id="article-functions-viewtags-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons" role="presentation">bookmark</i>
+        <span class="visuallyhidden">bookmark</span>
+    </button>
+    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
+        <li class="mdl-menu__item">
+        <a class="post_tag-link" href="/tags/Objective-C/">Objective-C</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/Runtime/">Runtime</a>
+    </ul>
+    
+
+    <!-- Share -->
+    <button id="article-fuctions-share-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+    <i class="material-icons" role="presentation">share</i>
+    <span class="visuallyhidden">share</span>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
+    
+
+    
+
+    <!-- Share Weibo -->
+    
+        <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=Objective-C内部实现剖析-通知&url=http://yoursite.com//2015/12/27/runtime-5/index.html&pic=&searchPic=false&style=simple" target="_blank">
+            <li class="mdl-menu__item">
+                分享到微博
+            </li>
+        </a>
+    
+
+    <!-- Share Twitter -->
+    
+        <a class="post_share-link" href="https://twitter.com/intent/tweet?text=Objective-C内部实现剖析-通知&url=http://yoursite.com//2015/12/27/runtime-5/index.html&via=GuYi" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Twitter
+            </li>
+        </a>
+    
+
+    <!-- Share Facebook -->
+    
+        <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com//2015/12/27/runtime-5/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Facebook
+            </li>
+        </a>
+    
+
+    <!-- Share Google+ -->
+    
+        <a class="post_share-link" href="https://plus.google.com/share?url=http://yoursite.com//2015/12/27/runtime-5/index.html" target="_blank">
+            <li class="mdl-menu__item">
+                分享到 Google+
+            </li>
+        </a>
+    
+
+    <!-- Share LinkedIn -->
+    
+
+    <!-- Share QQ -->
+    
+
+    <!-- Share Telegram -->
+    
+</ul>
+
+</div>
+
+                
+
+                <!-- Post Content -->
+                <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
+    
+        <h1 id="简述"><a href="#简述" class="headerlink" title="简述"></a>简述</h1><p>对于NSNotification的实现，苹果并没有公布，但是既然是基于观察者模式实现的，除去优化的问题，大致也可以用block来进行通信实现。本文大致模拟了通知的实现。</p>
+<a id="more"></a>
+<h1 id="观察者模式"><a href="#观察者模式" class="headerlink" title="观察者模式"></a>观察者模式</h1><p>定义：定义对象间的一种一对多的依赖关系。当一个对象的状态发生改变时，所有依赖于它的对象都得到通知并自动更新。<br>应用场景：</p>
+<ul>
+<li>有两种抽象类型相互依赖。将它们封装在各自的对象中，就可以对它们单独进行改变和复用。</li>
+<li>对一个对象的改变需要同时改变其他对象，而不知道具体有多少对象有待改变。</li>
+<li>一个对象必须通知其他对象，而它又不需要知道其他对象是什么。</li>
+</ul>
+<img src="/2015/12/27/runtime-5/NSNotification.png" alt="NSNotification.png" title="">
+<h1 id="NSNotification的伪实现"><a href="#NSNotification的伪实现" class="headerlink" title="NSNotification的伪实现"></a>NSNotification的伪实现</h1><h2 id="API"><a href="#API" class="headerlink" title="API"></a>API</h2><p>1.向通知中心注册观察者:</p>
+<ul>
+<li>(void)addObserver:(id)observer selector:(SEL)aSelector name:(nullable NSString *)aName object:(nullable id)anObject;（观察者接收到通知后执行任务的代码在发送通知的线程中执行）</li>
+<li>(id )addObserverForName:(nullable NSString *)name object:(nullable id)obj queue:(nullable NSOperationQueue *)queue usingBlock:(void (^)(GYNotification *note))block NS_AVAILABLE(10_6, 4_0);（观察者接收到通知后执行任务的代码在指定的操作队列中执行）</li>
+</ul>
+<p>2.通知中心向所有注册的观察者发送通知</p>
+<ul>
+<li>(void)postNotification:(GYNotification *)notification;</li>
+<li>(void)postNotificationName:(NSString *)aName object:(nullable id)anObject;</li>
+<li>(void)postNotificationName:(NSString *)aName object:(nullable id)anObject userInfo:(nullable NSDictionary *)aUserInfo;</li>
+</ul>
+<p>3.观察者收到通知，执行相应代码</p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>建两个新类GYNotification，GYNotificationCenter，这两个类的接口和苹果提供的接口完全一样，我将根据接口提供的功能给出实现代码。 要点是通知中心是单例类，并且通知中心维护了一个包含所有注册的观察者的集合，这里我选择了动态数组来存储所有的观察者，代码如下：<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line">+ (GYNotificationCenter *)defaultCenter</div><div class="line">&#123;</div><div class="line">    <span class="keyword">static</span> GYNotificationCenter *singleton;</div><div class="line">    <span class="keyword">static</span> <span class="built_in">dispatch_once_t</span> onceToken;</div><div class="line">    <span class="built_in">dispatch_once</span>(&amp;onceToken, ^&#123;</div><div class="line">        singleton = [[<span class="keyword">self</span> alloc] initSingleton];</div><div class="line">    &#125;);</div><div class="line">    <span class="keyword">return</span> singleton;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">instancetype</span>)initSingleton</div><div class="line">&#123;</div><div class="line">    <span class="keyword">if</span> ([<span class="keyword">super</span> init]) &#123;</div><div class="line">        _observers = [<span class="built_in">NSMutableArray</span> array];</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">self</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>还定义了一个观察者模型用于保存观察者，通知消息名，观察者收到通知后执行代码所在的操作队列和执行代码的回调，模型源码如下：</p>
+<figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">GYObserverModel</span> : <span class="title">NSObject</span></span></div><div class="line"></div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="keyword">id</span> observer;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">assign</span>) SEL selector;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *notificationName;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="keyword">id</span> object;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">NSOperationQueue</span> *operationQueue;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) OperationBlock block;</div><div class="line"></div><div class="line"><span class="keyword">@end</span></div></pre></td></tr></table></figure>
+<p>向通知中心注册观察者，代码如下：<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line">- (<span class="keyword">void</span>)addObserver:(<span class="keyword">id</span>)observer selector:(SEL)aSelector name:(<span class="built_in">NSString</span> *)aName object:(<span class="keyword">id</span>)anObject</div><div class="line">&#123;</div><div class="line">    GYObserverModel *observerModel = [[GYObserverModel alloc] init];</div><div class="line">    observerModel.observer = observer;</div><div class="line">    observerModel.selector = aSelector;</div><div class="line">    observerModel.notificationName = aName;</div><div class="line">    observerModel.object = anObject;</div><div class="line">    [<span class="keyword">self</span>.observers addObject:observerModel];</div><div class="line">&#125;</div><div class="line">- (<span class="keyword">id</span> &lt;<span class="built_in">NSObject</span>&gt;)addObserverForName:(<span class="built_in">NSString</span> *)name object:(<span class="keyword">id</span>)obj queue:(<span class="built_in">NSOperationQueue</span> *)queue usingBlock:(<span class="keyword">void</span> (^)(GYNotification * _Nonnull))block</div><div class="line">&#123;</div><div class="line">    GYObserverModel *observerModel = [[GYObserverModel alloc] init];</div><div class="line">    observerModel.notificationName = name;</div><div class="line">    observerModel.object = obj;</div><div class="line">    observerModel.operationQueue = queue;</div><div class="line">    observerModel.block = block;</div><div class="line">    [<span class="keyword">self</span>.observers addObject:observerModel];</div><div class="line">    <span class="keyword">return</span> <span class="literal">nil</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>发送通知有三种方式，最终都是调用- (void)postNotification:(GYNotification *)notification，代码如下：<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line">- (<span class="keyword">void</span>)postNotification:(GYNotification *)notification</div><div class="line">&#123;</div><div class="line">    [<span class="keyword">self</span>.observers enumerateObjectsUsingBlock:^(<span class="keyword">id</span>  _Nonnull obj, <span class="built_in">NSUInteger</span> idx, <span class="built_in">BOOL</span> * _Nonnull stop) &#123;</div><div class="line">        GYObserverModel *observerModel = obj;</div><div class="line">        <span class="keyword">id</span> observer = observerModel.observer;</div><div class="line">        SEL selector = observerModel.selector;</div><div class="line">        <span class="keyword">if</span> (!observerModel.operationQueue) &#123;</div><div class="line">            [observer performSelector:selector withObject:notification];</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            <span class="built_in">NSBlockOperation</span> *operation = [<span class="built_in">NSBlockOperation</span> blockOperationWithBlock:^&#123;</div><div class="line">                observerModel.block(notification);</div><div class="line">            &#125;];</div><div class="line">            <span class="built_in">NSOperationQueue</span> *operationQueue = observerModel.operationQueue;</div><div class="line">            [operationQueue addOperation:operation];</div><div class="line">        &#125;</div><div class="line">    &#125;];</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h1 id="NSNotification的线程问题"><a href="#NSNotification的线程问题" class="headerlink" title="NSNotification的线程问题"></a>NSNotification的线程问题</h1><blockquote>
+<p>In a multithreaded application, notifications are always delivered in the thread in which the notification was posted, which may not be the same thread in which an observer registered itself.</p>
+</blockquote>
+<p>在多线程应用中，Notification在哪个线程中post，就在哪个线程中被转发，而不一定是在注册观察者的那个线程中。</p>
+<p>示例：<br><figure class="highlight objectivec"><table><tr><td class="code"><pre><div class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</div><div class="line">    [<span class="keyword">super</span> viewDidLoad];</div><div class="line">    <span class="built_in">NSLog</span>(<span class="string">@"current thread = %@"</span>, [<span class="built_in">NSThread</span> currentThread]);</div><div class="line">    [[<span class="built_in">NSNotificationCenter</span> defaultCenter] addObserver:<span class="keyword">self</span> selector:<span class="keyword">@selector</span>(handleNotification:) name:POST_NOTIFICATION object:<span class="literal">nil</span>];</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)viewDidAppear:(<span class="built_in">BOOL</span>)animated &#123;</div><div class="line">    [<span class="keyword">self</span> postNotificationInBackground];</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)postNotificationInBackground &#123;</div><div class="line">    <span class="built_in">dispatch_async</span>(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, <span class="number">0</span>), ^&#123;</div><div class="line">        [[<span class="built_in">NSNotificationCenter</span> defaultCenter] postNotificationName:POST_NOTIFICATION object:<span class="literal">nil</span> userInfo:<span class="literal">nil</span>];</div><div class="line">    &#125;);</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)handleNotification:(<span class="built_in">NSNotification</span> *)notification &#123;</div><div class="line">    <span class="built_in">NSLog</span>(<span class="string">@"current thread = %@"</span>, [<span class="built_in">NSThread</span> currentThread]);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>Log:<br><figure class="highlight objectivec"><table><tr><td class="code"><pre><div class="line">current thread = &lt;<span class="built_in">NSThread</span>: <span class="number">0x7f8548405250</span>&gt;&#123;number = <span class="number">1</span>, name = main&#125;</div><div class="line">viewWillAppear: ViewController</div><div class="line">current thread = &lt;<span class="built_in">NSThread</span>: <span class="number">0x7f854845b790</span>&gt;&#123;number = <span class="number">2</span>, name = (null)&#125;</div></pre></td></tr></table></figure></p>
+<blockquote>
+<p>For example, if an object running in a background thread is listening for notifications from the user interface, such as a window closing, you would like to receive the notifications in the background thread instead of the main thread. In these cases, you must capture the notifications as they are delivered on the default thread and redirect them to the appropriate thread.</p>
+</blockquote>
+<p>我们在Notification所在的默认线程中捕获这些分发的通知，然后将其重定向到指定的线程中。如果我们希望一个Notification的post线程与转发线程不是同一个线程，就需要重定向。</p>
+<p>一种重定向的实现思路是自定义一个通知队列(注意，不是NSNotificationQueue对象，而是一个数组)，让这个队列去维护那些我们需要重定向的Notification。我们仍然是像平常一样去注册一个通知的观察者，当Notification来了时，先看看post这个Notification的线程是不是我们所期望的线程，如果不是，则将这个Notification存储到我们的队列中，并发送一个信号(signal)到期望的线程中，来告诉这个线程需要处理一个Notification。指定的线程在收到信号后，将Notification从队列中移除，并进行处理。</p>
+<p>官方示例代码：<br><figure class="highlight objectivec"><table><tr><td class="code"><pre><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ViewController</span> () &lt;<span class="title">NSMachPortDelegate</span>&gt;</span></div><div class="line"></div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>) <span class="built_in">NSMutableArray</span>    *notifications;         <span class="comment">/* 通知队列 */</span></div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>) <span class="built_in">NSThread</span>          *notificationThread;    <span class="comment">/* 期望线程 */</span></div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>) <span class="built_in">NSLock</span>            *notificationLock;      <span class="comment">/* 用于对通知队列加锁的锁对象，避免线程冲突 */</span></div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>) <span class="built_in">NSMachPort</span>        *notificationPort;      <span class="comment">/* 用于向期望线程发送信号的通信端口 */</span></div><div class="line"></div><div class="line"><span class="keyword">@end</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ViewController</span></span></div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</div><div class="line">    [<span class="keyword">super</span> viewDidLoad];</div><div class="line">    <span class="built_in">NSLog</span>(<span class="string">@"current thread = %@"</span>, [<span class="built_in">NSThread</span> currentThread]);</div><div class="line"></div><div class="line">    <span class="comment">/* 初始化 */</span></div><div class="line">    <span class="keyword">self</span>.notifications = [[<span class="built_in">NSMutableArray</span> alloc] init];</div><div class="line">    <span class="keyword">self</span>.notificationLock = [[<span class="built_in">NSLock</span> alloc] init];</div><div class="line">    <span class="keyword">self</span>.notificationThread = [<span class="built_in">NSThread</span> currentThread];</div><div class="line">    <span class="keyword">self</span>.notificationPort = [[<span class="built_in">NSMachPort</span> alloc] init];</div><div class="line">    <span class="keyword">self</span>.notificationPort.delegate = <span class="keyword">self</span>;</div><div class="line"></div><div class="line">    <span class="comment">/* 往当前线程的run loop添加端口源 */</span></div><div class="line">    <span class="comment">/* 当Mach消息到达而接收线程的run loop没有运行时，则内核会保存这条消息，直到下一次进入run loop */</span></div><div class="line">    [[<span class="built_in">NSRunLoop</span> currentRunLoop] addPort:<span class="keyword">self</span>.notificationPort</div><div class="line">    forMode:(__bridge <span class="built_in">NSString</span> *)kCFRunLoopCommonModes];</div><div class="line"></div><div class="line">    [[<span class="built_in">NSNotificationCenter</span> defaultCenter] addObserver:<span class="keyword">self</span> selector:<span class="keyword">@selector</span>(processNotification:) name:<span class="string">@"TestNotification"</span> object:<span class="literal">nil</span>];</div><div class="line">    <span class="built_in">dispatch_async</span>(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, <span class="number">0</span>), ^&#123;</div><div class="line">        [[<span class="built_in">NSNotificationCenter</span> defaultCenter] postNotificationName:TEST_NOTIFICATION object:<span class="literal">nil</span> userInfo:<span class="literal">nil</span>];</div><div class="line">    &#125;);</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)handleMachMessage:(<span class="keyword">void</span> *)msg &#123;</div><div class="line">    [<span class="keyword">self</span>.notificationLock lock];</div><div class="line"></div><div class="line">    <span class="keyword">while</span> ([<span class="keyword">self</span>.notifications count]) &#123;</div><div class="line">        <span class="built_in">NSNotification</span> *notification = [<span class="keyword">self</span>.notifications objectAtIndex:<span class="number">0</span>];</div><div class="line">        [<span class="keyword">self</span>.notifications removeObjectAtIndex:<span class="number">0</span>];</div><div class="line">        [<span class="keyword">self</span>.notificationLock unlock];</div><div class="line">        [<span class="keyword">self</span> processNotification:notification];</div><div class="line">        [<span class="keyword">self</span>.notificationLock lock];</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    [<span class="keyword">self</span>.notificationLock unlock];</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)processNotification:(<span class="built_in">NSNotification</span> *)notification &#123;</div><div class="line">    <span class="keyword">if</span> ([<span class="built_in">NSThread</span> currentThread] != _notificationThread) &#123;</div><div class="line">        <span class="comment">/* Forward the notification to the correct thread. */</span></div><div class="line">        [<span class="keyword">self</span>.notificationLock lock];</div><div class="line">        [<span class="keyword">self</span>.notifications addObject:notification];</div><div class="line">        [<span class="keyword">self</span>.notificationLock unlock];</div><div class="line">        [<span class="keyword">self</span>.notificationPort sendBeforeDate:[<span class="built_in">NSDate</span> date]</div><div class="line">                                   components:<span class="literal">nil</span></div><div class="line">                                         from:<span class="literal">nil</span></div><div class="line">                                     reserved:<span class="number">0</span>];</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">else</span> &#123;</div><div class="line">        <span class="comment">/* Process the notification here; */</span></div><div class="line">        <span class="built_in">NSLog</span>(<span class="string">@"current thread = %@"</span>, [<span class="built_in">NSThread</span> currentThread]);</div><div class="line">        <span class="built_in">NSLog</span>(<span class="string">@"process notification"</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">@end</span></div></pre></td></tr></table></figure></p>
+<p>Log:<br><figure class="highlight objectivec"><table><tr><td class="code"><pre><div class="line">current thread = &lt;<span class="built_in">NSThread</span>: <span class="number">0x7ffa4070ed50</span>&gt;&#123;number = <span class="number">1</span>, name = main&#125;</div><div class="line">current thread = &lt;<span class="built_in">NSThread</span>: <span class="number">0x7ffa4070ed50</span>&gt;&#123;number = <span class="number">1</span>, name = main&#125;</div><div class="line">process notification</div></pre></td></tr></table></figure></p>
+<p>这种方案有明显额缺陷，官方文档也对其进行了说明，归结起来有两点：</p>
+<ul>
+<li>所有的通知的处理都要经过 processNotification 函数进行处理。</li>
+<li>所有的接听对象都要提供相应的 NSMachPort 对象，进行消息转发。</li>
+</ul>
+<p>正是由于存在这样的缺陷，因此官方文档并不建议直接这样使用，而是鼓励开发者去继承NSNoticationCenter或者自己去提供一个单独的类进行线程的维护。</p>
+<h1 id="NSNotificationCenter的线程安全性"><a href="#NSNotificationCenter的线程安全性" class="headerlink" title="NSNotificationCenter的线程安全性"></a>NSNotificationCenter的线程安全性</h1><p>之所以采取通知中心在同一个线程中post和转发同一消息这一策略，应该是出于线程安全的角度来考量的。官方文档告诉我们，NSNotificationCenter是一个线程安全类，我们可以在多线程环境下使用同一个NSNotificationCenter对象而不需要加锁。</p>
+<p>我们可以在任何线程中添加/删除通知的观察者，也可以在任何线程中post一个通知。<br><figure class="highlight objectivec"><table><tr><td class="code"><pre><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">Poster</span> : <span class="title">NSObject</span></span></div><div class="line"></div><div class="line"><span class="keyword">@end</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">Poster</span></span></div><div class="line"></div><div class="line">- (<span class="keyword">instancetype</span>)init</div><div class="line">&#123;</div><div class="line">    <span class="keyword">self</span> = [<span class="keyword">super</span> init];</div><div class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>)</div><div class="line">    &#123;</div><div class="line">        [<span class="keyword">self</span> performSelectorInBackground:<span class="keyword">@selector</span>(postNotification) withObject:<span class="literal">nil</span>];</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">self</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)postNotification</div><div class="line">&#123;</div><div class="line">    [[<span class="built_in">NSNotificationCenter</span> defaultCenter] postNotificationName:TEST_NOTIFICATION object:<span class="literal">nil</span>];</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">@end</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">Observer</span> : <span class="title">NSObject</span></span></div><div class="line">&#123;</div><div class="line">    Poster  *_poster;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">assign</span>) <span class="built_in">NSInteger</span> i;</div><div class="line"></div><div class="line"><span class="keyword">@end</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">Observer</span></span></div><div class="line"></div><div class="line">- (<span class="keyword">instancetype</span>)init</div><div class="line">&#123;</div><div class="line">    <span class="keyword">self</span> = [<span class="keyword">super</span> init];</div><div class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>)</div><div class="line">    &#123;</div><div class="line">        _poster = [[Poster alloc] init];</div><div class="line">        [[<span class="built_in">NSNotificationCenter</span> defaultCenter] addObserver:<span class="keyword">self</span> selector:<span class="keyword">@selector</span>(handleNotification:) name:TEST_NOTIFICATION object:<span class="literal">nil</span>];</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">self</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)handleNotification:(<span class="built_in">NSNotification</span> *)notification</div><div class="line">&#123;</div><div class="line">    <span class="built_in">NSLog</span>(<span class="string">@"handle notification begin"</span>);</div><div class="line">    sleep(<span class="number">1</span>);</div><div class="line">    <span class="built_in">NSLog</span>(<span class="string">@"handle notification end"</span>);</div><div class="line">    <span class="keyword">self</span>.i = <span class="number">10</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)dealloc</div><div class="line">&#123;</div><div class="line">    [[<span class="built_in">NSNotificationCenter</span> defaultCenter] removeObserver:<span class="keyword">self</span>];</div><div class="line">    <span class="built_in">NSLog</span>(<span class="string">@"Observer dealloc"</span>);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">@end</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">ViewController</span></span></div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</div><div class="line">    [<span class="keyword">super</span> viewDidLoad];</div><div class="line">    __autoreleasing Observer *observer = [[Observer alloc] init];</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">@end</span></div></pre></td></tr></table></figure></p>
+<p>这段代码是在主线程添加了一个TEST_NOTIFICATION通知的监听者，并在主线程中将其移除，而我们的NSNotification是在后台线程中post的。在通知处理函数中，我们让回调所在的线程睡眠1秒钟，然后再去设置属性i值。这就会导致程序崩溃：</p>
+<ul>
+<li>当我们注册一个观察者是，通知中心会持有观察者的一个弱引用，来确保观察者是可用的。</li>
+<li>主线程调用dealloc操作会让Observer对象的引用计数减为0，这时对象会被释放掉。</li>
+<li>后台线程发送一个通知，如果此时Observer还未被释放，则会向其转发消息，并执行回调方法。而如果在回调执行的过程中对象被释放了，就会出现上面的问题。</li>
+</ul>
+<p>那我们该怎么做呢？这里有一些好的建议：</p>
+<ul>
+<li>尽量在一个线程中处理通知相关的操作，大部分情况下，这样做都能确保通知的正常工作。不过，我们无法确定到底会在哪个线程中调用dealloc方法，所以这一点还是比较困难。</li>
+<li>注册监听时，使用基于block的API。这样我们在block还要继续调用self的属性或方法，就可以通过weak-strong的方式来处理。具体大家可以改造下上面的代码试试是什么效果。</li>
+<li>使用带有安全生命周期的对象，这一点对象单例对象来说再合适不过了，在应用的整个生命周期都不会被释放。</li>
+<li>使用代理。</li>
+</ul>
+<h1 id="block方式的NSNotification"><a href="#block方式的NSNotification" class="headerlink" title="block方式的NSNotification"></a>block方式的NSNotification</h1><p>为了顺应语法的变化，apple从iOS4之后提供了带有block的NSNotification。使用方式如下：<br><figure class="highlight objectivec"><table><tr><td class="code"><pre><div class="line">- (<span class="keyword">id</span>&lt;<span class="built_in">NSObject</span>&gt;)addObserverForName:(<span class="built_in">NSString</span> *)name</div><div class="line">                            object:(<span class="keyword">id</span>)obj</div><div class="line">                             queue:(<span class="built_in">NSOperationQueue</span> *)queue</div><div class="line">                        usingBlock:(<span class="keyword">void</span> (^)(<span class="built_in">NSNotification</span> *note))block</div></pre></td></tr></table></figure></p>
+<ul>
+<li>观察者就是当前对象</li>
+<li>queue定义了block执行的线程，nil则表示block的执行线程和发通知在同一个线程</li>
+<li>block就是相应通知的处理函数</li>
+</ul>
+<p>这个API已经能够让我们方便的控制通知的线程切换。但是，这里有个问题需要注意。就是其remove操作。<br><figure class="highlight objectivec"><table><tr><td class="code"><pre><div class="line">- (<span class="keyword">void</span>)removeObservers &#123;</div><div class="line">    <span class="keyword">if</span>（_observer）&#123;</div><div class="line">        [[<span class="built_in">NSNotificationCenter</span> defaultCenter]removeObserver:_observer];</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>其中_observer是addObserverForName方式的api返回观察者对象。这也就意味着，你需要为每一个观察者记录一个成员对象，然后在remove的时候依次删除。试想一下，你如果需要10个观察者，则需要记录10个成员对象，这个想想就是很麻烦，而且它还不能够方便的指定observer。因此，理想的做法就是自己再做一层封装，将这些细节封装起来。</p>
+<p><strong>通知的移除不一定非要写</strong></p>
+<p>如果在闭包中使用了weakself，则这个通知所在NSObject或者ViewController都会释放，就不会再继续调用weakself调用的方法。</p>
+<p>对于addObserver：这里要分ViewController和普通NSObject两个说起。</p>
+<p><strong>ViewController</strong>：在调用ViewController的dealloc的时候，系统会调用<code>[[NSNotificationCenter defaultCenter]removeObserver:self]</code>方法，所以如果是在viewDidLoad中使用addObserver添加监听者的话可以省掉移除。当然，如果是在viewWillAppear中添加的话，那么就要在viewWillAppear中自己移除，而且，最好是使用<code>[[NSNotificationCenter defaultCenter]removeObserver:self name:@&quot;test&quot; object:nil]</code>，而非[[NSNotificationCenter defaultCenter]removeObserver:self]，否则很有可能你会把系统的其他通知也移除了</p>
+<p><strong>普通NSObject</strong>：在iOS9之后，NSObject也会像ViewController一样在dealloc时调用<code>[[NSNotificationCenter defaultCenter]removeObserver:self]</code>方法，在iOS9之前的不会调用，需要自己写。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1024259-43227bc7bf1e6a73.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>所以可以这么写：<br><figure class="highlight objectivec"><table><tr><td class="code"><pre><div class="line"><span class="keyword">if</span> ([[<span class="built_in">UIDevice</span> currentDevice].systemVersion floatValue] &lt; <span class="number">9.0</span>) &#123;</div><div class="line">    __<span class="keyword">weak</span> <span class="keyword">typeof</span>(<span class="keyword">self</span>) weakSelf;</div><div class="line">    [[<span class="built_in">NSNotificationCenter</span> defaultCenter]addObserverForName:TEST_NOTIFICATION</div><div class="line">                                                     object:<span class="literal">nil</span></div><div class="line">                                                      queue:[<span class="built_in">NSOperationQueue</span> mainQueue]</div><div class="line">                                                 usingBlock:^(<span class="built_in">NSNotification</span> *note)&#123;</div><div class="line">                                                            [weakSelf doSomeThing];</div><div class="line">                                                 &#125;];</div><div class="line">&#125; <span class="keyword">else</span> &#123;</div><div class="line">    [[<span class="built_in">NSNotificationCenter</span> defaultCenter]addObserver:<span class="keyword">self</span> selector:<span class="keyword">@selector</span>(doSomeThing) name:TEST_NOTIFICATION object:<span class="literal">nil</span>];</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>在使用类别的时候如果我们添加了通知，那么我们是没有办法在类别里面重写dealloc的，如果不移除通知就会出现野指针，这个时候我们就可以在iOS9以上使用addObserver，将通知的移除交给系统，iOS9一下使用addObserverForName+weakSelf，虽然通知依然存在，但是不会调用doSomeThing方法（当然不能直接在block里面写处理过程，因为还是会执行）。</p>
+
+    
+
+    
+</div>
+
+
+                
+
+                <!-- Post Comments -->
+                
+                    
+
+
+
+
+
+
+
+                
+            </div>
+
+            <!-- Post Prev & Next Nav -->
+            <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
+    <!-- Prev Nav -->
+    
+        <a href="/2015/12/28/runtime-6/" id="post_nav-newer" class="prev-content">
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            新篇
+        </a>
+    
+
+    <!-- Section Spacer -->
+    <div class="section-spacer"></div>
+
+    <!-- Next Nav -->
+    
+        <a href="/2015/12/25/runtime-4/" id="post_nav-older" class="next-content">
+            旧篇
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
+                <i class="material-icons">arrow_forward</i>
+            </button>
+        </a>
+    
+</nav>
+
+        </div>
+    </div>
+
+
+
+                    
+                        <!-- Overlay For Active Sidebar -->
+<div class="sidebar-overlay"></div>
+
+<!-- Material sidebar -->
+<aside id="sidebar" class="sidebar sidebar-colored sidebar-fixed-left" role="navigation">
+    <div id="sidebar-main">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header header-cover" style="background-image: url(/img/sidebar_header.png);">
+    <!-- Top bar -->
+    <div class="top-bar"></div>
+
+    <!-- Sidebar toggle button -->
+    <button type="button" class="sidebar-toggle mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style="display: initial;" data-upgraded=",MaterialButton,MaterialRipple">
+        <i class="material-icons">clear_all</i>
+        <span class="mdl-button__ripple-container">
+            <span class="mdl-ripple">
+            </span>
+        </span>
+    </button>
+
+    <!-- Sidebar Avatar -->
+    <div class="sidebar-image">
+        <img src="/img/grommash_avatar.jpeg" alt="GuYi's avatar">
+    </div>
+
+    <!-- Sidebar Email -->
+    <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
+        guxinqi25@gmail.com
+        <b class="caret"></b>
+    </a>
+</div>
+
+
+        <!-- Sidebar Navigation  -->
+        <ul class="nav sidebar-nav">
+    <!-- User dropdown  -->
+    <li class="dropdown">
+        <ul id="settings-dropdown" class="dropdown-menu">
+            
+                <li>
+                    <a href="#" target="_blank" title="Email Me">
+                        
+                            <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
+                        
+                        Email Me
+                    </a>
+                </li>
+            
+        </ul>
+    </li>
+
+    <!-- Homepage -->
+    
+        <li id="sidebar-first-li">
+            <a href="/" target="_self">
+                
+                    <i class="material-icons sidebar-material-icons">home</i>
+                
+                主页
+            </a>
+        </li>
+        
+    
+
+    <!-- Archives  -->
+    
+        <li class="dropdown">
+            <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
+                
+                    <i class="material-icons sidebar-material-icons">inbox</i>
+                
+                    归档
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+            <li>
+                <a class="sidebar_archives-link" href="/archives/2017/02/">二月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">十二月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/11/">十一月 2016<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/10/">十月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/09/">九月 2016<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/04/">四月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/03/">三月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/02/">二月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2015/12/">十二月 2015<span class="sidebar_archives-count">7</span></a>
+            </ul>
+        </li>
+        
+    
+
+    <!-- Categories  -->
+    
+
+    <!-- Pages  -->
+    
+
+    <!-- Article Number  -->
+    
+</ul>
+
+
+        <!-- Sidebar Footer -->
+        <!--
+I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright, I will thank you so much.
+If you still want to delete the copyrights, could you still retain the first one? Which namely "Theme Material"
+It will not impact the appearance and can give developers a lot of support :)
+
+很高兴您使用并喜欢该主题，开发不易 十分谢谢与希望您可以保留一下版权声明。
+如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
+它不会影响美观并可以给开发者很大的支持和动力。 :)
+-->
+
+<!-- Sidebar Divider -->
+
+    <div class="sidebar-divider"></div>
+
+
+<!-- Theme Material -->
+
+    <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
+        <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
+            主题 - Material
+            <span class="sidebar-badge badge-circle">i</span>
+        </div>
+    </a>
+
+
+<!-- Help & Support -->
+<!--
+
+-->
+
+<!-- Feedback -->
+<!--
+
+-->
+
+<!-- About Theme -->
+<!--
+
+-->
+
+    </div>
+
+    <!-- Sidebar Image -->
+    
+
+</aside>
+
+                    
+
+                    
+                        <!-- Footer Top Button -->
+                        <div class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
+
+                    
+
+                    <!--Footer-->
+<footer class="mdl-mini-footer" id="bottom">
+    
+        <!-- Paradox Footer Left Section -->
+        <div class="mdl-mini-footer--left-section sns-list">
+    <!-- Twitter -->
+    
+        <a href="https://twitter.com/twitter" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-twitter.svg);">
+                <span class="visuallyhidden">Twitter</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Facebook -->
+    
+        <a href="https://www.facebook.com/facebook" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-facebook.svg);">
+                <span class="visuallyhidden">Facebook</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Google + -->
+    
+        <a href="https://www.google.com/" target="_blank">
+            <button class="mdl-mini-footer--social-btn social-btn" style="background-image: url(/img/footer/footer_ico-gplus.svg);">
+                <span class="visuallyhidden">Google Plus</span>
+            </button><!--
+     --></a>
+    
+
+    <!-- Weibo -->
+    
+
+    <!-- Instagram -->
+    
+
+    <!-- Tumblr -->
+    
+
+    <!-- Github -->
+    
+
+    <!-- LinkedIn -->
+    
+
+    <!-- Zhihu -->
+    
+
+    <!-- Bilibili -->
+    
+
+    <!-- Telegram -->
+    
+</div>
+
+
+        <!--Copyright-->
+        <div id="copyright">
+            Copyright&nbsp;©&nbsp;
+            <script type="text/javascript">
+                var fd = new Date();
+                document.write(fd.getFullYear());
+            </script>
+            &nbsp;Grommash
+        </div>
+
+        <!-- Paradox Footer Right Section -->
+
+        <!--
+        I am glad you use this theme, the development is no so easy, I hope you can keep the copyright.
+        It will not impact the appearance and can give developers a lot of support :)
+
+        很高兴您使用该主题，开发不易，希望您可以保留一下版权声明。
+        它不会影响美观并可以给开发者很大的支持。 :)
+        -->
+
+        <div class="mdl-mini-footer--right-section">
+            <div>
+                <div class="footer-develop-div">Powered by <a href="https://hexo.io" target="_blank" class="footer-develop-a">Hexo</a></div>
+                <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
+            </div>
+        </div>
+    
+</footer>
+
+
+                    <!-- Import File -->
+
+    <script src="/js/lazyload.min.js"></script>
+    <script src="/js/js.min.js"></script>
+
+
+
+    <script src="/js/nprogress.js"></script>
+
+
+<script type="text/javascript">
+    NProgress.configure({
+        showSpinner: true
+    });
+    NProgress.start();
+    $('#nprogress .bar').css({
+        'background': '#29d'
+    });
+    $('#nprogress .peg').css({
+        'box-shadow': '0 0 10px #29d, 0 0 15px #29d'
+    });
+    $('#nprogress .spinner-icon').css({
+        'border-top-color': '#29d',
+        'border-left-color': '#29d'
+    });
+    setTimeout(function() {
+        NProgress.done();
+        $('.fade').removeClass('out');
+    }, 800);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Swiftye -->
+
+
+<!-- Local Search-->
+
+
+<!-- Window Load-->
+<script>
+    $(window).load(function() {
+        // Post_Toc parent position fixed
+        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
+    });
+</script>
+
+<!-- MathJax Load-->
+
+
+                </main>
+            </div>
+        </body>
+    
+</html>
