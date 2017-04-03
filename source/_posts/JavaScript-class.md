@@ -1,9 +1,12 @@
 ---
 title: JavaScript的构造函数与类
 date: 2016-11-28 14:24:33
-tags:
+tags: [JavaScript]
+categories: 技术
 ---
-JavaScript虽然有些地方跟其他语言不同，但是他仍然是面向对象语言，因此对象的使用是整个体系的基础。下面首先列举几种JavaScript创建对象的方式。
+JavaScript虽然有些地方跟其他语言不同，但是他仍然是面向对象语言，因此对象的使用是整个体系的基础。本文列举了几种JavaScript创建对象的方式，并讲讲ES6中class的概念。
+
+<!--more-->
 
 # 对象创建方法
 ## 最简单的new方法
@@ -58,7 +61,7 @@ var o2 = new Obj("Harry", "Objective-C");
 
 我们可以发现上述两个不同实例调用构造函数的方法sayWhat也不是同一个函数实例：
 ``` js
-console.log(o1.sayWhat == o2.sayWhat); //false
+console.log(o1.sayWhat == o2.sayWhat); /* false */
 ```
 我们可以把这个函数放到构造函数外部，防止多次定义方法函数。
 
@@ -100,7 +103,7 @@ class Foo {
   }
 }
 
-new Foo() instanceof Foo  // false
+new Foo() instanceof Foo  /* false */
 ```
 类的构造函数，不使用new是没法调用的，会报错。这是它跟普通构造函数的一个主要区别，后者不用new也可以执行。
 
@@ -113,10 +116,10 @@ class Logger {
   constructor() {
     this.someFunc = this.someFunc.bind(this);
   }
-  // 或者
+  /* 或者 */
   constructor() {
     this.someFunc = (...) => {
-      //....
+      /* .... */
     };
   }
 }
@@ -147,7 +150,7 @@ super这个关键字，既可以当作函数使用，也可以当作对象使用
 ``` js
 class MyClass {
   constructor() {
-    // ...
+    /* ... */
   }
   get prop() {
     return 'getter';
@@ -160,10 +163,10 @@ class MyClass {
 let inst = new MyClass();
 
 inst.prop = 123;
-// setter: 123
+/* setter: 123 */
 
 inst.prop
-// 'getter'
+/* 'getter' */
 ```
 上面代码中，prop属性有对应的存值函数和取值函数，因此赋值和读取行为都被自定义了。
 
@@ -174,6 +177,6 @@ class Foo {
 }
 
 Foo.prop = 1;
-Foo.prop // 1
+Foo.prop /* 1 */
 ```
 目前，只有这种写法可行，因为ES6明确规定，Class内部只有静态方法，没有静态属性。

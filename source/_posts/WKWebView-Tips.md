@@ -1,14 +1,14 @@
 ---
-title: WKWebView使用Tips
+title: WKWebViewTips
 date: 2016-02-04 13:00:14
-tags:
-cover: http://desk.fd.zol-img.com.cn/t_s960x600c5/g5/M00/03/03/ChMkJ1bVPASIRLpXABShkzlZnEgAAMLkAKgToEAFKGr133.jpg
+tags: [Objective-C,WebView]
+categories: 技术
 ---
-* WKWebView是现代WebKit API在iOS8和OS X Yosemite应用中的核心部分。它代替了UIKit中的UIWebView和AppKit中的WebView，提供了统一的跨双平台API。
-* 自诩拥有60fps滚动刷新率、内置手势、高效的app和web信息交换通道、和Safari相同的JavaScript引擎
-* 将UIWebViewDelegate与UIWebView重构成了14类与3个协议
+WKWebView是现代WebKit API在iOS8和OS X Yosemite应用中的核心部分。它代替了UIKit中的UIWebView和AppKit中的WebView，提供了统一的跨双平台API。他自诩拥有60fps滚动刷新率、内置手势、高效的app和web信息交换通道、和Safari相同的JavaScript引擎，而其将UIWebViewDelegate与UIWebView重构成了14类与3个协议
 
-本文记录了一些相关的注意事项
+本文记录了一些WKWebView使用的相关注意事项
+
+<!--more-->
 
 # WKWebKit Framework
 ## Classes
@@ -40,20 +40,20 @@ cover: http://desk.fd.zol-img.com.cn/t_s960x600c5/g5/M00/03/03/ChMkJ1bVPASIRLpXA
 * ``HTML <a> tag``带着``target="_blank"``不会响应。
 * URL Scheme和 AppStore links无法使用
 ```objc
-// Using [bendytree/Objective-C-RegEx-Categories](https://github.com/bendytree/Objective-C-RegEx-Categories) to check URL String
+/* Using [bendytree/Objective-C-RegEx-Categories](https://github.com/bendytree/Objective-C-RegEx-Categories) to check URL String */
 #import "RegExCategories.h"
 - (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
     NSURL *url = navigationAction.request.URL;
     NSString *urlString = (url) ? url.absoluteString : @"";
 
-    // iTunes: App Store link
+    /* iTunes: App Store link */
     if ([urlString isMatch:RX(@"\\/\\/itunes\\.apple\\.com\\/")]) {
         [[UIApplication sharedApplication] openURL:url];
         decisionHandler(WKNavigationActionPolicyCancel);
         return;
     }
 
-    // Protocol/URL-Scheme without http(s)
+    /* Protocol/URL-Scheme without http(s) */
     else if (![urlString isMatch:[@"^https?:\\/\\/." toRxIgnoreCase:YES]]) {
         [[UIApplication sharedApplication] openURL:url];
         decisionHandler(WKNavigationActionPolicyCancel);
@@ -91,7 +91,7 @@ webView:runJavaScriptTextInputPanelWithPrompt:defaultText:initiatedByFrame:compl
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
         [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
             textField.placeholder = @"User";
-            //textField.secureTextEntry = YES;
+            /* textField.secureTextEntry = YES; */
         }];
         [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
             textField.placeholder = @"Password";
@@ -111,9 +111,9 @@ webView:runJavaScriptTextInputPanelWithPrompt:defaultText:initiatedByFrame:compl
         });
     }
     else if ([authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
-        // needs this handling on iOS 9
+        /* needs this handling on iOS 9 */
         completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
-        // or, see also http://qiita.com/niwatako/items/9ae602cb173625b4530a#%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89
+        /* or, see also http://qiita.com/niwatako/items/9ae602cb173625b4530a#%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89 */
     }
     else {
         completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, nil);
@@ -145,7 +145,7 @@ iOS8
 4.删除所有WKWebViews。
 iOS9
 ```objc
-// Optional data
+/* Optional data */
 NSSet *websiteDataTypes = [NSSet setWithArray:@[
     WKWebsiteDataTypeDiskCache,
     WKWebsiteDataTypeOfflineWebApplicationCache,
@@ -157,13 +157,13 @@ NSSet *websiteDataTypes = [NSSet setWithArray:@[
     WKWebsiteDataTypeWebSQLDatabases
 ]];
 
-// All kinds of data
+/* All kinds of data */
 NSSet *websiteDataTypes = [WKWebsiteDataStore allWebsiteDataTypes];
-// Date from
+/* Date from */
 NSDate *dateFrom = [NSDate dateWithTimeIntervalSince1970:0];
-// Execute
+/* Execute */
 [[WKWebsiteDataStore defaultDataStore] removeDataOfTypes:websiteDataTypes modifiedSince:dateFrom completionHandler:^{
-    // Done
+    /* Done */
 }];
 ```
 
@@ -172,11 +172,11 @@ NSDate *dateFrom = [NSDate dateWithTimeIntervalSince1970:0];
 ```objc
 webView.scrollView.decelerationRate = UIScrollViewDecelerationRateNormal;
 ```
-至于iOS 9，没有在UIScrollView代理中设置滚动速度，这段代码是没有意义的。
-```objc
-- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
-    scrollView.decelerationRate = UIScrollViewDecelerationRateNormal;
-}
+    至于iOS 9，没有在UIScrollView代理中设置滚动速度，这段代码是没有意义的。
+    ```objc
+    - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+        scrollView.decelerationRate = UIScrollViewDecelerationRateNormal;
+    }
 ```
 * 不能禁用长按链接菜单
 CSS: ``-webkit-touch-callout: none; ``和JavaScript: ``document.documentElement.style.webkitTouchCallout='none';``无法使用。

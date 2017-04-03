@@ -1,13 +1,16 @@
 ---
 title: WebView缓存策略(NSURLProtocol)
 date: 2016-11-09 18:13:40
-tags:
-cover: http://images.forwallpaper.com/files/thumbs/preview/13/139236__bear-sunglasses-style-swag_p.jpg
+tags: [Objective-C,WebView]
+categories: 技术
 ---
 **首先说明一下这个方案只能应用于UIWebview，因为WKWebView不支持NSURLProtocol。**
 本文主要介绍通过NSURLProtocol和NSURLSession对Web页面进行缓存，其中还有一些地方还没完善，如读取缓存的条件，清理缓存时间，网页异步加载问题和跳转问题，之后有空再研究。
 方案的流程图：
+
 {% asset_img flow.png %}
+
+<!--more-->
 
 # NSURLProtocol
 首先介绍一下NSURLProtocol，他是一个抽象类。**Objective-C其实抽象类并不是一等公民，只是定义了一个类这个类中都是抽象方法需要子类重载，其实作用同protocol差不多**。而自定义NSURLProtocol个人理解就相当于重新对iOS系统默认的加载URL方式进行规范，这个URL加载包括NSURL，NSURLRequest，NSURLConnection和NSURLSession等。既然他是一个抽象类，就需要子类重写他所定义规范的抽象方法，针对初始化的是这三个方法：
@@ -47,7 +50,6 @@ cover: http://images.forwallpaper.com/files/thumbs/preview/13/139236__bear-sungl
 既然已经完成了自定义NSURLProtocol，接着就是考虑在什么时候去缓存请求到的数据，很明显在``- (void)startLoading``和``- (void)stopLoading``已经提供给我们了很好的时机。我们可以在startLoading时发起一个NSURLSession来请求而在NSURLSession的协议方法中我们可以对请求到的数据做自己想做的一些事。
 我们可以在protocol中定义全局变量cacheData和response，在NSURLSession请求时获取到请求的数据及响应，并保存到本地。这里我的缓存是归档解档到指定的路径下，并以request的URL为文件名进行md5签名(tips:很多URL带“/”是无法生成文件的)。
 ``` objectivec
-#pragma mark- NSURLSessionDelegate
 - (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSessionResponseDisposition))completionHandler
 {
     [self.client URLProtocol:self didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageNotAllowed];
@@ -58,18 +60,18 @@ cover: http://images.forwallpaper.com/files/thumbs/preview/13/139236__bear-sungl
 
 -  (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data
 {
-    //下载过程中
+    /* 下载过程中 */
     [self.client URLProtocol:self didLoadData:data];
     [self.cacheData appendData:data];
 }
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error
 {
-    //下载完成后触发
+    /* 下载完成后触发 */
     if (error) {
         [self.client URLProtocol:self didFailWithError:error];
     } else {
-    //将数据的缓存归档存入到本地文件中
+    /* 将数据的缓存归档存入到本地文件中 */
     GYWebCacheData *cache = [[GYWebCacheData alloc] init];
     cache.data = [self.cacheData copy];
     cache.timeDate = [NSDate date];
@@ -84,9 +86,9 @@ cover: http://images.forwallpaper.com/files/thumbs/preview/13/139236__bear-sungl
 因为需要有一个缓存时间，我保留了请求的data，response以及缓存时间：
 ``` objectivec
 @interface GYWebCacheData : NSObject<NSCoding>
-@property (nonatomic, strong) NSDate *timeDate;                //缓存时间
-@property (nonatomic, strong) NSData *data;                    //缓存数据
-@property (nonatomic, strong) NSURLResponse *response;         //缓存请求
+@property (nonatomic, strong) NSDate *timeDate;                /* 缓存时间 */
+@property (nonatomic, strong) NSData *data;                    /* 缓存数据 */
+@property (nonatomic, strong) NSURLResponse *response;         /* 缓存请求 */
 @end
 ```
 在stratLoading和stopLoading方法中需要对请求进行判断，如果有缓存就直接加载缓存的数据：
@@ -97,7 +99,7 @@ cover: http://images.forwallpaper.com/files/thumbs/preview/13/139236__bear-sungl
     NSLog(@"requst url = %@",url);
     GYWebCacheData *cache = (GYWebCacheData*)[NSKeyedUnarchiver unarchiveObjectWithFile:[self filePathWithUrlString:url]];
 
-    //判断是否有缓存，如果有并且在缓存时间内则读缓存
+    /* 判断是否有缓存，如果有并且在缓存时间内则读缓存 */
     if ([self isUseCahceWithCache:cache]) {
         NSLog(@"catch from cache = %@",cache.response.URL.absoluteString);
         [self.client URLProtocol:self didReceiveResponse:cache.response cacheStoragePolicy:NSURLCacheStorageNotAllowed];
@@ -107,7 +109,7 @@ cover: http://images.forwallpaper.com/files/thumbs/preview/13/139236__bear-sungl
     else {
         NSMutableURLRequest *newRequest = [self setupRequest];
         NSLog(@"catch from sever = %@",newRequest.URL.absoluteString);
-        //给新的请求加标示防止循环创建protocol
+        /* 给新的请求加标示防止循环创建protocol */
         [NSURLProtocol setProperty:@YES forKey:GYURLProtocolHandledKey inRequest:newRequest];
         [self setupTask];
     }

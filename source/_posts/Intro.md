@@ -1,8 +1,8 @@
 ---
-title: Intro
+title: 基于Hexo的个人博客
 date: 2015-12-07 10:57:51
-tags:
-cover: http://www.stancuflor.in/wp-content/uploads/2015/10/code-wallpaper-770x340.png
+tags: [Hexo]
+categories: 技术
 ---
 
 ## 前言
@@ -21,6 +21,8 @@ GitHub pages是github上用于对开源项目进行说明的网页。我们也�
 * 相关配置
 * 常用操作
 
+<!--more-->
+
 ## 第一步 搭建环境
 
 1.安装Git...Mac的Xcode自带了
@@ -29,11 +31,11 @@ GitHub pages是github上用于对开源项目进行说明的网页。我们也�
 
 ## 第二步 安装hexo
 
-```shell
+```
 sudo npm install -g hexo-cli
 ```
 一定要加sudo认证，踩过坑。然后去你想去的目录，执行
-```shell
+```
 hexo init
 ```
 你的博客就建在当前那个目录下啦。
@@ -42,17 +44,17 @@ hexo init
 
 之前你生成的博客只能在本地预览，因此你需建立与你用户名对应的仓库，仓库名必须为``your_user_name.github.io``比如我的就是``gxq93.github.io``，这将让你的hexo博客与你的GitHub pages绑定，不买域名的话以后这就是你博客的地址了。
 接着我们来生成 ``Git SSH Key``
-```shell
+```
 cd ~/.ssh
 ls
 ```
 如果没有这个文件夹或文件夹中没有id_rsa和id_rsa.pub这两个密钥和公钥，就执行
-```shell
+```
 ssh -keygen
 ```
 生成这对密钥，生成过程会提示你设置路径和密码，直接回车就是默认的``/.ssh``的路径以及没有密码
 接着取出rsa
-```shell
+```
 cat ~/.ssh/id_rsa.pub
 ```
 输出大概是这样
@@ -60,7 +62,7 @@ cat ~/.ssh/id_rsa.pub
 {% asset_img ssh_rsa.png %}
 
 然后把这坨东西复制到你github SSHkey设置上选择new SSHkey的key上，选择add，接着去验证一下
-```shell
+```
 ssh -T git@github.com
 ```
 如果显示的如Hi gxq93! You've successfully authenticated, but GitHub does not provide shell access.就表示绑定成功了，去github SSHkey设置上你也可以看到你的钥匙变成绿色的了。
@@ -68,7 +70,7 @@ ssh -T git@github.com
 {% asset_img ssh_sucess.png %}
 
 接着打开hexo的_config.yml的配置文件，设置
-```shell
+```
 deploy:
 type: git
 repo: git@github.com:gxq93/gxq93.github.io.git
@@ -77,7 +79,7 @@ branch: master
 注意在冒号后面一定要加个空格！不然无法编译。
 
 接着部署发布
-```shell
+```
 hexo generate
 hexo deploy
 ```
@@ -88,35 +90,36 @@ Tips:设置上传本地图片
 对于那些想要更有规律地提供图片和其他资源以及想要将他们的资源分布在各个文章上的人来说，hexo提供了更组织化的方式来管理资源。这个稍微有些复杂但是管理资源非常方便的功能可以通过将config.yml文件中的``post_asset_folder``选项设为true，当资源文件管理功能打开后，hexo将会在你每一次通过``hexo new [layout] <title>``命令创建新文章时自动创建一个文件夹。这个资源文件夹将会有与这个markdown文件一样的名字。
 
 使用图片标签
+
 ```
 {% asset_img example.png %}
 ```
+
 Tips:将文章存放在github上
 
 因为hexo只是将你文章的html推送到你相应的github库上，所以如果你想要换一台电脑编写你的博客或者像我这样电脑突然坏了的话，你是无法获取到你那些文章的markdown的，而如果每次写完你都将文章放到其他地方存取也是不太方便的，而正好hexo可以选择你那个库的分支来进行推送操作，所以我采用的方式就是在那个库上新建一个分支，写完文章将``source``文件夹推送更新到那个分支上，这样你的``source``文件和相应那些博客文件都放在同一个git库上管理，更加的方便，也不会出现像我之前那样因为电脑坏了所有的文章的``source``都没有的情况了😑
 
 ## 第四步 常用操作
 新建文章
-```shell
+```
 hexo new "your new article"
 ```
 部署
-```shell
+```
 hexo generate
 ```
 发布
-```shell
+```
 hexo deploy
 ```
 清除缓存
-```shell
+```
 hexo clean
 ```
 不显示全文
-```shell
+```
 <!--more-->
 ```
 
 最后贴出hexo网址
 [https://hexo.io/](https://hexo.io/)
-

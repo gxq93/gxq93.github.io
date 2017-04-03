@@ -1,15 +1,20 @@
 ---
-title: CocoaPods Trunk 上传Swift3.0项目
+title: CocoaPods Trunk上传Swift3.0项目
 date: 2016-09-30 10:42:10
-tags:
-cover: http://img9.cache.hxsd.com/game/2015/04/14/690215_1428982912_2.jpg
+tags: [Swift,CocoaPods]
+categories: 技术
 ---
 
-起因是因为无聊，突然想提高一下我那可怜的github的提交数，所以随便拿了个swift3.0写的轮播图组件打算传到cocoapods上。写完podspec(这个项目叫GYBanner🙈)然后
+起因是因为无聊，突然想提高一下我那可怜的github的提交数，所以随便拿了个Swift3.0写的轮播图组件打算传到Cocoapods上。写完podspec(这个项目叫GYBanner🙈)然后由于才刚升级Swift3.0的原因，Cocoapods也没有做好很贴心的适配，于是踩了一些坑～
+
+<!--more-->
+
+上传Trunk时：
 ```
 pod trunk push GYBanner.podspec
 ```
 报错了，这啥情况，检查一下原因
+
 ```
 pod lib lint GYBanner.podspec --verbose
 ```

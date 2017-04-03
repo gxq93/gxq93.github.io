@@ -1,10 +1,12 @@
 ---
-title: 不同形式的线程锁
+title: 线程锁在iOS中的应用
 date: 2016-3-23 13:18:04
-tags:
-cover: http://img.52jbj.com/uploads/allimg/150704/1-150F4003141.jpg
+tags: [Objective-C]
+categories: 技术
 ---
-在项目中做到线程安全是十分重要的事情，有时候简单的上个线程锁就能很好的完成需求，而给线程上锁的方法有很多，简单的列举一下
+在项目中做到线程安全是十分重要的事情，有时候简单的上个线程锁就能很好的完成需求，而给线程上锁的方法有很多，本文大致介绍了几种线程锁的使用。
+
+<!--more-->
 
 # GCD
 因为用到线程锁肯定会用到GCD，就简单先写一点GCD相关的一些东西。简单暴力介绍，上代码和图。
@@ -15,7 +17,7 @@ static NSInteger const imageCount = 15;
 static NSInteger const limitCount = 7;
 #define height [UIScreen mainScreen].bounds.size.height/5
 #define width [UIScreen mainScreen].bounds.size.width/3
-//界面部署
+/* 界面部署 */
 - (void)layoutUI {
     imageView = [NSMutableArray arrayWithCapacity:imageCount];
     for (int y=0; y<5; y++) {
@@ -36,9 +38,9 @@ static NSInteger const limitCount = 7;
 
 ```objc
 - (void)loadImageAtIndex:(NSInteger)index {
-//异步请求数据
+/* 异步请求数据 */
     NSData *data = [self requestDataAtIndex:index];
-    //切回主线程更新UI
+    /* 切回主线程更新UI */
     dispatch_async(dispatch_get_main_queue(), ^{
         [self updateWithData:data atIndex:index];
     });
@@ -69,6 +71,7 @@ static NSInteger const limitCount = 7;
 ```
 
 运行结果如图，因为是串行队列图片按顺序一张一张加载。
+
 ￼![](http://www.z4a.net/images/2016/05/09/1ed39ccc88b0d963.gif)
 
 然后是并行队列:
@@ -83,6 +86,7 @@ static NSInteger const limitCount = 7;
 }
 ```
 运行结果可以看出图片是并发加载的
+
 ![](http://www.z4a.net/images/2016/05/09/fa59e219154607ea.gif)
 ￼
 然后把加载图片的async异步任务改成sync同步任务
@@ -98,13 +102,14 @@ static NSInteger const limitCount = 7;
 
 ```
 运行结果如图，图片同时加载出来
+
 ￼![](http://www.z4a.net/images/2016/05/09/sync.gif)
 
 # 线程锁
 下面主要介绍一下iOS的线程锁
 个人理解使用线程锁的目的就是为了保护资源，防止当前线程上的资源被其他线程抢占，相当于抢红包10个红包20个人抢，不进行保护的话因为速度差不多就可能发生资源分配错乱，而在iOS中线程锁的使用方式其实有很多种。
 ```objc
-#pragma mark - 如果只要显示9张图片
+/* 如果只要显示9张图片 */
 - (void)unlockTap {
     for (NSInteger i=0; i<imageCount; i++) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -125,6 +130,7 @@ static NSInteger const limitCount = 7;
 }
 ```
 以上代码原因就是没有进行线程保护，从而导致如下结果没有达到预期需求。
+
 ￼![](http://www.z4a.net/images/2016/05/09/22cf0414115ce3b8.gif)
 ￼
 ## NSLock
@@ -139,7 +145,7 @@ NSLock *lock = [[NSLock alloc]init];
 
 ```objc
 - (void)lockloadImageAtIndex:(NSInteger)index {
-    //加锁
+    /* 加锁 */
     [lock lock];
     if (imageName.count>limitCount){
         NSString *str = [imageName lastObject];
@@ -150,12 +156,13 @@ NSLock *lock = [[NSLock alloc]init];
             image.image = [UIImage imageWithData:data];
         });
     }
-    //解锁
+    /* 解锁 */
     [lock unlock];
 }
 ```
 
 运行结果如下图，很好的完成了需求，因为线程加了锁，所以图片是按顺序加载的。
+
 ￼![](http://www.z4a.net/images/2016/05/09/74853d81c8d3f6e0.gif)
 ￼
 但是不可忽视的是多线程中很容易发生死锁，如递归。可以使用NSRecursiveLock替换NSLock，它实际上定义的是一个递归锁，这个锁可以被同一线程多次请求，而不会引起死锁。这主要是用在循环或递归操作中。
@@ -167,7 +174,7 @@ dispatch_semaphore_t semaphore = dispatch_semaphore_create(1);
 ```
 ```objc
 - (void)lockloadImageAtIndex:(NSInteger)index {
-    //加锁
+    /* 加锁 */
     dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
 
     if (imageName.count>limitCount){
@@ -179,7 +186,7 @@ dispatch_semaphore_t semaphore = dispatch_semaphore_create(1);
             image.image = [UIImage imageWithData:data];
         });
     }
-    //解锁
+    /* 解锁 */
     dispatch_semaphore_signal(semaphore);
 }
 ```
@@ -194,7 +201,7 @@ OSSpinLock spinlock = OS_SPINLOCK_INIT;
 ```
 ```objc
 - (void)lockloadImageAtIndex:(NSInteger)index {
-    //加锁
+    /* 加锁 */
     OSSpinLockLock(&spinlock);
 
     if (imageName.count>limitCount){
@@ -207,7 +214,7 @@ OSSpinLock spinlock = OS_SPINLOCK_INIT;
             image.image = [UIImage imageWithData:data];
         });
     }
-    //解锁
+    /* 解锁 */
     OSSpinLockUnlock(&spinlock);
 }
 ```

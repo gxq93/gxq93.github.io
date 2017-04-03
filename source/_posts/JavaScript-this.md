@@ -1,11 +1,14 @@
 ---
 title: JavaScript的this
 date: 2016-11-22 14:21:41
-tags:
+tags: [JavaScript]
+categories: 技术
 ---
 最近在学JavaScript，就记录一些学习的心得吧。
 # this
-开始了解JavaScript的时候，对于this理解很费劲，毕竟在ES6之前没有class，习惯了普通面向对象语言的人就很不习惯，虽然现在网上资料很多，但是有时候资料多也不是什么好事，看了[MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this)的文档，觉得上面的描述清晰多了，就大致描述一下this的使用场景。
+开始了解JavaScript的时候，对于this理解很费劲，毕竟在ES6之前没有class，习惯了普通面向对象语言的人就很不习惯，虽然现在网上资料很多，但是有时候资料多也不是什么好事，看了[MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this)的文档，觉得上面的描述清晰多了，接下来本文主要大致的描述一下this的使用场景。
+
+<!--more-->
 
 首先this作为函数关键字和其他语言不太一样，而对他自己来说，在严格模式和非严格模式中意义也不同。
 
@@ -15,25 +18,25 @@ this的指向在函数定义的时候是确定不了的，只有函数执行的�
 在全局上下文中不管是不是严格模式，this都表示全局对象。
 在严格版中的默认的this不再是window，而是undefined。
 ``` js
-console.log(this.document === document); // true
+console.log(this.document === document); /* true */
 
-// In web browsers, the window object is also the global object:
-console.log(this === window); // true
+/* In web browsers, the window object is also the global object: */
+console.log(this === window); /* true */
 
 this.a = 37;
-console.log(window.a); // 37
+console.log(window.a); /* 37 */
 ```
 ## 函数上下文
 在函数中，this的值取决于这个函数是怎么调用的。
 ### 简单的调用
 ``` js
-function f1(){
+function f1() {
   return this;
 }
-// In a browser:
-f1() === window; // the window is the global object in browsers
+/* In a browser: */
+f1() === window; /* the window is the global object in browsers */
 
-// In Node:
+/* In Node: */
 f1() === global
 ```
 ### 对象方法
@@ -46,7 +49,7 @@ var o = {
   }
 };
 
-console.log(o.f()); // logs 37
+console.log(o.f()); /* logs 37 */
 ```
 注意,这种行为是不受或者函数是如何定义的。在前面的示例中,我们定义了内联函数f在o的定义。然而,我们可以简单地定义了函数在对象外,后来将它连接到o.f.这样做结果相同:
 ``` js
@@ -58,12 +61,12 @@ function independent() {
 
 o.f = independent;
 
-console.log(o.f()); // logs 37
+console.log(o.f()); /* logs 37 */
 ```
 或者这样：
 ``` js
 o.b = {g: independent, prop: 42};
-console.log(o.b.g()); // logs 42
+console.log(o.b.g()); /* logs 42 */
 ```
 甚至这样：
 ``` js
@@ -72,12 +75,12 @@ var p = Object.create(o);
 p.a = 1;
 p.b = 4;
 
-console.log(p.f()); // 5
+console.log(p.f()); /* 5 */
 ```
 只要记住this就是指向函数调用对象就行。
 同样，在setter和getter方法中原理也是一样的：
 ``` js
-function sum(){
+function sum() {
   return this.a + this.b + this.c;
 }
 
@@ -85,34 +88,34 @@ var o = {
   a: 1,
   b: 2,
   c: 3,
-  get average(){
-    return (this.a + this.b + this.c) / 3;
+  get average() {
+    return (this.a + this.b + this.c) /* 3 */;
   }
 };
 
 Object.defineProperty(o, 'sum', {
     get: sum, enumerable:true, configurable:true});
 
-console.log(o.average, o.sum); // logs 2, 6
+console.log(o.average, o.sum); /* logs 2, 6 */
 ```
 ### 构造函数
 当一个函数作为构造函数(new关键字)，this会被绑定到构造的新对象。
 ``` js
-function C(){
+function C() {
   this.a = 37;
 }
 
 var o = new C();
-console.log(o.a); // logs 37
+console.log(o.a); /* logs 37 */
 
 
-function C2(){
+function C2() {
   this.a = 37;
   return {a:38};
 }
 
 o = new C2();
-console.log(o.a); // logs 38
+console.log(o.a); /* logs 38 */
 ```
 ### 作为DOM事件处理者
 如果函数作为DOM事件的处理者，this指向执行的元素。
@@ -133,19 +136,19 @@ console.log(o.a); // logs 38
 ``` js
 var o1 = {
     a: 3,
-    fn: function(){
+    fn: function() {
         console.log(this.a);
     }
 }
 var o2 = o1.fn;
-o2(); //undefined
+o2(); /*undefined */
 ```
 在上述情况下你会发现o2函数中的this已经不是指向o1的a，这很好理解，因为函数调用对象不是o1，但是有时候我们不得不将这个对象保存到另外的一个变量中，那么就可以通过以下方法：
 ``` js
 var o1 = {
     a: 3,
     fn: function(){
-        console.log(this.a); //3
+        console.log(this.a); /* 3 */
     }
 }
 var o2 = o1.fn;
@@ -158,8 +161,8 @@ call方法除了第一个参数以外还可以添加多个参数，如下：
 var o1 = {
     a: 3,
     fn: function(b,c){
-        console.log(this.a); //3
-        console.log(b + c);  //3
+        console.log(this.a); /* 3 */
+        console.log(b + c);  /* 3 */
     }
 }
 var o2 = o1.fn;
@@ -171,7 +174,7 @@ apply方法和call方法有些相似，它也可以改变this的指向：
 var o1 = {
     a: 3,
     fn: function(){
-        console.log(this.a); //3
+        console.log(this.a); /* 3 */
     }
 }
 var o2 = o1.fn;
@@ -182,8 +185,8 @@ o2.apply(o1);
 var o1 = {
     a: 3,
     fn: function(b,c){
-        console.log(this.a); //3
-        console.log(b + c);  //3
+        console.log(this.a); /* 3 */
+        console.log(b + c);  /* 3 */
     }
 }
 var o2 = o1.fn;
@@ -210,7 +213,7 @@ console.log(o2.bind(o1)); //function() { console.log(this.a); }
 var o1 = {
     a: 3,
     fn: function(){
-        console.log(this.a); //3
+        console.log(this.a); /* 3 */
     }
 }
 var o2 = o1.fn;
@@ -222,8 +225,8 @@ o3();
 var o1 = {
     a: 3,
     fn: function(b,c,d){
-        console.log(this.a); //3
-        console.log(b+c+d);  //6
+        console.log(this.a); /* 3 */
+        console.log(b+c+d);  /* 6 */
     }
 }
 var o2 = o1.fn;
@@ -276,7 +279,7 @@ const getVerifiedToken = selector => {
 不幸的是，空对象{}和空白函数代码块{}长得一模一样。。以上的例子中，emptyObject的{}会被解释为一个空白函数代码块，所以emptyObject()会返回undefined。如果要在箭头函数中明确地返回一个空对象，则你不得不将{}包含在一对圆括号中({})：
 ``` js
 const emptyObject = () => ({});
-emptyObject(); // {}
+emptyObject(); /* {} */
 ```
 下面是一个更完整的例子：
 ``` js
@@ -296,8 +299,8 @@ function (a, b) { return a * b; }
 function () { return arguments[0]; }
 (...args) => args[0]
 
-() => {} // undefined
-() => ({}) // {}
+() => {} /* undefined */
+() => ({}) /* {} */
 ```
 
 **箭头函数没有属于自己的this和arguments**

@@ -1,8 +1,8 @@
 ---
-title: 写给自己的Runtime-block
+title: Objective-C内部实现剖析-block
 date: 2015-12-22 11:05:55
-tags:
-cover: http://m2.quanjing.com/2m/top003/top-612099.jpg
+tags: [Objective-C,Runtime]
+categories: 技术
 ---
 # Block
 在OC中Block的语法看上去特别别扭，但他实际上是作为最普通的C语言源代码来处理的，在实际编译时无法转换成我们能够理解的源代码，因此通过clang(LLVM编译器)先讲代码进行转化成C++代码。如创建一个``block.m``文件，加入内容
@@ -16,10 +16,13 @@ int main()
 }
 ```
 使用clang命令行进行转换
-``` shell
+```
 clang -rewrite-objc block.m
 ```
-转换后将形成一个约520行左右的cpp文件，在这里我们将能看到我们想要的信息。
+转换后将形成一个约520行左右的cpp文件，在这里我们将能看到我们想要的信息。接下去本文主要介绍一下block的实现原理。
+
+<!--more-->
+
 转换后有关block的内容大致如下：
 ``` objc
 struct __main_block_impl_0 {
@@ -170,7 +173,7 @@ static void __main_block_func_0(struct __main_block_impl_0 *__cself)
 使用\_\_block修饰自动变量转化后的代码主要的变换是这样的：
 ``` objc
 static void __main_block_func_0(struct __main_block_impl_0 *__cself) {
-    __Block_byref_i_0 *i = __cself->i; // bound by ref
+    __Block_byref_i_0 *i = __cself->i; /* bound by ref */
     (i->__forwarding->i)++;
     printf("%d",(i->__forwarding->i));
 }
@@ -246,7 +249,7 @@ struct __main_block_impl_0 {
 };
 
 static void __main_block_func_0(struct __main_block_impl_0 *__cself) {
-    id array = __cself->array; // bound by copy
+    id array = __cself->array; /* bound by copy */
 
     ((void (*)(id, SEL, ObjectType))(void *)objc_msgSend)((id)array, sel_registerName("addObject:"), (id)((NSNumber *(*)(Class, SEL, int))(void *)objc_msgSend)(objc_getClass("NSNumber"), sel_registerName("numberWithInt:"), 1));
 
@@ -290,84 +293,3 @@ int main()
 在多线程情况下，可能weakSelf指向的对象会在block执行前被废弃，这在大部分情况下都是可以的，只会输出Self is nil，但在有些情况下(譬如weakSelf作为KVO的观察者被移除，或者block还没执行完self已经销毁)就会导致crash。这时可以在Block内部再持有一次weakSelf指向的对象``typeof(weakSelf) strongSelf = weakSelf``，延长该对象的生命周期，这就是所谓的 weak-strong dance。
 每次使用\_\_weak变量的时候，都会取出该变量指向的对象并retain，然后将该对象注册到autoreleasepool中，这是延长对象生命周期的关键，但这不会造成循环引用，当函数执行结束，变量超出作用域，过一会儿(一般一次RunLoop之后)，对象就被释放了。所以weak-strong dance的行为非常符合预期：延长捕获对象的生命周期，一旦block执行完，这个局部对象就被释放，而block也会被释放(如果被GCD之类的API copy过一次增加了引用计数，那最终也会被GCD释放)。
 每使用一次\_\_weak变量就会把对象注册到autoreleasepool中，所以如果短时间内大量使用\_\_weak变量的话，会导致注册到autoreleasepool中的对象大量增加，占用一定内存。而weak-strong dance恰好无意中解决了这个隐患，在执行block时，把\_\_weak变量(weakSelf)赋值给一个临时变量(strongSelf)，之后一直都使用这个临时变量，所以\_\_weak变量只使用了一次，也就只有一个对象注册到autoreleasepool中。
-# 协议
-## 数据结构
-``` objc
-typedef struct objc_object Protocol;
-```
-其实协议就是一个对象结构体
-## 操作函数
-### **objc_**:
-``` objc
-// 返回指定的协议
-Protocol * objc_getProtocol ( const char *name );
-// 获取运行时所知道的所有协议的数组
-Protocol ** objc_copyProtocolList ( unsigned int *outCount );
-// 创建新的协议实例
-Protocol * objc_allocateProtocol ( const char *name );
-// 在运行时中注册新创建的协议
-void objc_registerProtocol ( Protocol *proto );
-```
-### **protocol_**:
-**get**: 协议，属性
-``` objc
-// 返回协议名
-const char * protocol_getName ( Protocol *p );
-
-// 获取协议的指定属性
-objc_property_t protocol_getProperty ( Protocol *proto, const char *name, BOOL isRequiredProperty, BOOL isInstanceProperty );
-```
-**copy**：协议列表，属性列表
-``` objc
-// 获取协议中的属性列表
-objc_property_t * protocol_copyPropertyList ( Protocol *proto, unsigned int *outCount );
-// 获取协议采用的协议
-Protocol ** protocol_copyProtocolList ( Protocol *proto, unsigned int *outCount );
-```
-**add**：属性，方法，协议
-``` objc
-// 为协议添加方法
-void protocol_addMethodDescription ( Protocol *proto, SEL name, const char *types, BOOL isRequiredMethod, BOOL isInstanceMethod );
-
-// 添加一个已注册的协议到协议中
-void protocol_addProtocol ( Protocol *proto, Protocol *addition );
-
-// 为协议添加属性
-void protocol_addProperty ( Protocol *proto, const char *name, const objc_property_attribute_t *attributes, unsigned int attributeCount, BOOL isRequiredProperty, BOOL isInstanceProperty );
-```
-**isEqual**：判断两协议等同
-``` objc
-// 测试两个协议是否相等
-BOOL protocol_isEqual ( Protocol *proto, Protocol *other );
-```
-**comform**：判断是否遵循协议
-``` objc
-// 查看协议是否采用了另一个协议
-BOOL protocol_conformsToProtocol ( Protocol *proto, Protocol *other );
-```
-# 类目
-``` objc
-typedef struct objc_category *Category;
-
-struct objc_category {
-char *category_name     OBJC2_UNAVAILABLE; // 分类名
-char *class_name        OBJC2_UNAVAILABLE; // 分类所属的类名
-struct objc_method_list *instance_methods    OBJC2_UNAVAILABLE; // 实例方法列表
-struct objc_method_list *class_methods       OBJC2_UNAVAILABLE; // 类方法列表
-struct objc_protocol_list *protocols         OBJC2_UNAVAILABLE; // 分类所实现的协议列表
-}  
-
-// objc-runtime-new.h中定义：
-
-struct category_t {
-const char *name;         // name 是指 class_name 而不是 category_name
-classref_t cls;           // cls是要扩展的类对象，编译期间是不会定义的，而是在Runtime阶段通过name对应到对应的类对象
-struct method_list_t *instanceMethods;       
-struct method_list_t *classMethods;
-struct protocol_list_t *protocols;
-struct property_list_t *instanceProperties;    // instanceProperties表示Category里所有的properties，(这就是我们可以通过objc_setAssociatedObject和objc_getAssociatedObject增加实例变量的原因，)不过这个和一般的实例变量是不一样的
-};
-```
-category就是定义方法的结构体，instance_methods列表是objc_class中方法列表的一个子集，class_methods列表是元类方法列表的一个子集。由其结构成员可知，category为什么不能添加成员变量（可添加属性，只有setter/getter方法）。
-
-给category添加方法后，category_list会生成method list。这个方法列表是倒序添加的，也就是说，新生成的category的方法会先于旧的category的方法插入。category的方法会优先于类方法执行。

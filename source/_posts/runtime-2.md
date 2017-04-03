@@ -1,23 +1,26 @@
 ---
-title: 写给自己的Runtime-方法
+title: Objective-C内部实现剖析-方法
 date: 2015-12-12 10:47:11
-tags:
-cover: http://youimg1.c-ctrip.com/target/tg/426/356/477/27c4e44e40114b4d9e03cb5cd74cb644.jpg
+tags: [Objective-C,Runtime]
+categories: 技术
 ---
 # 方法
-Objective-C最重要的一个特性就是“消息传递”，消息有名称(name)和选择器(selector)，可以接受参数并可能有返回值。
+Objective-C最重要的一个特性就是“消息传递”，消息有名称(name)和选择器(selector)，可以接受参数并可能有返回值。本文主要介绍了消息传递的一些原理。
+
+<!--more-->
+
 ## C函数
 C使用的是静态绑定，在编译期就能决定运行时所应调用的函数（不考虑内联）函数地址硬解码在指令中，而如果出现只有一个函数调用指令，不过待调用的函数地址无法硬解码在指令之中，就得使用动态绑定了，在运行期把代码读取出来：
 ``` c
-void printHello(){
+void printHello() {
     printf("hello");
 }
-void printWorld(){
+void printWorld() {
     printf("world");
 }
-void doSomething(){
+void doSomething() {
     void (*func)()
-    if(type == 0){
+    if(type == 0) {
         func = printHello();
     }
     else {
@@ -33,7 +36,7 @@ Objective-C中如果向某对象传递消息，就会使用动态绑定机制来
 id returnValue = [someObject messageName:parameter];
 ```
 someObject叫做``receiver``，messageName叫做``selector``，selector与参数``parameter``合起来成为``message``，编译器看到message后，将其转换成一条标准的c函数``objc_msgSend``。
-``objc_msgSend``其原型如下：
+objc_msgSend其原型如下：
 ```objc
 void objc_msgSend(id self, SEL cmd, ...)
 ```
@@ -46,8 +49,8 @@ self：指向消息的接受者target的对象类型，作为一个占位参数�
 ``super``并不是隐藏参数，它实际上只是一个”编译器标示符”，它负责告诉编译器，当调用方法时，跳过当前类去调用父类的方法，而不是本类中的方法。实际上给super发消息时，super还是与self指向的是相同的消息接收者。
 ```objc
 struct objc_super {
-__unsafe_unretained id receiver;
-__unsafe_unretained Class super_class;
+    __unsafe_unretained id receiver;
+    __unsafe_unretained Class super_class;
 };
 ```
 当向super发送消息时，调用的是``objc_msgSendSuper``。如果返回值是一个结构体，则会调用``objc_msgSend_stret``或``objc_msgSendSuper_stret``。
@@ -74,33 +77,33 @@ typedef id (*IMP)(id, SEL, ...)
 ```objc
 typedef struct objc_method *Method;
 struct objc_method {
-SEL method_name             // 方法名
-char *method_types          // 参数类型
-IMP method_imp              // 方法实现
+    SEL method_name             /* 方法名 */
+    char *method_types          /* 参数类型 */
+    IMP method_imp              /* 方法实现 */
 }
 ```
 ``objc_method_list`` 就是用来存储当前类的方法链表，``objc_method``存储了类的某个方法的信息。
 ```objc
 struct objc_method_list {
-struct objc_method_list *obsolete                        
-int method_count                                                 
-#ifdef __LP64__
-int space                                                              
-#endif
-/* variable length structure */
-struct objc_method method_list[1]                        
+    struct objc_method_list *obsolete                        
+    int method_count                                                 
+    #ifdef __LP64__
+    int space                                                              
+    #endif
+    /* variable length structure */
+    struct objc_method method_list[1]                        
 }
 ```
 ### 快速映射表
 方法调用最先是在方法缓存，也就是快速映射表里找的，方法调用是懒调用，第一次调用时加载后加到快速映射表里。一个objc程序启动后，需要进行类的初始化、调用方法时的cache初始化，再发送消息的时候就直接走缓存（引申：``+load``方法和``+initialize``方法。load方法是首次加载类时调用，绝对只调用一次；initialize方法是首次给类发消息时调用，通常只调用一次，但如果它的子类初始化时未定义initialize方法，则会再调用一次它的initialize方法）。
 ```objc
 struct objc_cache {
-// 缓存bucket的总数
-unsigned int mask /* total = mask + 1 */                 
-// 实际缓存bucket的总数
-unsigned int occupied                                    
-// 指向Method数据结构指针的数组
-Method buckets[1]                                        
+    /* 缓存bucket的总数 */
+    unsigned int mask /* total = mask + 1 */                 
+    /* 实际缓存bucket的总数 */
+    unsigned int occupied                                    
+    /* 指向Method数据结构指针的数组 */
+    Method buckets[1]                                        
 };
 ```
 ### 尾调用优化
@@ -109,58 +112,58 @@ Method buckets[1]
 ### **method_**：
 **invoke**: 方法实现的返回值；
 ```objc
-// 调用指定方法的实现
+/* 调用指定方法的实现 */
 id method_invoke ( id receiver, Method m, ... );
 
-// 调用返回一个数据结构的方法的实现
+/* 调用返回一个数据结构的方法的实现 */
 void method_invoke_stret ( id receiver, Method m, ... );
 ```
 **get**:方法名；方法实现；参数与返回值相关
 ```objc
-// 获取方法名
+/* 获取方法名 */
 SEL method_getName ( Method m );
-// 返回方法的实现
+/* 返回方法的实现 */
 IMP method_getImplementation ( Method m );
-// 获取描述方法参数和返回值类型的字符串
+/* 获取描述方法参数和返回值类型的字符串 */
 const char * method_getTypeEncoding ( Method m );
-// 返回方法的参数的个数
+/* 返回方法的参数的个数 */
 unsigned int method_getNumberOfArguments ( Method m );
-// 通过引用返回方法指定位置参数的类型字符串
+/* 通过引用返回方法指定位置参数的类型字符串 */
 void method_getArgumentType ( Method m, unsigned int index, char *dst, size_t dst_len );
 ```
 **copy**:返回值类型，参数类型
 ```objc
-// 获取方法的返回值类型的字符串
+/* 获取方法的返回值类型的字符串 */
 char * method_copyReturnType ( Method m );
-// 获取方法的指定位置参数的类型字符串
+/* 获取方法的指定位置参数的类型字符串 */
 char * method_copyArgumentType ( Method m, unsigned int index );
-// 通过引用返回方法的返回值类型字符串
+/* 通过引用返回方法的返回值类型字符串 */
 void method_getReturnType ( Method m, char *dst, size_t dst_len );
 ```
 **set**：方法实现
 ```objc
-// 设置方法的实现
+/* 设置方法的实现 */
 IMP method_setImplementation ( Method m, IMP imp );
 ```
 **exchange**：交换方法实现
 ```objc
-// 交换两个方法的实现
+/* 交换两个方法的实现 */
 void method_exchangeImplementations ( Method m1, Method m2 );
 ```
 **description**:方法描述
 ```objc
-// 返回指定方法的方法描述结构体
+/* 返回指定方法的方法描述结构体 */
 struct objc_method_description * method_getDescription ( Method m );
 ```
 ### **SEL_**:
 ```objc
-// 返回给定选择器指定的方法的名称
+/* 返回给定选择器指定的方法的名称 */
 const char * sel_getName ( SEL sel );
-// 在Objective-C Runtime系统中注册一个方法，将方法名映射到一个选择器，并返回这个选择器
+/* 在Objective-C Runtime系统中注册一个方法，将方法名映射到一个选择器，并返回这个选择器 */
 SEL sel_registerName ( const char *str );
-// 在Objective-C Runtime系统中注册一个方法
+/* 在Objective-C Runtime系统中注册一个方法 */
 SEL sel_getUid ( const char *str );
-// 比较两个选择器
+/* 比较两个选择器 */
 BOOL sel_isEqual ( SEL lhs, SEL rhs );
 ```
 ## 消息传递过程

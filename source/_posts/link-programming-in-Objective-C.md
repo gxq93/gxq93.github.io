@@ -1,10 +1,12 @@
 ---
-title: link programming in Objective-C
+title: Link Programming in Objective-C
 date: 2016-4-13 13:34:02
-tags:
-cover: http://img.tuku.cn/file_big/201501/b54c1abfa8174e138eead1252b98db24.jpg
+tags: [Objective-C,响应式编程]
+categories: 技术
 ---
 在oc中方法的调用大部分都是通过``[ ]``，这与其他很多语言有很大的差异，而有些开发框架如``Masonry``则采用了链式编程的思想，这大大增加了代码的可读性和简洁性。今天有空就对这种思想简单的实践一下。
+
+<!--more-->
 
 ## 链式编程思想
 链式编程思想即将多个操作（多行代码）用过.语法链接在一起，形成单行代码，如``objc.method1().method2()``，跟c,java,swift等其他语言一样。
@@ -71,7 +73,7 @@ maker.add(1).add(3).substrct(1).muilt(3).divide(3).showResult();
 在每一次.语法调用之后都会返回``maker``自身，这就是链式编程的主要思想，当然如果不想传参的话直接用
 ```objc
 - (CaculateMaker*)method {
-    //do something//
+    /* do something */
     return self;
 }
 ```
