@@ -654,17 +654,17 @@ A concrete subclass must therefore provide an initialization or creation method 
     
 
         <!-- Post Title -->
-        <p class="article-headline-p"><a href="/2015/12/27/runtime-5/">Objective-C内部实现剖析-通知</a></p>
+        <p class="article-headline-p"><a href="/2015/11/26/runtime-5/">Objective-C内部实现剖析-通知</a></p>
     </div>
 
     <!-- Post Excerpt -->
     <div class="mdl-color-text--grey-600 mdl-card__supporting-text post_entry-content">
         
-            简述对于NSNotification的实现，苹果并没有公布，但是既然是基于观察者模式实现的，除去优化的问题，大致也可以用block来进行通信实现。本文大致模拟了通知的实现。
+            简述对于 NSNotification 的实现，苹果并没有公布，但是既然是基于观察者模式实现的，除去优化的问题，大致也可以用 block 来进行通信实现。本文大致模拟了通知的实现。
         
         &nbsp;&nbsp;&nbsp;
         <span>
-            <a href="/2015/12/27/runtime-5/" target="_self">继续阅读</a>
+            <a href="/2015/11/26/runtime-5/" target="_self">继续阅读</a>
         </span>
     </div>
     <!-- Post_entry Info-->
@@ -676,7 +676,7 @@ A concrete subclass must therefore provide an initialization or creation method 
             </div>
             <div>
                 <strong>GuYi</strong>
-                <span>12月 27, 2015</span>
+                <span>11月 26, 2015</span>
             </div>
         </div>
         <div id="post_entry-right-info">
@@ -713,17 +713,17 @@ A concrete subclass must therefore provide an initialization or creation method 
     
 
         <!-- Post Title -->
-        <p class="article-headline-p"><a href="/2015/12/25/runtime-4/">Objective-C内部实现剖析-协议和类目</a></p>
+        <p class="article-headline-p"><a href="/2015/09/04/runtime-4/">Objective-C内部实现剖析-协议和类目</a></p>
     </div>
 
     <!-- Post Excerpt -->
     <div class="mdl-color-text--grey-600 mdl-card__supporting-text post_entry-content">
         
-            本文主要介绍了runtime中协议和类目内部相关的实现。
+            本文主要介绍了 runtime 中协议和类目内部相关的实现。
         
         &nbsp;&nbsp;&nbsp;
         <span>
-            <a href="/2015/12/25/runtime-4/" target="_self">继续阅读</a>
+            <a href="/2015/09/04/runtime-4/" target="_self">继续阅读</a>
         </span>
     </div>
     <!-- Post_entry Info-->
@@ -735,7 +735,7 @@ A concrete subclass must therefore provide an initialization or creation method 
             </div>
             <div>
                 <strong>GuYi</strong>
-                <span>12月 25, 2015</span>
+                <span>9月 04, 2015</span>
             </div>
         </div>
         <div id="post_entry-right-info">
@@ -772,19 +772,17 @@ A concrete subclass must therefore provide an initialization or creation method 
     
 
         <!-- Post Title -->
-        <p class="article-headline-p"><a href="/2015/12/22/runtime-3/">Objective-C内部实现剖析-block</a></p>
+        <p class="article-headline-p"><a href="/2015/08/22/runtime-3/">Objective-C内部实现浅谈-Block</a></p>
     </div>
 
     <!-- Post Excerpt -->
     <div class="mdl-color-text--grey-600 mdl-card__supporting-text post_entry-content">
         
-            Block在OC中Block的语法看上去特别别扭，但他实际上是作为最普通的C语言源代码来处理的，在实际编译时无法转换成我们能够理解的源代码，因此通过clang(LLVM编译器)先讲代码进行转化成C++代码。如创建一个block.m文件，加入内容#include &lt;stdio.h&gt;int main()&#123;    void (^block)(void) = ^&#123;printf("Block\n");&#125;;    block();    return 0;&#125;
-使用clang命令行进行转换clang -rewrite-objc block.m
-转换后将形成一个约520行左右的cpp文件，在这里我们将能看到我们想要的信息。接下去本文主要介绍一下block的实现原理。
+            Block在 OC 中闭包的语法看上去特别别扭，但他实际上是作为最普通的 C 语言源代码来处理的，在实际编译时无法转换成我们能够理解的源代码，因此通过 clang (LLVM 编译器)先将代码进行转化成 C++ 代码。在这里我们将能看到我们想要的信息。接下去本文主要介绍一下 block 的实现原理。
         
         &nbsp;&nbsp;&nbsp;
         <span>
-            <a href="/2015/12/22/runtime-3/" target="_self">继续阅读</a>
+            <a href="/2015/08/22/runtime-3/" target="_self">继续阅读</a>
         </span>
     </div>
     <!-- Post_entry Info-->
@@ -796,7 +794,7 @@ A concrete subclass must therefore provide an initialization or creation method 
             </div>
             <div>
                 <strong>GuYi</strong>
-                <span>12月 22, 2015</span>
+                <span>8月 22, 2015</span>
             </div>
         </div>
         <div id="post_entry-right-info">
@@ -924,7 +922,7 @@ A concrete subclass must therefore provide an initialization or creation method 
             </a>
             <ul class="dropdown-menu">
             <li>
-                <a class="sidebar_archives-link" href="/archives/2017/02/">二月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">十二月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/11/">十一月 2016<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/10/">十月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/09/">九月 2016<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/04/">四月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/03/">三月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/02/">二月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2015/12/">十二月 2015<span class="sidebar_archives-count">7</span></a>
+                <a class="sidebar_archives-link" href="/archives/2017/02/">二月 2017<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/12/">十二月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/11/">十一月 2016<span class="sidebar_archives-count">3</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/10/">十月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/09/">九月 2016<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/04/">四月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/03/">三月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2016/02/">二月 2016<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2015/12/">十二月 2015<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2015/11/">十一月 2015<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2015/09/">九月 2015<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2015/08/">八月 2015<span class="sidebar_archives-count">2</span></a></li><li><a class="sidebar_archives-link" href="/archives/2015/07/">七月 2015<span class="sidebar_archives-count">1</span></a></li><li><a class="sidebar_archives-link" href="/archives/2015/06/">六月 2015<span class="sidebar_archives-count">1</span></a>
             </ul>
         </li>
         
