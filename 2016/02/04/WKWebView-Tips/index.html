@@ -259,16 +259,8 @@
                 
     <!-- Paradox Post Header -->
     
-        
-            <!-- Random Thumbnail -->
-            <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
-            <script>
-    var randomNum = Math.floor(Math.random() * 19 + 1);
-
-    $('.post_thumbnail-random').css('background-image', 'url(' + '/img/random/material-' + randomNum + '.png' + ')');
-</script>
-
-        
+        <!-- Custom Thumbnail -->
+        <div class="post_thumbnail-custom mdl-card__media mdl-color-text--grey-50" style="background-image:url(http://7xtg0o.com1.z0.glb.clouddn.com/1-7d7cjzjDQySL1lFBlLkaVw.jpeg)">
     
             <p class="article-headline-p">
                 WKWebViewTips
@@ -408,8 +400,7 @@
 </li>
 <li><p>iOS9上滚动速度bug<br>在iOS 8以下代码没问题,它可以用更多的惯性滚动。</p>
 <figure class="highlight objc"><table><tr><td class="code"><pre><div class="line">webView.scrollView.decelerationRate = <span class="built_in">UIScrollViewDecelerationRateNormal</span>;</div></pre></td></tr></table></figure>
-<p>  至于iOS 9，没有在UIScrollView代理中设置滚动速度，这段代码是没有意义的。</p>
-  <figure class="highlight objc"><table><tr><td class="code"><pre><div class="line">- (<span class="keyword">void</span>)scrollViewWillBeginDragging:(<span class="built_in">UIScrollView</span> *)scrollView &#123;</div><div class="line">    scrollView.decelerationRate = <span class="built_in">UIScrollViewDecelerationRateNormal</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>  至于iOS 9，没有在UIScrollView代理中设置滚动速度，这段代码是没有意义的。<br>  ​<figure class="highlight objc"><table><tr><td class="code"><pre><div class="line">- (<span class="keyword">void</span>)scrollViewWillBeginDragging:(<span class="built_in">UIScrollView</span> *)scrollView &#123;</div><div class="line">    scrollView.decelerationRate = <span class="built_in">UIScrollViewDecelerationRateNormal</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 </li>
 <li><p>不能禁用长按链接菜单<br>CSS: <code>-webkit-touch-callout: none;</code>和JavaScript: <code>document.documentElement.style.webkitTouchCallout=&#39;none&#39;;</code>无法使用。<br>iOS8.2之后修复了这个bug。</p>
 </li>
@@ -420,6 +411,7 @@
 <li>WKWebView的backForwardList属性是只读的。</li>
 <li>很难和UIWebView在iOS7及以下共存。<br>参考翻译自<a href="https://github.com/ShingoFukuyama/WKWebViewTips" target="_blank" rel="external">https://github.com/ShingoFukuyama/WKWebViewTips</a></li>
 </ul>
+<p>```</p>
 
     
 
