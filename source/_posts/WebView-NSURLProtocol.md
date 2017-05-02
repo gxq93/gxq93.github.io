@@ -3,6 +3,7 @@ title: WebView缓存策略(NSURLProtocol)
 date: 2016-11-09 18:13:40
 tags: [Objective-C,WebView]
 categories: 技术
+thumbnail: http://7xtg0o.com1.z0.glb.clouddn.com/1-1uO2NznNGici7cGqgL-FoA.jpeg
 ---
 **首先说明一下这个方案只能应用于UIWebview，因为WKWebView不支持NSURLProtocol。**
 本文主要介绍通过NSURLProtocol和NSURLSession对Web页面进行缓存，其中还有一些地方还没完善，如读取缓存的条件，清理缓存时间，网页异步加载问题和跳转问题，之后有空再研究。

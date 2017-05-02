@@ -1,11 +1,12 @@
 ---
 title: Objective-C内部实现剖析-通知
-date: 2015-12-27 15:46:53
+date: 2015-11-26 15:46:53
 tags: [Objective-C,Runtime]
 categories: 技术
+thumbnail: http://7xtg0o.com1.z0.glb.clouddn.com/1-gB1gWyEaaB9hKmOoqrrr5A.png
 ---
 # 简述
-对于NSNotification的实现，苹果并没有公布，但是既然是基于观察者模式实现的，除去优化的问题，大致也可以用block来进行通信实现。本文大致模拟了通知的实现。
+对于 NSNotification 的实现，苹果并没有公布，但是既然是基于观察者模式实现的，除去优化的问题，大致也可以用 block 来进行通信实现。本文大致模拟了通知的实现。
 
 <!--more-->
 
@@ -21,8 +22,8 @@ categories: 技术
 # NSNotification的伪实现
 ## API
 1.向通知中心注册观察者:
-* (void)addObserver:(id)observer selector:(SEL)aSelector name:(nullable NSString \*)aName object:(nullable id)anObject;（观察者接收到通知后执行任务的代码在发送通知的线程中执行）
-* (id )addObserverForName:(nullable NSString \*)name object:(nullable id)obj queue:(nullable NSOperationQueue \*)queue usingBlock:(void (^)(GYNotification \*note))block NS_AVAILABLE(10_6, 4_0);（观察者接收到通知后执行任务的代码在指定的操作队列中执行）
+* (void)addObserver:(id)observer selector:(SEL)aSelector name:(nullable NSString \*)aName object:(nullable id)anObject;(观察者接收到通知后执行任务的代码在发送通知的线程中执行)
+* (id )addObserverForName:(nullable NSString \*)name object:(nullable id)obj queue:(nullable NSOperationQueue \*)queue usingBlock:(void (^)(GYNotification \*note))block NS_AVAILABLE(10_6, 4_0);(观察者接收到通知后执行任务的代码在指定的操作队列中执行)
 
 2.通知中心向所有注册的观察者发送通知
 * (void)postNotification:(GYNotification \*)notification;
@@ -32,10 +33,9 @@ categories: 技术
 3.观察者收到通知，执行相应代码
 
 ## 实现
-建两个新类GYNotification，GYNotificationCenter，这两个类的接口和苹果提供的接口完全一样，我将根据接口提供的功能给出实现代码。 要点是通知中心是单例类，并且通知中心维护了一个包含所有注册的观察者的集合，这里我选择了动态数组来存储所有的观察者，代码如下：
+建两个新类 GYNotification，GYNotificationCenter，这两个类的接口和苹果提供的接口完全一样，我将根据接口提供的功能给出实现代码。 要点是通知中心是单例类，并且通知中心维护了一个包含所有注册的观察者的集合，这里我选择了动态数组来存储所有的观察者，代码如下：
 ``` objc
-+ (GYNotificationCenter *)defaultCenter
-{
++ (GYNotificationCenter *)defaultCenter {
     static GYNotificationCenter *singleton;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -44,8 +44,7 @@ categories: 技术
     return singleton;
 }
 
-- (instancetype)initSingleton
-{
+- (instancetype)initSingleton {
     if ([super init]) {
         _observers = [NSMutableArray array];
     }
@@ -70,8 +69,7 @@ categories: 技术
 
 向通知中心注册观察者，代码如下：
 ``` objc
-- (void)addObserver:(id)observer selector:(SEL)aSelector name:(NSString *)aName object:(id)anObject
-{
+- (void)addObserver:(id)observer selector:(SEL)aSelector name:(NSString *)aName object:(id)anObject {
     GYObserverModel *observerModel = [[GYObserverModel alloc] init];
     observerModel.observer = observer;
     observerModel.selector = aSelector;
@@ -79,8 +77,7 @@ categories: 技术
     observerModel.object = anObject;
     [self.observers addObject:observerModel];
 }
-- (id <NSObject>)addObserverForName:(NSString *)name object:(id)obj queue:(NSOperationQueue *)queue usingBlock:(void (^)(GYNotification * _Nonnull))block
-{
+- (id <NSObject>)addObserverForName:(NSString *)name object:(id)obj queue:(NSOperationQueue *)queue usingBlock:(void (^)(GYNotification * _Nonnull))block {
     GYObserverModel *observerModel = [[GYObserverModel alloc] init];
     observerModel.notificationName = name;
     observerModel.object = obj;
@@ -92,8 +89,7 @@ categories: 技术
 ```
 发送通知有三种方式，最终都是调用- (void)postNotification:(GYNotification *)notification，代码如下：
 ``` objc
-- (void)postNotification:(GYNotification *)notification
-{
+- (void)postNotification:(GYNotification *)notification {
     [self.observers enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         GYObserverModel *observerModel = obj;
         id observer = observerModel.observer;
@@ -114,7 +110,7 @@ categories: 技术
 # NSNotification的线程问题
 >In a multithreaded application, notifications are always delivered in the thread in which the notification was posted, which may not be the same thread in which an observer registered itself.
 
-在多线程应用中，Notification在哪个线程中post，就在哪个线程中被转发，而不一定是在注册观察者的那个线程中。
+在多线程应用中，Notification 在哪个线程中 post，就在哪个线程中被转发，而不一定是在注册观察者的那个线程中。
 
 示例：
 ``` objectivec
@@ -141,14 +137,13 @@ categories: 技术
 Log:
 ``` objectivec
 current thread = <NSThread: 0x7f8548405250>{number = 1, name = main}
-viewWillAppear: ViewController
 current thread = <NSThread: 0x7f854845b790>{number = 2, name = (null)}
 ```
 >For example, if an object running in a background thread is listening for notifications from the user interface, such as a window closing, you would like to receive the notifications in the background thread instead of the main thread. In these cases, you must capture the notifications as they are delivered on the default thread and redirect them to the appropriate thread.
 
-我们在Notification所在的默认线程中捕获这些分发的通知，然后将其重定向到指定的线程中。如果我们希望一个Notification的post线程与转发线程不是同一个线程，就需要重定向。
+我们在 Notification 所在的默认线程中捕获这些分发的通知，然后将其重定向到指定的线程中。如果我们希望一个 Notification 的 post 线程与转发线程不是同一个线程，就需要重定向。
 
-一种重定向的实现思路是自定义一个通知队列(注意，不是NSNotificationQueue对象，而是一个数组)，让这个队列去维护那些我们需要重定向的Notification。我们仍然是像平常一样去注册一个通知的观察者，当Notification来了时，先看看post这个Notification的线程是不是我们所期望的线程，如果不是，则将这个Notification存储到我们的队列中，并发送一个信号(signal)到期望的线程中，来告诉这个线程需要处理一个Notification。指定的线程在收到信号后，将Notification从队列中移除，并进行处理。
+一种重定向的实现思路是自定义一个通知队列(注意，不是 NSNotificationQueue 对象，而是一个数组)，让这个队列去维护那些我们需要重定向的 Notification。我们仍然是像平常一样去注册一个通知的观察者，当 Notification 来了时，先看看 post 这个 Notification 的线程是不是我们所期望的线程，如果不是，则将这个 Notification 存储到我们的队列中，并发送一个信号(signal)到期望的线程中，来告诉这个线程需要处理一个 Notification。指定的线程在收到信号后，将 Notification 从队列中移除，并进行处理。
 
 官方示例代码：
 ``` objectivec
@@ -230,10 +225,10 @@ process notification
 * 所有的通知的处理都要经过 processNotification 函数进行处理。
 * 所有的接听对象都要提供相应的 NSMachPort 对象，进行消息转发。
 
-正是由于存在这样的缺陷，因此官方文档并不建议直接这样使用，而是鼓励开发者去继承NSNoticationCenter或者自己去提供一个单独的类进行线程的维护。
+正是由于存在这样的缺陷，因此官方文档并不建议直接这样使用，而是鼓励开发者去继承 NSNoticationCenter 或者自己去提供一个单独的类进行线程的维护。
 
 # NSNotificationCenter的线程安全性
-之所以采取通知中心在同一个线程中post和转发同一消息这一策略，应该是出于线程安全的角度来考量的。官方文档告诉我们，NSNotificationCenter是一个线程安全类，我们可以在多线程环境下使用同一个NSNotificationCenter对象而不需要加锁。
+之所以采取通知中心在同一个线程中 post 和转发同一消息这一策略，应该是出于线程安全的角度来考量的。官方文档告诉我们，NSNotificationCenter 是一个线程安全类，我们可以在多线程环境下使用同一个 NSNotificationCenter 对象而不需要加锁。
 
 我们可以在任何线程中添加/删除通知的观察者，也可以在任何线程中post一个通知。
 ```objectivec
@@ -243,25 +238,21 @@ process notification
 
 @implementation Poster
 
-- (instancetype)init
-{
+- (instancetype)init {
     self = [super init];
-    if (self)
-    {
+    if (self) {
         [self performSelectorInBackground:@selector(postNotification) withObject:nil];
     }
     return self;
 }
 
-- (void)postNotification
-{
+- (void)postNotification {
     [[NSNotificationCenter defaultCenter] postNotificationName:TEST_NOTIFICATION object:nil];
 }
 
 @end
 
-@interface Observer : NSObject
-{
+@interface Observer : NSObject {
     Poster  *_poster;
 }
 
@@ -271,27 +262,23 @@ process notification
 
 @implementation Observer
 
-- (instancetype)init
-{
+- (instancetype)init {
     self = [super init];
-    if (self)
-    {
+    if (self) {
         _poster = [[Poster alloc] init];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleNotification:) name:TEST_NOTIFICATION object:nil];
     }
     return self;
 }
 
-- (void)handleNotification:(NSNotification *)notification
-{
+- (void)handleNotification:(NSNotification *)notification {
     NSLog(@"handle notification begin");
     sleep(1);
     NSLog(@"handle notification end");
     self.i = 10;
 }
 
-- (void)dealloc
-{
+- (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     NSLog(@"Observer dealloc");
 }
@@ -307,19 +294,19 @@ process notification
 
 @end
 ```
-这段代码是在主线程添加了一个TEST_NOTIFICATION通知的监听者，并在主线程中将其移除，而我们的NSNotification是在后台线程中post的。在通知处理函数中，我们让回调所在的线程睡眠1秒钟，然后再去设置属性i值。这就会导致程序崩溃：
+这段代码是在主线程添加了一个 TEST_NOTIFICATION 通知的监听者，并在主线程中将其移除，而我们的 NSNotification 是在后台线程中 post 的。在通知处理函数中，我们让回调所在的线程睡眠1秒钟，然后再去设置属性 i 值。这就会导致程序崩溃：
 * 当我们注册一个观察者是，通知中心会持有观察者的一个弱引用，来确保观察者是可用的。
-* 主线程调用dealloc操作会让Observer对象的引用计数减为0，这时对象会被释放掉。
-* 后台线程发送一个通知，如果此时Observer还未被释放，则会向其转发消息，并执行回调方法。而如果在回调执行的过程中对象被释放了，就会出现上面的问题。
+* 主线程调用 dealloc 操作会让 Observer 对象的引用计数减为0，这时对象会被释放掉。
+* 后台线程发送一个通知，如果此时 Observer 还未被释放，则会向其转发消息，并执行回调方法。而如果在回调执行的过程中对象被释放了，就会出现上面的问题。
 
 那我们该怎么做呢？这里有一些好的建议：
-* 尽量在一个线程中处理通知相关的操作，大部分情况下，这样做都能确保通知的正常工作。不过，我们无法确定到底会在哪个线程中调用dealloc方法，所以这一点还是比较困难。
-* 注册监听时，使用基于block的API。这样我们在block还要继续调用self的属性或方法，就可以通过weak-strong的方式来处理。具体大家可以改造下上面的代码试试是什么效果。
+* 尽量在一个线程中处理通知相关的操作，大部分情况下，这样做都能确保通知的正常工作。不过，我们无法确定到底会在哪个线程中调用 dealloc 方法，所以这一点还是比较困难。
+* 注册监听时，使用基于 block 的API。这样我们在 block 还要继续调用 self 的属性或方法，就可以通过 weak-strong 的方式来处理。具体大家可以改造下上面的代码试试是什么效果。
 * 使用带有安全生命周期的对象，这一点对象单例对象来说再合适不过了，在应用的整个生命周期都不会被释放。
 * 使用代理。
 
 # block方式的NSNotification
-为了顺应语法的变化，apple从iOS4之后提供了带有block的NSNotification。使用方式如下：
+为了顺应语法的变化，apple 从 iOS4 之后提供了带有 block 的 NSNotification。使用方式如下：
 ``` objectivec
 - (id<NSObject>)addObserverForName:(NSString *)name
                             object:(id)obj
@@ -327,10 +314,10 @@ process notification
                         usingBlock:(void (^)(NSNotification *note))block
 ```
 * 观察者就是当前对象
-* queue定义了block执行的线程，nil则表示block的执行线程和发通知在同一个线程
-* block就是相应通知的处理函数
+* queue 定义了 block 执行的线程，nil 则表示 block 的执行线程和发通知在同一个线程
+* block 就是相应通知的处理函数
 
-这个API已经能够让我们方便的控制通知的线程切换。但是，这里有个问题需要注意。就是其remove操作。
+这个 API 已经能够让我们方便的控制通知的线程切换。但是，这里有个问题需要注意。就是其 remove 操作。
 ``` objectivec
 - (void)removeObservers {
     if（_observer）{
@@ -338,17 +325,17 @@ process notification
     }
 }
 ```
-其中_observer是addObserverForName方式的api返回观察者对象。这也就意味着，你需要为每一个观察者记录一个成员对象，然后在remove的时候依次删除。试想一下，你如果需要10个观察者，则需要记录10个成员对象，这个想想就是很麻烦，而且它还不能够方便的指定observer。因此，理想的做法就是自己再做一层封装，将这些细节封装起来。
+其中 _observer 是 addObserverForName 方式的 api 返回观察者对象。这也就意味着，你需要为每一个观察者记录一个成员对象，然后在 remove 的时候依次删除。试想一下，你如果需要10个观察者，则需要记录10个成员对象，这个想想就是很麻烦，而且它还不能够方便的指定 observer。因此，理想的做法就是自己再做一层封装，将这些细节封装起来。
 
 **通知的移除不一定非要写**
 
-如果在闭包中使用了weakself，则这个通知所在NSObject或者ViewController都会释放，就不会再继续调用weakself调用的方法。
+如果在闭包中使用了 weakself，则这个通知所在 NSObject 或者 ViewController 都会释放，就不会再继续调用 weakself 调用的方法。
 
-对于addObserver：这里要分ViewController和普通NSObject两个说起。
+对于addObserver：这里要分 ViewController 和普通 NSObject 两个说起。
 
-**ViewController**：在调用ViewController的dealloc的时候，系统会调用``[[NSNotificationCenter defaultCenter]removeObserver:self]``方法，所以如果是在viewDidLoad中使用addObserver添加监听者的话可以省掉移除。当然，如果是在viewWillAppear中添加的话，那么就要在viewWillAppear中自己移除，而且，最好是使用``[[NSNotificationCenter defaultCenter]removeObserver:self name:@"test" object:nil]``，而非[[NSNotificationCenter defaultCenter]removeObserver:self]，否则很有可能你会把系统的其他通知也移除了
+**ViewController**：在调用 ViewController 的 dealloc 的时候，系统会调用``[[NSNotificationCenter defaultCenter]removeObserver:self]``方法，所以如果是在 viewDidLoad 中使用 addObserver 添加监听者的话可以省掉移除。当然，如果是在 viewWillAppear 中添加的话，那么就要在 viewWillDisappear 中自己移除，而且，最好是使用``[[NSNotificationCenter defaultCenter]removeObserver:self name:@"test" object:nil]``，而非``[[NSNotificationCenter defaultCenter]removeObserver:self]``，否则很有可能你会把系统的其他通知也移除了
 
-**普通NSObject**：在iOS9之后，NSObject也会像ViewController一样在dealloc时调用``[[NSNotificationCenter defaultCenter]removeObserver:self]``方法，在iOS9之前的不会调用，需要自己写。
+**普通NSObject**：在 iOS9 之后，NSObject 也会像 ViewController 一样在 dealloc 时调用``[[NSNotificationCenter defaultCenter]removeObserver:self]``方法，在 iOS9 之前的不会调用，需要自己写。
 
 ![](http://upload-images.jianshu.io/upload_images/1024259-43227bc7bf1e6a73.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
@@ -366,4 +353,4 @@ if ([[UIDevice currentDevice].systemVersion floatValue] < 9.0) {
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(doSomeThing) name:TEST_NOTIFICATION object:nil];
 }
 ```
-在使用类别的时候如果我们添加了通知，那么我们是没有办法在类别里面重写dealloc的，如果不移除通知就会出现野指针，这个时候我们就可以在iOS9以上使用addObserver，将通知的移除交给系统，iOS9一下使用addObserverForName+weakSelf，虽然通知依然存在，但是不会调用doSomeThing方法（当然不能直接在block里面写处理过程，因为还是会执行）。
+在使用类别的时候如果我们添加了通知，那么我们是没有办法在类别里面重写 dealloc 的，如果不移除通知就会出现野指针，这个时候我们就可以在 iOS9 以上使用 addObserver，将通知的移除交给系统，iOS9 一下使用 addObserverForName+weakSelf，虽然通知依然存在，但是不会调用 doSomeThing 方法(当然不能直接在 block 里面写处理过程，因为还是会执行)。

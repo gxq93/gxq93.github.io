@@ -3,6 +3,7 @@ title: NSProxy浅谈
 date: 2017-02-04 11:32:37
 tags: [Objective-C]
 categories: 技术
+thumbnail: http://7xtg0o.com1.z0.glb.clouddn.com/1-Bnx0KZgPIBQ75F5rjLx70g.png
 ---
 >NSProxy is an abstract superclass defining an API for objects that act as stand-ins for other objects or for objects that don’t exist yet. Typically, a message to a proxy is forwarded to the real object or causes the proxy to load (or transform itself into) the real object. Subclasses of NSProxy can be used to implement transparent distributed messaging (for example, NSDistantObject) or for lazy instantiation of objects that are expensive to create.
 

@@ -3,6 +3,7 @@ title: Swift闭包形式的初始化方法
 date: 2016-10-08 14:42:26
 tags: [Swift]
 categories: 技术
+thumbnail: http://7xtg0o.com1.z0.glb.clouddn.com/1-BRHKm8nigXNKVdF1B0PX0g.png
 ---
 对于swift一般控件的初始化，相信大部分都还是习惯这样声明：
 ``` swift

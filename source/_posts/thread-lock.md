@@ -3,6 +3,7 @@ title: 线程锁在iOS中的应用
 date: 2016-3-23 13:18:04
 tags: [Objective-C]
 categories: 技术
+thumbnail: http://7xtg0o.com1.z0.glb.clouddn.com/1-34ona0OcnJhWaw53CXmb7w.png
 ---
 在项目中做到线程安全是十分重要的事情，有时候简单的上个线程锁就能很好的完成需求，而给线程上锁的方法有很多，本文大致介绍了几种线程锁的使用。
 

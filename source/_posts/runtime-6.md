@@ -3,6 +3,7 @@ title: Objective-C内部实现剖析-KVC和KVO
 date: 2015-12-28 15:46:58
 tags: [Objective-C,Runtime]
 categories: 技术
+thumbnail: http://7xtg0o.com1.z0.glb.clouddn.com/1-yAQxTFJwEKXnAr2JrOFs7w.jpeg
 ---
 本文主要介绍了KVC和KVO相关的内部实现。
 

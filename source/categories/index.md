@@ -1,6 +1,5 @@
 ---
 title: Categories
-date: 2016-08-16 15:00:44
-type: "tags"
-comments: false
+date: 2015-12-07 15:00:00
+type: "categories"
 ---

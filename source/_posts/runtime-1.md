@@ -1,19 +1,20 @@
 ---
-title: Objective-C内部实现剖析-类和对象
-date: 2015-12-10 10:32:00
+title: Objective-C内部实现浅谈-类和对象
+date: 2015-7-13 10:32:00
 tags: [Objective-C,Runtime]
 categories: 技术
+thumbnail: http://7xtg0o.com1.z0.glb.clouddn.com/1-PZzg31G7d7CpBdpHUPl96Q.jpeg
 ---
 # Runtime
-OC实质是围绕类的动态配置和消息传递，通过操作函数来配置类信息，通过``msgSend``函数传递消息。作为面向对象语言，“对象”(object)就是“基本构造单元”(building block)，开发者可以通过对象来存储并传递数据，在对象之间传递数据并执行任务的过程就叫做“消息传递”。
+OC 实质是围绕类的动态配置和消息传递，通过操作函数来配置类信息，通过``msgSend``函数传递消息。作为面向对象语言，“对象”(object)就是“基本构造单元”(building block)，开发者可以通过对象来存储并传递数据，在对象之间传递数据并执行任务的过程就叫做“消息传递”。
 
-当应用程序运行起来之后，为其提供相关支持的代码叫做“Objective-C运行期环境”，它提供了一些使得对象之间能够传递信息的重要函数，并且包含创建类实例所用的全部逻辑。这篇文章主要介绍了runtime中对象和类所扮演的角色。
+当应用程序运行起来之后，为其提供相关支持的代码叫做“Objective-C运行期环境”，它提供了一些使得对象之间能够传递信息的重要函数，并且包含创建类实例所用的全部逻辑。这篇文章主要介绍了 runtime 中对象和类所扮演的角色。
 
 <!--more-->
 
 # 类和对象
 ## 数据结构
-在OC中类和对象是这样定义的
+在 OC 中类和对象是这样定义的
 ```objc
 /* An opaque type that represents an Objective-C class. */
 typedef struct objc_class *Class;
@@ -41,9 +42,9 @@ struct objc_class {
     endif
 } OBJC2_UNAVAILABLE;
 ```
-可以看出类的本质是一个结构体，在这个结构体中有两个``Class``类型的参数``isa``和``super_class``，这两个参数是实现函数的重要映射，决定找到存放在哪个类的方法实现。（isa用于自省确定所属类，super_class确定继承关系）。
+可以看出类的本质是一个结构体，在这个结构体中有两个``Class``类型的参数``isa``和``super_class``，这两个参数是实现函数的重要映射，决定找到存放在哪个类的方法实现。(isa 用于自省确定所属类，super_class 确定继承关系)。
 
-实例对象的isa指针指向类，类的isa指针指向其元类（``metaClass``）。对象就是一个含isa指针的结构体。类存储实例对象的方法列表，元类中只记录类名，类方法列表等，元类也是类对象。
+实例对象的 isa 指针指向类，类的 isa 指针指向其元类（``metaClass``）。对象就是一个含 isa 指针的结构体。类存储实例对象的方法列表，元类中只记录类名，类方法列表等，元类也是类对象。
 ```objc
 /* An opaque type that represents an Objective-C class. */
 /* typedef struct objc_class *Class; */
@@ -54,19 +55,19 @@ struct objc_object {
 /* A pointer to an instance of a class. */
 typedef struct objc_object *id;
 ```
-这是实例对象的结构，当创建实例对象时，分配的内存包含一个``objc_object``数据结构，然后是类到父类直到根类NSObject的实例变量的数据。NSObject类的``alloc``和``allocWithZone:``方法使用函数``class_createInstance``来创建objc_object数据结构。
+这是实例对象的结构，当创建实例对象时，分配的内存包含一个``objc_object``数据结构，然后是类到父类直到根类 NSObject 的实例变量的数据。NSObject 类的``alloc``和``allocWithZone:``方法使用函数``class_createInstance``来创建 objc_object 数据结构。
 
-向一个Objective-C对象发送消息时，运行时库会根据实例对象的isa指针找到这个实例对象所属的类。Runtime库会在类的方法列表由super_class指针找到父类的方法列表直至根类NSObject中去寻找与消息对应的``selector``指向的方法。找到后即运行这个方法。(如下图)
+向一个 Objective-C 对象发送消息时，运行时库会根据实例对象的 isa 指针找到这个实例对象所属的类。Runtime 库会在类的方法列表由 super_class 指针找到父类的方法列表直至根类 NSObject 中去寻找与消息对应的``selector``指向的方法。找到后即运行这个方法。(如下图)
 
 {% asset_img runtime1.png %}
 
-* 1、isa：实例对象->类->元类->（不经过父元类）直接到根元类（NSObject的元类），根元类的isa指向自己；
-* 2、 superclass：类->父类->...->根类NSObject，元类->父元类->...->根元类->根类,NSObject的superclass指向nil。
+* 1、isa：实例对象->类->元类->(不经过父元类)直接到根元类(NSObject 的元类)，根元类的 isa 指向自己；
+* 2、 superclass：类->父类->...->根类 NSObject，元类->父元类->...->根元类->根类,NSObject 的 superclass 指向 nil。
 
 ## 操作函数
 类和对象的操作函数名只要以类对象``class_``为前缀，实例对象``object_``为前缀。
 ### **class_**:
-**get**:类名，父类，元类；实例变量，成员变量；属性；实例方法，类方法，方法实现
+**get**：类名，父类，元类；实例变量，成员变量；属性；实例方法，类方法，方法实现
 ```objc
 /* 获取类的类名 */
 const char * class_getName ( Class cls );
@@ -80,7 +81,7 @@ Ivar class_getInstanceVariable ( Class cls, const char *name );
 Ivar class_getClassVariable ( Class cls, const char *name );
 /* 获取指定的属性 */
 objc_property_t class_getProperty ( Class cls, const char *name );
-/*方法：具体内容下文讲 */
+/* 方法：具体内容下文讲 */
 /* 获取实例方法 */
 Method class_getInstanceMethod ( Class cls, SEL name );
 /* 获取类方法 */
@@ -89,7 +90,7 @@ Method class_getClassMethod ( Class cls, SEL name );
 IMP class_getMethodImplementation ( Class cls, SEL name );
 IMP class_getMethodImplementation_stret ( Class cls, SEL name );
 ```
-**copy**:成员变量列表；属性列表；方法列表；协议列表
+**copy**：成员变量列表；属性列表；方法列表；协议列表
 ```objc
 /* 获取整个成员变量列表 */
 Ivar * class_copyIvarList ( Class cls, unsigned int *outCount );
@@ -100,7 +101,7 @@ Method * class_copyMethodList ( Class cls, unsigned int *outCount );
 /* 获取类实现的协议列表 */
 Protocol * class_copyProtocolList ( Class cls, unsigned int *outCount );
 ```
-**add**:成员变量；属性；方法；协议(添加成员变量只能在运行时创建的类，且不能为元类)
+**add**：成员变量；属性；方法；协议(添加成员变量只能在运行时创建的类，且不能为元类)
 ```objc
 /* 添加成员变量 */
 BOOL class_addIvar ( Class cls, const char *name, size_t size, uint8_t alignment, const char *types );
@@ -118,12 +119,12 @@ void class_replaceProperty ( Class cls, const char *name, const objc_property_at
 /* 替代方法的实现 */
 IMP class_replaceMethod ( Class cls, SEL name, IMP imp, const char *types );
 ```
-**respond**:响应方法判断（内省）
+**respond**：响应方法判断（内省）
 ```objc
 /* 类实例是否响应指定的selector */
 BOOL class_respondsToSelector ( Class cls, SEL sel );
 ```
-**isMetaClass**:元类判断（内省）
+**isMetaClass**：元类判断（内省）
 ```objc
 /* 判断给定的Class是否是一个元类 */
 BOOL class_isMetaClass ( Class cls );
@@ -134,7 +135,7 @@ BOOL class_isMetaClass ( Class cls );
 BOOL class_conformsToProtocol ( Class cls, Protocol *protocol );
 ```
 ### **object_**:
-**get**:实例变量；成员变量；类名；类；元类；关联对象
+**get**：实例变量；成员变量；类名；类；元类；关联对象
 ```objc
 /* 获取对象实例变量 */
 Ivar object_getInstanceVariable ( id obj, const char *name, void **outValue );
@@ -150,14 +151,14 @@ Class objc_getMetaClass ( const char *name );
 /* 获取关联对象 */
 id objc_getAssociatedObject(self, &myKey);
 ```
-**copy**:对象；类；类列表；协议列表
+**copy**：对象；类；类列表；协议列表
 ```objc
 /* 获取指定对象的一份拷贝 */
 id object_copy ( id obj, size_t size );
 /* 创建并返回一个指向所有已注册类的指针列表 */
 Class * objc_copyClassList ( unsigned int *outCount );
 ```
-**set**:实例变量；类；类列表；协议；关联对象
+**set**：实例变量；类；类列表；协议；关联对象
 ```objc
 /* 设置类实例的实例变量的值 */
 Ivar object_setInstanceVariable ( id obj, const char *name, void *value );
@@ -166,7 +167,7 @@ void object_setIvar ( id obj, Ivar ivar, id value );
 /* 设置关联对象 */
 void objc_setAssociatedObject(self, &myKey, anObject, OBJC_ASSOCIATION_RETAIN);
 ```
-**dispose**:对象
+**dispose**：对象
 ```objc
 /* 释放指定对象占用的内存 */
 id object_dispose ( id obj );
@@ -191,7 +192,7 @@ id objc_constructInstance ( Class cls, void *bytes );
 void * objc_destructInstance ( id obj );
 ```
 # 实例变量和属性
-“属性”(property)是OC的一项特性，用于封装对象中的数据。OC对象通常会把其所需要的数据保存为各种实例变量。实例变量一般通过“存取方法”(access method)来访问。其中，“获取方法”(getter)用于读取变量值，而“设置方法”(setter)用于写入变量值。而属性可以更容易地依照类对象来访问存放于其中的数据。
+“属性”(property)是 OC 的一项特性，用于封装对象中的数据。OC 对象通常会把其所需要的数据保存为各种实例变量。实例变量一般通过“存取方法”(access method)来访问。其中，“获取方法”(getter)用于读取变量值，而“设置方法”(setter)用于写入变量值。而属性可以更容易地依照类对象来访问存放于其中的数据。
 ## 数据结构：
 ### 成员变量Ivar
 ```objc
@@ -209,7 +210,7 @@ struct objc_ivar {
 ```objc
 typedef struct objc_property *objc_property_t;
 ```
-``objc_property_attribute_t``（属性的特性有：返回值、是否为atomic、getter/setter名字、是否为dynamic、背后使用的ivar名字、是否为弱引用等）
+``objc_property_attribute_t``（属性的特性有：返回值、是否为 atomic、getter/setter 名字、是否为 dynamic、背后使用的 ivar 名字、是否为弱引用等）
 ```objc
 typedef struct {
     const char *name;           /* 特性名 */
@@ -218,7 +219,7 @@ typedef struct {
 ```
 ## 操作函数：
 ### **ivar_**：
-**get**:成员变量名，成员变量类型编码，成员变量的偏移量
+**get**：成员变量名，成员变量类型编码，成员变量的偏移量
 ```objc
 /* 获取成员变量名 */
 const char * ivar_getName ( Ivar v );
@@ -228,7 +229,7 @@ const char * ivar_getTypeEncoding ( Ivar v );
 ptrdiff_t ivar_getOffset ( Ivar v );
 ```
 ### **property_**：
-**get**:属性名，属性特性描述字符串，属性中指定的特性，属性的特性列表
+**get**：属性名，属性特性描述字符串，属性中指定的特性，属性的特性列表
 ```objc
 /* 获取属性名 */
 const char * property_getName ( objc_property_t property );
@@ -241,14 +242,14 @@ objc_property_attribute_t * property_copyAttributeList ( objc_property_t propert
 ```
 # 属性相关的内容
 ## 实例变量与属性
-Objective-C中不提倡使用
+Objective-C 中不提倡使用
 ```objc
 @interface Person:NSObject {
     NSString *_firstName;
     NSString *_secondName;
 }
 ```
-虽然这样可以定义实例变量的作用域，但是对象布局在编译期就已经固定了，只要访问``_firstName``变量的代码，编译器就把其替换为偏移量（offset），这个偏移量是硬编码，表示该变量距离存放对象的内存区域的起始地址有多远，如果又加了一个实例变量，如：
+虽然这样可以定义实例变量的作用域，但是对象布局在编译期就已经固定了，只要访问``_firstName``变量的代码，编译器就把其替换为偏移量(offset)，这个偏移量是硬编码，表示该变量距离存放对象的内存区域的起始地址有多远，如果又加了一个实例变量，如：
 ```objc
 @interface Person:NSObject {
     NSString *_family;
@@ -256,7 +257,7 @@ Objective-C中不提倡使用
     NSString *_secondName;
 }
 ```
-``_firestName``的偏移量就指向了``_family``，那么在修改定义后就必须重新编译，否则就会出错。Objective-C做法是把实例变量当作一种存储偏移量所用的“特殊变量”，交给“类对象”来管理，偏移量会在运行期查找，如果类的定义变了，存储的偏移量也就变了。
+``_firestName``的偏移量就指向了``_family``，那么在修改定义后就必须重新编译，否则就会出错。Objective-C 做法是把实例变量当作一种存储偏移量所用的“特殊变量”，交给“类对象”来管理，偏移量会在运行期查找，如果类的定义变了，存储的偏移量也就变了。
 这个问题还有一种方法，尽量不要直接访问实例变量，而通过存取方法来做，也就是属性。虽然属性最终还是通过实例变量来实现，但是它更简洁。如果使用属性的话，编译器会自动编写访问这些属性所需方法，这个过程叫做“自动合成”。这个过程在编译期执行，除了生成方法代码外，编译器还自动向类中添加适当类型的实例变量，并在属性名前加前缀``_``。
 也可以通过``@synthesize``语法来定义实例变量的名字
 ```objc
@@ -265,15 +266,15 @@ Objective-C中不提倡使用
 这会将生成的实例名字命名为`` _myFirstName``
 ## 属性特质(attribute)
 属性有各种特质影响编译期所产生的存取方法
-* 原子性（atomic/nonatomic）
+* 原子性(atomic/nonatomic)
 * 读／写权限(readwrite/readonly)
 * 内存管理语义(assign/strong/weak/copy/unsafe_unretained)
 * 方法名
-getter=< name >   如：``@property(nonatomic,getter=isOn) BOOL on;``
-setter=< name >
+  getter=< name >   如：``@property (nonatomic, getter=isOn) BOOL on;``
+  setter=< name >
 
-上述特质可通过前文runtime方法得到。
+上述特质可通过前文 runtime 方法得到。
 ## 访问实例变量
 在对象之外访问实例变量应该通过属性来访问，而在对象内部则可根据情况分类讨论。
-如果直接访问实例变量，由于不经过方法派发，访问速度会比访问属性更快，编译器所产生的代码会直接访问保存对象实例的那块内存，但是直接访问实例变量不会触发“设置方法”，比如如果在ARC下直接访问一个声明为copy的属性，那么并不会拷贝这个属性，只会保留新值释放旧值。因此通过getter方法定义的懒加载方法也不会被调用。也不会触发``KVO``。
-因此可以在写入实例变量时通过“设置方法”来做，而在读取实例变量时直接访问（懒加载除外）。
+如果直接访问实例变量，由于不经过方法派发，访问速度会比访问属性更快，编译器所产生的代码会直接访问保存对象实例的那块内存，但是直接访问实例变量不会触发“设置方法”，比如如果在 ARC 下直接访问一个声明为 copy 的属性，那么并不会拷贝这个属性，只会保留新值释放旧值。因此通过 getter 方法定义的懒加载方法也不会被调用。也不会触发``KVO``。
+因此可以在写入实例变量时通过“设置方法”来做，而在读取实例变量时直接访问(懒加载除外)。

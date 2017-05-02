@@ -3,6 +3,7 @@ title: WKWebViewTips
 date: 2016-02-04 13:00:14
 tags: [Objective-C,WebView]
 categories: 技术
+thumbnail: http://7xtg0o.com1.z0.glb.clouddn.com/1-7d7cjzjDQySL1lFBlLkaVw.jpeg
 ---
 WKWebView是现代WebKit API在iOS8和OS X Yosemite应用中的核心部分。它代替了UIKit中的UIWebView和AppKit中的WebView，提供了统一的跨双平台API。他自诩拥有60fps滚动刷新率、内置手势、高效的app和web信息交换通道、和Safari相同的JavaScript引擎，而其将UIWebViewDelegate与UIWebView重构成了14类与3个协议
 
@@ -30,12 +31,12 @@ WKWebView是现代WebKit API在iOS8和OS X Yosemite应用中的核心部分。�
 * WKNavigationDelegate: 提供了追踪主窗口网页加载过程和判断主窗口和子窗口是否进行页面加载新页面的相关方法。
 * WKScriptMessageHandler: 提供从网页中收消息的回调方法。
 * WKUIDelegate: 提供用原生控件显示网页的方法回调。
-这里有篇很好的文章介绍了UIWebViewDelegate与UIWebView的API区别和JS与Swift的对话机制[http://nshipster.cn/wkwebkit/](http://nshipster.cn/wkwebkit/)。
+  这里有篇很好的文章介绍了UIWebViewDelegate与UIWebView的API区别和JS与Swift的对话机制[http://nshipster.cn/wkwebkit/](http://nshipster.cn/wkwebkit/)。
 
 # WKWebView Tips
 
 * ``file:///``无法在tmp目录中工作，只能用``file:``访问tmp目录。
-[https://github.com/shazron/WKWebViewFIleUrlTest](https://github.com/shazron/WKWebViewFIleUrlTest)有具体例子
+  [https://github.com/shazron/WKWebViewFIleUrlTest](https://github.com/shazron/WKWebViewFIleUrlTest)有具体例子
 * 不能在Storyboard或者Interface Builder中创建。
 * ``HTML <a> tag``带着``target="_blank"``不会响应。
 * URL Scheme和 AppStore links无法使用
@@ -64,7 +65,7 @@ WKWebView是现代WebKit API在iOS8和OS X Yosemite应用中的核心部分。�
 ```
 
 * JS的alert, confirm, prompt需要调用WKUIDelegate方法
-如果你想要展示对话框，你需要执行以下方法
+  如果你想要展示对话框，你需要执行以下方法
 
 ```objc
 webView:runJavaScriptAlertPanelWithMessage:initiatedByFrame:completionHandler:
@@ -121,7 +122,7 @@ webView:runJavaScriptTextInputPanelWithPrompt:defaultText:initiatedByFrame:compl
 }
 ```
 * 多个WKWebView之间的cookie传递
-使用WKProcessPool在webviews之间进行cookie传递
+  使用WKProcessPool在webviews之间进行cookie传递
 
 ```objc
 self.processPool = [[WKProcessPool alloc] init];
@@ -136,14 +137,14 @@ WKWebView *webView2 = [[WKWebView alloc] initWithFrame:CGRectZero configuration:
 
 ```
 * 无法使用NSURLProtocol, NSCachedURLResponse,NSURLProtocol
-UIWebView可以通过NSURLProtocol, NSCachedURLResponse,NSURLProtocol过滤广告网站和缓存和离线浏览，但是WKWebView不能。
+  UIWebView可以通过NSURLProtocol, NSCachedURLResponse,NSURLProtocol过滤广告网站和缓存和离线浏览，但是WKWebView不能。
 * Cookie, Cache, Credential, WebKit data不容易被清除
-iOS8
-1.和UIWebView一样的方法用使用NSURLCache和NSHTTPCookie来删除cookies和caches。
-2.如果你使用WKProccessPool对它重新初始化。
-3.在Library目录中删除Cookies, Caches及WebKit的子目录。
-4.删除所有WKWebViews。
-iOS9
+  iOS8
+  1.和UIWebView一样的方法用使用NSURLCache和NSHTTPCookie来删除cookies和caches。
+  2.如果你使用WKProccessPool对它重新初始化。
+  3.在Library目录中删除Cookies, Caches及WebKit的子目录。
+  4.删除所有WKWebViews。
+  iOS9
 ```objc
 /* Optional data */
 NSSet *websiteDataTypes = [NSSet setWithArray:@[
@@ -168,12 +169,12 @@ NSDate *dateFrom = [NSDate dateWithTimeIntervalSince1970:0];
 ```
 
 * iOS9上滚动速度bug
-在iOS 8以下代码没问题,它可以用更多的惯性滚动。
+  在iOS 8以下代码没问题,它可以用更多的惯性滚动。
 ```objc
 webView.scrollView.decelerationRate = UIScrollViewDecelerationRateNormal;
 ```
     至于iOS 9，没有在UIScrollView代理中设置滚动速度，这段代码是没有意义的。
-    ```objc
+    ​```objc
     - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
         scrollView.decelerationRate = UIScrollViewDecelerationRateNormal;
     }
@@ -191,3 +192,5 @@ WKWebView初始化时,它可以设置cookie管理地区而不等待这个区域�
 * WKWebView的backForwardList属性是只读的。
 * 很难和UIWebView在iOS7及以下共存。
 参考翻译自[https://github.com/ShingoFukuyama/WKWebViewTips](https://github.com/ShingoFukuyama/WKWebViewTips)
+
+```
