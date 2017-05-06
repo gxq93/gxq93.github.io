@@ -236,14 +236,7 @@
     <!-- Post Excerpt -->
     <div class="mdl-color-text--grey-600 mdl-card__supporting-text post_entry-content">
         
-            
-NSProxy is an abstract superclass defining an API for objects that act as stand-ins for other objects or for objects that don’t exist yet. Typically, a message to a proxy is forwarded to the real object or causes the proxy to load (or transform itself into) the real object. Subclasses of NSProxy can be used to implement transparent distributed messaging (for example, NSDistantObject) or for lazy instantiation of objects that are expensive to create.
-
-NSProxy是一个抽象父类定义一个API的对象充当其他对象或对象的替身。通常,一个消息代理转发给真正的对象或导致代理负载或转型为真正的对象。子类NSProxy可用于实现透明的分布式消息(例如NSDistantObject)或延迟实例化的对象。
-
-A concrete subclass must therefore provide an initialization or creation method and override the forwardInvocation: and methodSignatureForSelector: methods to handle messages that it doesn’t implement itself.
-
-创建合适的NSProxy子类，通过复写forwardInvocation:方法和 methodSignatureForSelector:方法，将NSProxy不识别的调用forward给具体负责实现的对象。
+            NSProxy 是一个不同于 NSObject 的根类，虽然这个类平时很少用到，但是他的作用却是十分明确并有许多地方可以深究的，这篇文章主要简单的介绍一下 NSProxy 并介绍几个他的应用场景，后续一篇文章会具体应用 NSProxy 到一个有趣的中间件中。
         
         &nbsp;&nbsp;&nbsp;
         <span>
@@ -523,7 +516,7 @@ A concrete subclass must therefore provide an initialization or creation method 
     
 
         <!-- Post Title -->
-        <p class="article-headline-p"><a href="/2016/02/04/WKWebView-Tips/">WKWebViewTips</a></p>
+        <p class="article-headline-p"><a href="/2016/02/04/WKWebView-Tips/">WKWebView使用注意事项</a></p>
     </div>
 
     <!-- Post Excerpt -->
@@ -581,13 +574,13 @@ A concrete subclass must therefore provide an initialization or creation method 
     
 
         <!-- Post Title -->
-        <p class="article-headline-p"><a href="/2015/12/28/runtime-6/">Objective-C内部实现剖析-KVC和KVO</a></p>
+        <p class="article-headline-p"><a href="/2015/12/28/runtime-6/">Objective-C内部实现浅谈-KVC和KVO</a></p>
     </div>
 
     <!-- Post Excerpt -->
     <div class="mdl-color-text--grey-600 mdl-card__supporting-text post_entry-content">
         
-            本文主要介绍了KVC和KVO相关的内部实现。
+            本文主要介绍了 KVC 和 KVO 相关的内部实现。
         
         &nbsp;&nbsp;&nbsp;
         <span>
@@ -638,7 +631,7 @@ A concrete subclass must therefore provide an initialization or creation method 
     
 
         <!-- Post Title -->
-        <p class="article-headline-p"><a href="/2015/11/26/runtime-5/">Objective-C内部实现剖析-通知</a></p>
+        <p class="article-headline-p"><a href="/2015/11/26/runtime-5/">Objective-C内部实现浅谈-通知</a></p>
     </div>
 
     <!-- Post Excerpt -->
@@ -695,7 +688,7 @@ A concrete subclass must therefore provide an initialization or creation method 
     
 
         <!-- Post Title -->
-        <p class="article-headline-p"><a href="/2015/09/04/runtime-4/">Objective-C内部实现剖析-协议和类目</a></p>
+        <p class="article-headline-p"><a href="/2015/09/04/runtime-4/">Objective-C内部实现浅谈-协议和类目</a></p>
     </div>
 
     <!-- Post Excerpt -->
