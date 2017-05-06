@@ -168,7 +168,7 @@ BOOL sel_isEqual ( SEL lhs, SEL rhs );
 ```
 ## 消息传递过程
 * 检查 target 是否为 nil。如果为 nil，直接 cleanup，然后 return。(这就是我们可以向 nil 发送消息的原因)
-  如果方法返回值是一个对象，那么发送给 nil 的消息将返回 nil。如果方法返回值为指针类型，其指针大小为小于或者等于**sizeof(void*)、float、double、long double 、long long**的整型标量，发送给nil的消息将返回0。如果方法返回值为结构体，发送给 nil 的消息将返回0。结构体中各个字段的值将都是0。如果方法的返回值不是上述提到的几种情况，那么发送给 nil 的消息的返回值将是未定义的。
+  如果方法返回值是一个对象，那么发送给 nil 的消息将返回 nil。如果方法返回值为指针类型，其指针大小为小于或者等于**sizeof(void*)、float、double、long double 、long long**的整型标量，发送给 nil 的消息将返回0。如果方法返回值为结构体，发送给 nil 的消息将返回0。结构体中各个字段的值将都是0。如果方法的返回值不是上述提到的几种情况，那么发送给 nil 的消息的返回值将是未定义的。
 * 如果 target 非 nil，在 target 的``Class``中根据``SEL``去找``IMP``。（因为同一个方法可能在不同的类中有不同的实现，所以我们需要依赖于接收者的类来找到的确切的实现）
 * 首先它找到``selector``对应的方法实现。
 * 在 target 类的方法缓存列表里检查有没有对应的方法实现，有的话，直接调用。
@@ -180,11 +180,11 @@ BOOL sel_isEqual ( SEL lhs, SEL rhs );
 ## 动态方法解析与消息转发
 如果以上的类中没有找到对应的 selector (一般保险起见先用``respondsToSelector:``内省判断)，还可以利用消息转发机制依次执行以下流程：
 * Method Resolution(动态方法解析)：
-  用所属类的类方法``+(BOOL)resolveInstanceMethod:``(实例方法)或者``+(BOOL)resolveClassMethod:``(类方法)，在此方法里添加``class_addMethod``函数。一般用于@dynamic动态属性。（当一个属性声明为@dynamic，就是向编译器保证编译时不用管 setter/getter 实现，一定会在运行时实现）
+  用所属类的类方法``+(BOOL)resolveInstanceMethod:``(实例方法)或者``+(BOOL)resolveClassMethod:``(类方法)，在此方法里添加``class_addMethod``函数。一般用于 @dynamic 动态属性。（当一个属性声明为@dynamic，就是向编译器保证编译时不用管 setter/getter 实现，一定会在运行时实现）
 * Fast Forwarding (快速消息转发)：
-  如果上一步无法响应消息，调用``-(id)forwardingTargetForSelector:(SEL)aSelector``方法，将消息接受者转发到另一个对象target。(不能为self，否则死循环)
+  如果上一步无法响应消息，调用``-(id)forwardingTargetForSelector:(SEL)aSelector``方法，将消息接受者转发到另一个对象 target。(不能为self，否则死循环)
 * Normal Forwarding(普通消息转发)：
-  如果上一步无法响应消息，调用方法签名``-(NSMethodSignature )methodSignatureForSelector:(SEL)aSelector``，方法签名目的将函数的参数类型和返回值封装。如果返回非 nil，则创建一个NSInvocation 对象利用方法签名和 selector 封装未被处理的消息，作为参数传递给``-(void)forwardInvocation:(NSInvocation )anInvocation``。
+  如果上一步无法响应消息，调用方法签名``-(NSMethodSignature )methodSignatureForSelector:(SEL)aSelector``，方法签名目的将函数的参数类型和返回值封装。如果返回非 nil，则创建一个 NSInvocation 对象利用方法签名和 selector 封装未被处理的消息，作为参数传递给``-(void)forwardInvocation:(NSInvocation )anInvocation``。
 
 如果以上步骤(消息传递和消息转发)还是不能响应消息，则调动``doesNotRecognizeSelector：``方法，抛出异常。
 ```objc

@@ -1,5 +1,5 @@
 ---
-title: Objective-C内部实现剖析-通知
+title: Objective-C内部实现浅谈-通知
 date: 2015-11-26 15:46:53
 tags: [Objective-C,Runtime]
 categories: 技术
