@@ -10,7 +10,7 @@
     
     <title>
         
-            标签: WebView | 
+            归档: 2017/5 | 
         
         Grommash
     </title>
@@ -48,7 +48,7 @@
     <!-- The Open Graph protocol -->
     <meta property="og:url" content="http://yoursite.com">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="标签: WebView | Grommash">
+    <meta property="og:title" content="归档: 2017/5 | Grommash">
     <meta property="og:description" content="null">
     
 
@@ -226,22 +226,21 @@
     <!-- Post Thumbnail -->
     
         <!-- Custom Thumbnail -->
-        <div class="post_thumbnail-custom mdl-card__media mdl-color-text--grey-50" style="background-image:url(http://7xtg0o.com1.z0.glb.clouddn.com/1-yctwM_bXOdj21thTiMR_Mw.png)">
+        <div class="post_thumbnail-custom mdl-card__media mdl-color-text--grey-50" style="background-image:url(http://7xtg0o.com1.z0.glb.clouddn.com/1-kJROF66aOK4WAx3jTKqfSA.png)">
     
 
         <!-- Post Title -->
-        <p class="article-headline-p"><a href="/2016/11/09/WebView-NSURLProtocol/">WebView缓存策略(NSURLProtocol)</a></p>
+        <p class="article-headline-p"><a href="/2017/05/14/ProtocolCourier/">基于NSProxy的中间件-ProtocolCourier</a></p>
     </div>
 
     <!-- Post Excerpt -->
     <div class="mdl-color-text--grey-600 mdl-card__supporting-text post_entry-content">
         
-            首先说明一下这个方案只能应用于UIWebview，因为WKWebView不支持NSURLProtocol。本文主要介绍通过NSURLProtocol和NSURLSession对Web页面进行缓存，其中还有一些地方还没完善，如读取缓存的条件，清理缓存时间，网页异步加载问题和跳转问题，之后有空再研究。方案的流程图：
-
+            接着上篇文章我们现在把NSProxy应用到一个更实际的例子中，首先介绍一下ProtocolCourier是一款设计初衷为了简化一些遵守了很多协议而造成代码量大的类的中间件，他的目的是为了减少一些文件的代码量，把单独每个协议的代码抽离出来。接下来我们大致介绍一下如何实现这个”协议快递员”。
         
         &nbsp;&nbsp;&nbsp;
         <span>
-            <a href="/2016/11/09/WebView-NSURLProtocol/" target="_self">继续阅读</a>
+            <a href="/2017/05/14/ProtocolCourier/" target="_self">继续阅读</a>
         </span>
     </div>
     <!-- Post_entry Info-->
@@ -253,65 +252,7 @@
             </div>
             <div>
                 <strong>GuYi</strong>
-                <span>11月 09, 2016</span>
-            </div>
-        </div>
-        <div id="post_entry-right-info">
-            <!-- Category -->
-            <span class="post_entry-category">
-                <a class="post_category-link" href="/categories/技术/">技术</a>
-            </span>
-
-            
-
-            
-
-            <!-- Post Views -->
-            <span class="post_entry-views">
-            </span>
-        </div>
-    </div>
-</div>
-
-        
-        
-        
-    
-        
-        
-            <!-- Paradox Thumbnail -->
-            <div class="post_entry-module mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col fade out">
-    <!-- Post Thumbnail -->
-    
-        <!-- Custom Thumbnail -->
-        <div class="post_thumbnail-custom mdl-card__media mdl-color-text--grey-50" style="background-image:url(http://7xtg0o.com1.z0.glb.clouddn.com/1-7d7cjzjDQySL1lFBlLkaVw.jpeg)">
-    
-
-        <!-- Post Title -->
-        <p class="article-headline-p"><a href="/2016/02/04/WKWebView-Tips/">WKWebView使用注意事项</a></p>
-    </div>
-
-    <!-- Post Excerpt -->
-    <div class="mdl-color-text--grey-600 mdl-card__supporting-text post_entry-content">
-        
-            WKWebView 是现代 WebKit API 在 iOS8 和 OS X Yosemite 应用中的核心部分。它代替了 UIKit 中的 UIWebView 和 AppKit 中的 WebView，提供了统一的跨双平台 API。他自诩拥有 60fps 滚动刷新率、内置手势、高效的 app 和 web 信息交换通道、和 Safari 相同的 JavaScript 引擎，而其将 UIWebViewDelegate 与 UIWebView 重构成了14类与3个协议
-本文记录了一些 WKWebView 使用的相关注意事项
-        
-        &nbsp;&nbsp;&nbsp;
-        <span>
-            <a href="/2016/02/04/WKWebView-Tips/" target="_self">继续阅读</a>
-        </span>
-    </div>
-    <!-- Post_entry Info-->
-    <div id="post_entry-info">
-        <div id="post_entry-left-info" class="mdl-card__supporting-text meta mdl-color-text--grey-600 ">
-            <!-- Author Avatar -->
-            <div id="author-avatar">
-                <img src="/img/grommash_avatar.jpeg" width="44px" height="44px" alt="GuYi's avatar">
-            </div>
-            <div>
-                <strong>GuYi</strong>
-                <span>2月 04, 2016</span>
+                <span>5月 14, 2017</span>
             </div>
         </div>
         <div id="post_entry-right-info">
@@ -516,6 +457,14 @@ It will not impact the appearance and can give developers a lot of support :)
 </aside>
 
                     
+
+                    
+                        <!-- Footer Top Button -->
+                        <div class="toTop-wrap">
+    <a href="#top" class="toTop">
+        <i class="material-icons footer_top-i">expand_less</i>
+    </a>
+</div>
 
                     
 

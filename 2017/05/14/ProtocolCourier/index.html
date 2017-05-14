@@ -10,7 +10,7 @@
     
     <title>
         
-            Swift闭包形式的初始化方法 | 
+            基于NSProxy的中间件-ProtocolCourier | 
         
         Grommash
     </title>
@@ -27,7 +27,7 @@
     <meta name="theme-color" content="#0097A7">
     <meta name="author" content="GuYi">
     <meta name="description" content="null">
-    <meta name="keywords" content="null,Swift">
+    <meta name="keywords" content="null,Objective-C">
 
     <!--iOS -->
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
@@ -48,9 +48,9 @@
     <!-- The Open Graph protocol -->
     <meta property="og:url" content="http://yoursite.com">
     <meta property="og:type" content="blog">
-    <meta property="og:title" content="Swift闭包形式的初始化方法 | Grommash">
+    <meta property="og:title" content="基于NSProxy的中间件-ProtocolCourier | Grommash">
     <meta property="og:description" content="null">
-    <meta property="og:article:tag" content="Swift"> 
+    <meta property="og:article:tag" content="Objective-C"> 
 
     <!--[if lte IE 9]>
         <link rel="stylesheet" href="/css/ie-blocker.css">
@@ -235,7 +235,7 @@
     </button>
 
     <ul class="post-toc-wrap mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="post-toc-trigger-btn">
-        
+        <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#设计"><span class="post-toc-number">1.</span> <span class="post-toc-text">设计</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#实现"><span class="post-toc-number">2.</span> <span class="post-toc-text">实现</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#初始化"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">初始化</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#转发消息"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">转发消息</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#使用"><span class="post-toc-number">3.</span> <span class="post-toc-text">使用</span></a></li></ol>
 
         <!--
         <li class="mdl-menu__item">
@@ -260,10 +260,10 @@
     <!-- Paradox Post Header -->
     
         <!-- Custom Thumbnail -->
-        <div class="post_thumbnail-custom mdl-card__media mdl-color-text--grey-50" style="background-image:url(http://7xtg0o.com1.z0.glb.clouddn.com/1-BRHKm8nigXNKVdF1B0PX0g.png)">
+        <div class="post_thumbnail-custom mdl-card__media mdl-color-text--grey-50" style="background-image:url(http://7xtg0o.com1.z0.glb.clouddn.com/1-kJROF66aOK4WAx3jTKqfSA.png)">
     
             <p class="article-headline-p">
-                Swift闭包形式的初始化方法
+                基于NSProxy的中间件-ProtocolCourier
             </p>
         </div>
 
@@ -282,7 +282,7 @@
     <!-- Author Name & Date -->
     <div>
         <strong>GuYi</strong>
-        <span>10月 08, 2016</span>
+        <span>5月 14, 2017</span>
     </div>
 
     <div class="section-spacer"></div>
@@ -306,7 +306,7 @@
     </button>
     <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
         <li class="mdl-menu__item">
-        <a class="post_tag-link" href="/tags/Swift/">Swift</a>
+        <a class="post_tag-link" href="/tags/Objective-C/">Objective-C</a>
     </ul>
     
 
@@ -349,11 +349,36 @@
                 <!-- Post Content -->
                 <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
     
-        <p>对于swift一般控件的初始化，相信大部分都还是习惯这样声明：<br><figure class="highlight swift"><table><tr><td class="code"><pre><div class="line"><span class="built_in">lazy</span> <span class="keyword">var</span> customView:<span class="type">UIView</span> = &#123;</div><div class="line">    <span class="keyword">let</span> view:<span class="type">UIView</span> = <span class="type">UIView</span>(frame: <span class="type">CGRect</span>(x: <span class="number">0</span>, y: <span class="number">0</span>, width: <span class="number">100</span>, height: <span class="number">100</span>))</div><div class="line">    view.backgroundColor = <span class="type">UIColor</span>.yellow</div><div class="line">    <span class="keyword">return</span> view</div><div class="line">&#125;()</div></pre></td></tr></table></figure></p>
-<p>今天发现了一个新的写法（也仅仅只是一种写法而已。。。）<br><figure class="highlight swift"><table><tr><td class="code"><pre><div class="line"><span class="built_in">lazy</span> <span class="keyword">var</span> customView:<span class="type">UIView</span> = &#123;</div><div class="line">    $<span class="number">0</span>.backgroundColor = <span class="type">UIColor</span>.yellow</div><div class="line">    <span class="keyword">return</span> $<span class="number">0</span></div><div class="line">&#125;(<span class="type">UIView</span>(frame: <span class="type">CGRect</span>(x: <span class="number">0</span>, y: <span class="number">0</span>, width: <span class="number">100</span>, height: <span class="number">100</span>)))</div></pre></td></tr></table></figure></p>
+        <p>接着上篇文章我们现在把<code>NSProxy</code>应用到一个更实际的例子中，首先介绍一下<code>ProtocolCourier</code>是一款设计初衷为了简化一些遵守了很多协议而造成代码量大的类的中间件，他的目的是为了减少一些文件的代码量，把单独每个协议的代码抽离出来。接下来我们大致介绍一下如何实现这个”协议快递员”。</p>
 <a id="more"></a>
-<p>最终达到的效果是一样的，当然了，实现的原理也仅仅只是调用闭包将对象返回作为变量，第一种的闭包不传参数返回自定义的对象，而第二种先将该对象进行初始化并作为闭包的参数传入进行其它的一些业务逻辑绑定。对于写无聊了第一种方法可以用用第二种来装装逼: )<br>或者再恶心一点，对于初始化完不需要其它操作的控件，可以这样：<br><figure class="highlight swift"><table><tr><td class="code"><pre><div class="line"><span class="keyword">var</span> <span class="number">_</span>:<span class="type">UIView</span> = &#123;</div><div class="line">    $<span class="number">0</span>.backgroundColor = <span class="type">UIColor</span>.yellow</div><div class="line">    view.addSubview($<span class="number">0</span>)</div><div class="line">    <span class="keyword">return</span> $<span class="number">0</span></div><div class="line">&#125;(<span class="type">UIView</span>(frame: <span class="type">CGRect</span>(x: <span class="number">0</span>, y: <span class="number">0</span>, width: <span class="number">100</span>, height: <span class="number">100</span>)))</div></pre></td></tr></table></figure></p>
-<p>当你的同事在viewDidLoad中看到这样一坨东西，是不是黑人问号，一脸懵逼这他妈是哪个东西。<br>当然这些只是玩笑而已，毕竟这么写可能过个几天，这坨东西你自己可能都不认识了😃</p>
+<h1 id="设计"><a href="#设计" class="headerlink" title="设计"></a>设计</h1><p>首先第一步我们需要设计一下到底怎么才能做到协议转发，他需要提供哪些接口，需要哪些参数。这里我的设计思路是每个 NSProxy 对象只遵守一个协议，他可以包装所有遵守这个协议或者这个协议所包含的其他协议(譬如 UITableViewDelegate 包含 UIScrollViewDelegate)的类，在实例化每个代理对象后作为例如 TabView 的 delegate  对象，从而起到转发这些代理方法的作用。因此我的头文件是这样定义的：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">#define CreateProtocolCourier(__protocol__, ...) ((ProtocolCourier&lt;__protocol__&gt;*)[ProtocolCourier packageForProtocol:@protocol(__protocol__) withObjects:((NSArray *)[NSArray arrayWithObjects:__VA_ARGS__,nil])])</div><div class="line"></div><div class="line">@interface ProtocolCourier : NSProxy</div><div class="line">@property (nonatomic,strong, readonly) Protocol *protocol;</div><div class="line">@property (nonatomic,strong, readonly) NSArray *attachedObjects;</div><div class="line"></div><div class="line">+ (instancetype)packageForProtocol:(Protocol*)protocol withObjects:(NSArray*)objects;</div><div class="line"></div><div class="line">@end</div></pre></td></tr></table></figure>
+<p>最外层只需提供一个宏作为初始化方法，参数为这个转发对象所遵守的协议以及真正执行这些代理方法的对象。对外提供两个获取协议以及添加包装的对象的接口。</p>
+<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><h2 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h2><p>接下来就来着手实现这个功能。首先初始化过程必然需要判断添加的真正需要执行代码的对象是否是包含这个协议。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">- (BOOL)object:(id)object conformsProtocolOrAdoptedByProtocol:(Protocol*)protocol &#123;</div><div class="line">    if ([object conformsToProtocol:protocol]) &#123;</div><div class="line">        return YES;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    BOOL conforms = NO;</div><div class="line">    </div><div class="line">    unsigned int count = 0;</div><div class="line">    Protocol * __unsafe_unretained * list = protocol_copyProtocolList(protocol, &amp;count);</div><div class="line">    for (NSUInteger i = 0; i &lt; count; i++) &#123;</div><div class="line">        Protocol * aProtocol = list[i];</div><div class="line">        </div><div class="line">        // NSObject 协议因为所有类都包含了所以直接跳过</div><div class="line">        if ([NSStringFromProtocol(aProtocol) isEqualToString:@&quot;NSObject&quot;]) continue;</div><div class="line">        </div><div class="line">        if ([self object:object conformsProtocolOrAdoptedByProtocol:aProtocol]) &#123;</div><div class="line">            conforms = YES;</div><div class="line">            break;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    free(list);</div><div class="line">    </div><div class="line">    return conforms;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个首先判断这个对象是否响应这个协议，如果不是这个协议则通过<code>protocol_copyProtocolList</code>获取这个协议所包含的协议列表进行递归查询时候有包含任何这个”协议链”中任何一个协议，如果一个都不符合则抛异常。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">+ (instancetype)packageForProtocol:(Protocol *)protocol withObjects:(NSArray *)objects &#123;</div><div class="line">    ProtocolCourier *courier = [[super alloc] initWithProtocol:protocol objects:objects];</div><div class="line">    return courier;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (instancetype)initWithProtocol:(Protocol*)protocol objects:(NSArray*)objects &#123;</div><div class="line">    _protocol = protocol;</div><div class="line">    </div><div class="line">    NSMutableArray * validObjects = [NSMutableArray array];</div><div class="line">    </div><div class="line">    NSAssert(objects.count &gt; 0, @&quot;必须添加需要转发的对象&quot;);</div><div class="line">    </div><div class="line">    for (id object in objects) &#123;</div><div class="line">        if ([self object:object conformsProtocolOrAdoptedByProtocol:protocol]) &#123;</div><div class="line">            [validObjects addObject:object];</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    NSAssert(validObjects.count &gt; 0, @&quot;添加的类并没有遵守%@这个协议或者这个协议所采用的协议&quot;, NSStringFromProtocol(protocol));</div><div class="line">    </div><div class="line">    _objects = [NSOrderedSet orderedSetWithArray:validObjects];</div><div class="line">    </div><div class="line">    return self;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>注意这里<code>_objects</code>使用的数据结构是<code>NSOrderedSet</code>防止对象重复。</p>
+<h2 id="转发消息"><a href="#转发消息" class="headerlink" title="转发消息"></a>转发消息</h2><p>接着就要实现 NSProxy 最关键的消息转发过程了，自然就是继承那几个满足需求的方法。</p>
+<ul>
+<li>respondsToSelector:(SEL)selector</li>
+<li>(void)forwardInvocation:(NSInvocation *)anInvocation</li>
+<li>(NSMethodSignature *)methodSignatureForSelector:(SEL)selector</li>
+</ul>
+<p>首先是找到满足我们需要转发的协议或者代理方法是我们的代理类能够响应。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">- (BOOL)respondsToSelector:(SEL)selector &#123;</div><div class="line">    BOOL responds = NO;</div><div class="line">    BOOL isRequired = NO;</div><div class="line">    </div><div class="line">    struct objc_method_description methodDescription = [self methodDescriptionForSelector:selector isRequired:&amp;isRequired];</div><div class="line">    </div><div class="line">    //设计初衷：如果是是 required 方法就必须通过 Courier 来响应</div><div class="line">    if (isRequired) &#123;</div><div class="line">        responds = YES;</div><div class="line">    &#125;</div><div class="line">    else if (methodDescription.name != NULL) &#123;</div><div class="line">        responds = [self checkIfAttachedObjectsRespondToSelector:selector];</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    return responds;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (BOOL)checkIfAttachedObjectsRespondToSelector:(SEL)selector &#123;</div><div class="line">    for (id object in self.objects) &#123;</div><div class="line">        if ([object respondsToSelector:selector]) &#123;</div><div class="line">            return YES;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    return NO;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里有一个很关键需要实现的也是找到这个方法是否是在这个”协议链”中的，并且我特意将<code>required</code>的协议方法特殊处理，必须要经过代理类并且代理类必须要实现这些 required 方法，否则会抛异常。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">- (struct objc_method_description)methodDescriptionForSelector:(SEL)selector isRequired:(BOOL *)isRequired &#123;</div><div class="line">    struct objc_method_description method = &#123;NULL, NULL&#125;;</div><div class="line">    </div><div class="line">    method = [self methodDescriptionInProtocol:self.protocol selector:selector isRequired:isRequired];</div><div class="line">    </div><div class="line">    if (method.name == NULL) &#123;</div><div class="line">        unsigned int count = 0;</div><div class="line">        Protocol * __unsafe_unretained * list = protocol_copyProtocolList(self.protocol, &amp;count);</div><div class="line">        for (NSUInteger i = 0; i &lt; count; i++) &#123;</div><div class="line">            Protocol * aProtocol = list[i];</div><div class="line">            </div><div class="line">            if ([NSStringFromProtocol(aProtocol) isEqualToString:@&quot;NSObject&quot;]) continue;</div><div class="line">            </div><div class="line">            method = [self methodDescriptionInProtocol:aProtocol selector:selector isRequired:isRequired];</div><div class="line">            if (method.name != NULL) &#123;</div><div class="line">                break;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        free(list);</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    return method;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (struct objc_method_description)methodDescriptionInProtocol:(Protocol *)protocol selector:(SEL)selector isRequired:(BOOL *)isRequired &#123;</div><div class="line">    struct objc_method_description method = &#123;NULL, NULL&#125;;</div><div class="line">    </div><div class="line">    //返回一个指定的方法的方法描述结构给定的协议</div><div class="line">    method = protocol_getMethodDescription(protocol, selector, YES, YES);</div><div class="line">    if (method.name != NULL) &#123;</div><div class="line">        *isRequired = YES;</div><div class="line">        return method;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    method = protocol_getMethodDescription(protocol, selector, NO, YES);</div><div class="line">    if (method.name != NULL) &#123;</div><div class="line">        *isRequired = NO;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    return method;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>可以看到获取方法描述的方式与上面判断时候在当前”协议链”的方式一样，都是通过递归来遍历整个”协议链”，最后通过方法描述的名字是否为空来判断实际实现的对象遵守这个协议或者这个协议继承的协议。</p>
+<p>能正确判断实现对象包含这个协议并且能拿到方法描述后我们就能准确的将这些方法转发给实际实现的对象了。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">- (void)forwardInvocation:(NSInvocation *)anInvocation &#123;</div><div class="line">    SEL selector = [anInvocation selector];</div><div class="line">    </div><div class="line">    BOOL isRequired = NO;</div><div class="line">    </div><div class="line">    struct objc_method_description methodDescription = [self methodDescriptionForSelector:selector isRequired:&amp;isRequired];</div><div class="line">    </div><div class="line">    if (methodDescription.name == NULL) &#123;</div><div class="line">        [super forwardInvocation:anInvocation];</div><div class="line">        return;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    BOOL someoneResponded = NO;</div><div class="line">    for (id object in self.objects) &#123;</div><div class="line">        if ([object respondsToSelector:selector]) &#123;</div><div class="line">            [anInvocation invokeWithTarget:object];</div><div class="line">            someoneResponded = YES;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    NSAssert(!(isRequired &amp;&amp; !someoneResponded), @&quot;%@方法未实现&quot;, NSStringFromSelector(selector));</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (NSMethodSignature *)methodSignatureForSelector:(SEL)selector &#123;</div><div class="line">    NSMethodSignature * methodSignature;</div><div class="line">    </div><div class="line">    BOOL isRequired = NO;</div><div class="line">    struct objc_method_description methodDescription = [self methodDescriptionForSelector:selector isRequired:&amp;isRequired];</div><div class="line">    </div><div class="line">    if (methodDescription.name == NULL) &#123;</div><div class="line">        return [super methodSignatureForSelector:selector];</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    methodSignature = [NSMethodSignature signatureWithObjCTypes:methodDescription.types];</div><div class="line">    </div><div class="line">    return methodSignature;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><p>虽然这个中间件只有200多行代码，但是使用起来还是挺有意思的，比如一个 ViewController 上有一个 UITableView，我们需要实现 UIScrollViewDelegate，UITableViewDelegate，UITableViewDataSource，我们就可以这样使用:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@interface ViewController ()</div><div class="line">@property (nonatomic, strong) IBOutlet UILabel *offsetLabel;</div><div class="line">@property (nonatomic, strong) IBOutlet UITableView *tableView;</div><div class="line"></div><div class="line">@property (nonatomic, strong) GYTableViewDelegate *tableViewDelegate;</div><div class="line">@property (nonatomic, strong) GYTableViewDataSource *tableviewDataSource;</div><div class="line">@property (nonatomic, strong) GYScrollViewDelegate *scrollViewDelegate;</div><div class="line"></div><div class="line">@property (nonatomic, strong) ProtocolCourier&lt;UITableViewDelegate&gt; *tableViewDelegateCourier;</div><div class="line">@property (nonatomic, strong) ProtocolCourier&lt;UITableViewDataSource&gt; *tableViewDataSourceCourier;</div><div class="line"></div><div class="line">@end</div><div class="line">- (void)viewDidLoad &#123;</div><div class="line">    [super viewDidLoad];</div><div class="line">    </div><div class="line">    self.tableViewDelegate = [[GYTableViewDelegate alloc] init];</div><div class="line">    self.tableviewDataSource = [[GYTableViewDataSource alloc] init];</div><div class="line">    self.scrollViewDelegate = [[GYScrollViewDelegate alloc] init];</div><div class="line">    self.scrollViewDelegate.label = self.offsetLabel;</div><div class="line">    </div><div class="line">    self.tableViewDelegateCourier = CreateProtocolCourier(UITableViewDelegate, self.tableViewDelegate, self.scrollViewDelegate);</div><div class="line">    self.tableViewDataSourceCourier = CreateProtocolCourier(UITableViewDataSource, self.tableviewDataSource);</div><div class="line">    </div><div class="line">    self.tableView.delegate = self.tableViewDelegateCourier;</div><div class="line">    self.tableView.dataSource = self.tableViewDataSourceCourier;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这三个实现协议的对象是这样的:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">@interface GYTableViewDelegate : NSObject&lt;UITableViewDelegate&gt;</div><div class="line">@end</div><div class="line">@interface GYTableViewDataSource : NSObject&lt;UITableViewDataSource&gt;</div><div class="line">@end</div><div class="line">@interface GYScrollViewDelegate : NSObject&lt;UIScrollViewDelegate&gt;</div><div class="line">@property (nonatomic, weak) UILabel * label;</div><div class="line">@end</div></pre></td></tr></table></figure>
+<p>我们只要在 .m 文件中实现各自遵守的协议，我们的”协议快递员”就能准确的把”协议快递”发送过来啦。</p>
+<p>这里有个问题就是虽然我们这样确实是抽离了很多的 ViewController 的代码，但是很多情况下我们可能需要一些状态是 ViewController 和代理对象共享的，比如上述例子中的 offsetLabel，如果把这些需要共享的控件或者状态也通过 ProtocolCourier 传递过来我觉得有点多余了，所以我就是做了简单的对象赋值，可能不算优美，之后再考虑有没有别的好方法。另外还有一个问题不可避免的就是过度使用的话可能会造成一个”类爆炸”的情况，类太多了有时候可能阅读起来会比较费力，因此需要适当使用。当然了这只是个简单的实现，可能还不能具体应用到工程中，不过就当作学习理解消息转发这个过程吧。</p>
+<p>最后这个中间件的代码在<a href="https://github.com/gxq93/ProtocolCourier" target="_blank" rel="external">这里</a>。</p>
 
     
 
@@ -380,21 +405,13 @@
             <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
     <!-- Prev Nav -->
     
-        <a href="/2016/11/09/WebView-NSURLProtocol/" id="post_nav-newer" class="prev-content">
-            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
-                <i class="material-icons">arrow_back</i>
-            </button>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            新篇
-        </a>
-    
 
     <!-- Section Spacer -->
     <div class="section-spacer"></div>
 
     <!-- Next Nav -->
     
-        <a href="/2016/09/30/CocoaPods-Swift3/" id="post_nav-older" class="next-content">
+        <a href="/2017/02/04/NSProxy/" id="post_nav-older" class="next-content">
             旧篇
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
