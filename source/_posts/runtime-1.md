@@ -3,7 +3,6 @@ title: Objective-C内部实现浅谈-类和对象
 date: 2015-7-13 10:32:00
 tags: [Objective-C,Runtime]
 categories: 技术
-thumbnail: http://7xtg0o.com1.z0.glb.clouddn.com/1-PZzg31G7d7CpBdpHUPl96Q.jpeg
 ---
 这篇文章主要介绍了 runtime 中对象和类所扮演的角色。
 

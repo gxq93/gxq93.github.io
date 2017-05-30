@@ -3,7 +3,6 @@ title: CocoaPods Trunk上传Swift3.0项目
 date: 2016-09-30 10:42:10
 tags: [Swift,CocoaPods]
 categories: 技术
-thumbnail: http://7xtg0o.com1.z0.glb.clouddn.com/1-fgy4_Lt8x-fxjrh8idaX9w.jpeg
 ---
 
 起因是因为无聊，突然想提高一下我那可怜的github的提交数，所以随便拿了个Swift3.0写的轮播图组件打算传到Cocoapods上。写完podspec(这个项目叫GYBanner🙈)然后由于才刚升级Swift3.0的原因，Cocoapods也没有做好很贴心的适配，于是踩了一些坑～

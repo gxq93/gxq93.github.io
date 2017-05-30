@@ -3,7 +3,6 @@ title: JavaScript的Promise和Thunk
 date: 2016-12-16 11:17:31
 tags: [JavaScript]
 categories: 技术
-thumbnail: http://7xtg0o.com1.z0.glb.clouddn.com/1-8QSf3trO8Fgu7ZJPK4I-0Q.jpeg
 ---
 这篇文章主要介绍解决JavaScript异步编程中callback hell问题的两种方案，而这两种方案也都包含了函数式编程的思想在里面。
 

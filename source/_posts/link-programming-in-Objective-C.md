@@ -3,7 +3,6 @@ title: Link Programming in Objective-C
 date: 2016-4-13 13:34:02
 tags: [Objective-C,响应式编程]
 categories: 技术
-thumbnail: http://7xtg0o.com1.z0.glb.clouddn.com/1-65b3tcODklio-5koqOe0dA.png
 ---
 在oc中方法的调用大部分都是通过``[ ]``，这与其他很多语言有很大的差异，而有些开发框架如``Masonry``则采用了链式编程的思想，这大大增加了代码的可读性和简洁性。今天有空就对这种思想简单的实践一下。
 

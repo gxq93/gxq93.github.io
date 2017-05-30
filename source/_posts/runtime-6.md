@@ -3,7 +3,6 @@ title: Objective-C内部实现浅谈-KVC和KVO
 date: 2015-12-28 15:46:58
 tags: [Objective-C,Runtime]
 categories: 技术
-thumbnail: http://7xtg0o.com1.z0.glb.clouddn.com/1-yAQxTFJwEKXnAr2JrOFs7w.jpeg
 ---
 本文主要介绍了 KVC 和 KVO 相关的内部实现。
 
@@ -44,7 +43,7 @@ thumbnail: http://7xtg0o.com1.z0.glb.clouddn.com/1-yAQxTFJwEKXnAr2JrOFs7w.jpeg
 -(void)setValue:(id)value forKey:(NSString*)key;
 -(id)valueforKey:(NSString*)key;
 @end
-  
+
 @implementation NSObject(GYKVC)
 -(void)setValue:(id)value forKey:(NSString *)key{
     if (key == nil || key.length == 0) {
@@ -133,7 +132,7 @@ KVO 的键值观察通知依赖于 NSObject 的两个方法``willChangeValueForK
 ``` objc
 -(void)setName:(NSString *)newName {
   [self willChangeValueForKey:@"name"];    
-  [super setValue:newName forKey:@"name"]; 
+  [super setValue:newName forKey:@"name"];
   [self didChangeValueForKey:@"name"];     
 }
 ```

@@ -3,7 +3,6 @@ title: 基于Hexo的个人博客
 date: 2015-6-07 10:57:51
 tags: [Hexo]
 categories: 技术
-thumbnail: http://7xtg0o.com1.z0.glb.clouddn.com/1-H3XklSUjsE7Hkl8tiOD6hw.jpeg
 ---
 
 ## 前言

@@ -3,7 +3,6 @@ title: JavaScript的构造函数与类
 date: 2016-11-28 14:24:33
 tags: [JavaScript]
 categories: 技术
-thumbnail: http://7xtg0o.com1.z0.glb.clouddn.com/1-5zbU5cgwDu-2XZdwwpYMMQ.jpeg
 ---
 JavaScript虽然有些地方跟其他语言不同，但是他仍然是面向对象语言，因此对象的使用是整个体系的基础。本文列举了几种JavaScript创建对象的方式，并讲讲ES6中class的概念。
 

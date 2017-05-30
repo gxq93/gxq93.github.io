@@ -3,7 +3,6 @@ title: Objective-C内部实现浅谈-通知
 date: 2015-11-26 15:46:53
 tags: [Objective-C,Runtime]
 categories: 技术
-thumbnail: http://7xtg0o.com1.z0.glb.clouddn.com/1-gB1gWyEaaB9hKmOoqrrr5A.png
 ---
 # 简述
 对于 NSNotification 的实现，苹果并没有公布，但是既然是基于观察者模式实现的，除去优化的问题，大致也可以用 block 来进行通信实现。本文大致模拟了通知的实现。

@@ -3,7 +3,6 @@ title: Objective-C内部实现浅谈-方法
 date: 2015-08-06 10:47:11
 tags: [Objective-C,Runtime]
 categories: 技术
-thumbnail: http://7xtg0o.com1.z0.glb.clouddn.com/1-jwiNw4za2fidw6xi-oyZRQ.jpeg
 ---
 # 方法
 Objective-C 最重要的一个特性就是“消息传递”，消息有名称(name)和选择器(selector)，可以接受参数并可能有返回值。本文主要介绍了消息传递的一些原理。

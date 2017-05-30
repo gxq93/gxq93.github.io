@@ -3,7 +3,6 @@ title: 一款基于RAC的“房贷计算器”应用
 date: 2016-09-08 13:46:24
 tags: [Objective-C,响应式编程]
 categories: 技术
-thumbnail: http://7xtg0o.com1.z0.glb.clouddn.com/1-II3MFDkOwugt_Amb-8zcpw.jpeg
 ---
 # Intro
 最近公司要求开发一个小应用“房贷计算器”来引流，由于要求需要一礼拜内完成开发上线，因此时间有点仓促所以没有仔细构思就开始开发了，所以其实很多地方设计的极其不合理，后期也懒得再修改维护了，就开源一下，有问题的地方看客看了笑笑就好。附上[github地址](https://github.com/gxq93/HouseloanCalculator)

@@ -3,7 +3,6 @@ title: Objective-C内部实现浅谈-Block
 date: 2015-08-22 11:05:55
 tags: [Objective-C,Runtime]
 categories: 技术
-thumbnail: http://7xtg0o.com1.z0.glb.clouddn.com/1-GlmHP6nltxqLBZA3Rv8AGg.jpeg
 ---
 # Block
 在 OC 中闭包的语法看上去特别别扭，但他实际上是作为最普通的 C 语言源代码来处理的，在实际编译时无法转换成我们能够理解的源代码，因此通过 clang (LLVM 编译器)先将代码进行转化成 C++ 代码。在这里我们将能看到我们想要的信息。接下去本文主要介绍一下 block 的实现原理。
@@ -39,12 +38,12 @@ struct __main_block_impl_0 {
     }
 };
 
-static void __main_block_func_0(struct __main_block_impl_0 *__cself) 
+static void __main_block_func_0(struct __main_block_impl_0 *__cself)
 {
     printf("Block\n");
 }
 
-static struct __main_block_desc_0 
+static struct __main_block_desc_0
 {
     size_t reserved;
     size_t Block_size;
@@ -175,7 +174,7 @@ static void __main_block_func_0(struct __main_block_impl_0 *__cself)
 \_\_block 的使用就不多介绍了，他实际就是修饰用于指定将变量值设置到哪个存储域中。
 使用 \_\_block 修饰自动变量转化后的代码主要的变换是这样的：
 ``` objc
-static void __main_block_func_0(struct __main_block_impl_0 *__cself) 
+static void __main_block_func_0(struct __main_block_impl_0 *__cself)
 {
     __Block_byref_i_0 *i = __cself->i; /* bound by ref */
     (i->__forwarding->i)++;
@@ -248,7 +247,7 @@ struct __main_block_impl_0 {
     }
 };
 
-static void __main_block_func_0(struct __main_block_impl_0 *__cself) 
+static void __main_block_func_0(struct __main_block_impl_0 *__cself)
 {
     id array = __cself->array; /* bound by copy */
     ((void (*)(id, SEL, ObjectType))(void *)objc_msgSend)((id)array, sel_registerName("addObject:"), (id)((NSNumber *(*)(Class, SEL, int))(void *)objc_msgSend)(objc_getClass("NSNumber"), sel_registerName("numberWithInt:"), 1));

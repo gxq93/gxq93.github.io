@@ -3,7 +3,6 @@ title: Objective-C内部实现浅谈-协议和类目
 date: 2015-09-04 15:32:45
 tags: [Objective-C,Runtime]
 categories: 技术
-thumbnail: http://7xtg0o.com1.z0.glb.clouddn.com/1-i3SuhBo3VEC8G79ee1CQ5w.jpeg
 ---
 本文主要介绍了 runtime 中协议和类目内部相关的实现。
 

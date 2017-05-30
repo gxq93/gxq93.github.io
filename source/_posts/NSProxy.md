@@ -3,7 +3,6 @@ title: NSProxy浅谈
 date: 2017-02-04 11:32:37
 tags: [Objective-C]
 categories: 技术
-thumbnail: http://7xtg0o.com1.z0.glb.clouddn.com/1-Bnx0KZgPIBQ75F5rjLx70g.png
 ---
 ``NSProxy`` 是一个不同于 ``NSObject`` 的根类，虽然这个类平时很少用到，但是他的作用却是十分明确并有许多地方可以深究的，这篇文章主要简单的介绍一下 NSProxy 并介绍几个他的应用场景，后续一篇文章会具体应用 NSProxy 到一个有趣的中间件中。
 

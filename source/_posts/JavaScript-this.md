@@ -3,7 +3,6 @@ title: JavaScript的this
 date: 2016-11-22 14:21:41
 tags: [JavaScript]
 categories: 技术
-thumbnail: http://7xtg0o.com1.z0.glb.clouddn.com/1-0fg92OXeGLessV9ZBP4YnQ.png
 ---
 最近在学JavaScript，就记录一些学习的心得吧。
 # this
