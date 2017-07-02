@@ -1,0 +1,777 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Objective-C,React Native," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="一直以为 ReactNative 在 iOS 端的手势是直接导出原生的手势供 RN 端来使用，直到踩到了坑看了源码才发现原来 RN 的手势是这样实现的。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ReactNative与原生手势的冲突">
+<meta property="og:url" content="http://yoursite.com/2017/07/02/ReactNative-gesture-conflict/index.html">
+<meta property="og:site_name" content="Grommash">
+<meta property="og:description" content="一直以为 ReactNative 在 iOS 端的手势是直接导出原生的手势供 RN 端来使用，直到踩到了坑看了源码才发现原来 RN 的手势是这样实现的。">
+<meta property="og:image" content="http://7xtg0o.com1.z0.glb.clouddn.com/gesture-conflict.gif">
+<meta property="og:image" content="http://yoursite.com/2017/07/02/ReactNative-gesture-conflict/RCTTouchHandler1.png">
+<meta property="og:image" content="http://yoursite.com/2017/07/02/ReactNative-gesture-conflict/RCTTouchHandler2.png">
+<meta property="og:image" content="http://yoursite.com/2017/07/02/ReactNative-gesture-conflict/RCTTouchHandler3.png">
+<meta property="og:image" content="http://yoursite.com/2017/07/02/ReactNative-gesture-conflict/RCTTouchHandler4.png">
+<meta property="og:updated_time" content="2017-07-02T09:36:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ReactNative与原生手势的冲突">
+<meta name="twitter:description" content="一直以为 ReactNative 在 iOS 端的手势是直接导出原生的手势供 RN 端来使用，直到踩到了坑看了源码才发现原来 RN 的手势是这样实现的。">
+<meta name="twitter:image" content="http://7xtg0o.com1.z0.glb.clouddn.com/gesture-conflict.gif">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/07/02/ReactNative-gesture-conflict/"/>
+
+
+
+
+
+  <title>ReactNative与原生手势的冲突 | Grommash</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Grommash</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/07/02/ReactNative-gesture-conflict/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="GuYi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Grommash">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ReactNative与原生手势的冲突</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-02T15:54:53+08:00">
+                2017-07-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>一直以为 ReactNative 在 iOS 端的手势是直接导出原生的手势供 RN 端来使用，直到踩到了坑看了源码才发现原来 RN 的手势是这样实现的。</p>
+<a id="more"></a>
+<h1 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h1><p>介绍一下产生问题的场景，看如下 gif。</p>
+<p><img src="http://7xtg0o.com1.z0.glb.clouddn.com/gesture-conflict.gif" alt=""></p>
+<p>首先底部的容器是一个iOS原生的 UIScrollView，由 UIScrollView 驱动上层页面的滑动，而每一个页面是一个单独的 RCTRootView 来展示 RN 的内容，在 RN 页面中有一个类似 Banner 的组件，由 RN 的<code>PanResponder</code>驱动，代码大致是这样的：</p>
+<figure class="highlight jsx"><table><tr><td class="code"><pre><div class="line"><span class="keyword">constructor</span>() &#123;</div><div class="line">        <span class="keyword">super</span>();</div><div class="line">        <span class="keyword">this</span>.state = &#123;</div><div class="line">            <span class="attr">left</span>: <span class="number">0</span>,</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    componentWillMount() &#123;</div><div class="line">        <span class="keyword">this</span>._panResponder = PanResponder.create(&#123;</div><div class="line">            <span class="attr">onStartShouldSetPanResponder</span>: <span class="function"><span class="params">()</span> =&gt;</span> <span class="literal">true</span>,</div><div class="line">            <span class="attr">onMoveShouldSetPanResponder</span>: <span class="function"><span class="params">()</span>=&gt;</span> <span class="literal">true</span>,</div><div class="line">            <span class="attr">onPanResponderGrant</span>: <span class="function"><span class="params">()</span>=&gt;</span> &#123;</div><div class="line">                <span class="keyword">this</span>._left = <span class="keyword">this</span>.state.left</div><div class="line">            &#125;,</div><div class="line">            <span class="attr">onPanResponderReject</span>: <span class="function"><span class="params">()</span>=&gt;</span> &#123;</div><div class="line">            &#125;,</div><div class="line">            <span class="attr">onPanResponderMove</span>: <span class="function">(<span class="params">evt, gs</span>)=&gt;</span> &#123;</div><div class="line">                <span class="keyword">this</span>.setState(&#123;</div><div class="line">                    <span class="attr">left</span>: <span class="keyword">this</span>._left + gs.dx</div><div class="line">                &#125;)</div><div class="line">            &#125;,</div><div class="line">            <span class="attr">onPanResponderRelease</span>: <span class="function">(<span class="params">evt, gs</span>)=&gt;</span> &#123;</div><div class="line">                <span class="keyword">this</span>.setState(&#123;</div><div class="line">                    <span class="attr">left</span>: <span class="keyword">this</span>._left + gs.dx</div><div class="line">                &#125;)</div><div class="line">            &#125;,</div><div class="line">        &#125;)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    render() &#123;</div><div class="line">        <span class="keyword">return</span> (</div><div class="line">            &lt;View style=&#123;styles.container&#125;&gt;</div><div class="line">                &lt;View</div><div class="line">                    &#123;...this._panResponder.panHandlers&#125;</div><div class="line">                    style=&#123;[styles.rect, &#123;"left": this.state.left, overflow: 'hidden'&#125;]&#125;&gt;</div><div class="line">                    &lt;Image style=&#123;&#123;width: screenWidth, height: 200&#125;&#125;</div><div class="line">                           source=&#123;&#123;uri: 'https://images.unsplash.com/photo-1441742917377-57f78ee0e582?h=1024'&#125;&#125;/&gt;</div><div class="line">                    &lt;Image style=&#123;&#123;width: screenWidth, height: 200&#125;&#125;</div><div class="line">                           source=&#123;&#123;url: 'https://images.unsplash.com/photo-1441716844725-09cedc13a4e7?h=1024'&#125;&#125;/&gt;</div><div class="line">                &lt;/View&gt;</div><div class="line">                &lt;View style=&#123;styles.placeholderView&#125;&gt;</div><div class="line">                    &lt;Text style = &#123;styles.placeholderText&#125;&gt;这里是第一个页面&lt;/Text&gt;</div><div class="line">                &lt;/View&gt;</div><div class="line">            &lt;/View&gt;</div><div class="line">        );</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>如果把 RN 的 PanResponder 当作原生的 PanGestureRecognizer 来看，那么应该是当手势在图片上滑动时，应该触发图片上的手势识别器，从而忽略 ScrollView 上的手势，但是真实的情形确是图片上的手势先响应，但过一会儿后 UIScrollView 上的手势也开始响应，从而导致在这个 Banner 组件滑动过程中 UIScrollView 也跟着滑动。</p>
+<h1 id="RN手势识别器原理"><a href="#RN手势识别器原理" class="headerlink" title="RN手势识别器原理"></a>RN手势识别器原理</h1><p>既然有这么明显的手势冲突，第一反应肯定就是去看看 RN 上的手势识别究竟是怎么实现的。在阅读了 RN 所用的手势识别原生模块<code>RCTTouchHandler</code>的代码后，终于发现 RN 所使用的手势识别器与之前所设想的大相径庭。</p>
+<img src="/2017/07/02/ReactNative-gesture-conflict/RCTTouchHandler1.png" alt="RCTTouchHandler1.png" title="">
+<p>RCTTouchHandler 添加在 <code>RCTRootContentView</code>之上，而这个 RCTRootContentView 对应于 RCTRootView，也就是说对于每一个 RN 页面，其实有且只有一个手势识别器 RCTTouchHandler，而这个手势识别器的范围是整个 RN 页面。</p>
+<p>那么这个自定义的手势识别器是怎么让原生与 RN 通信的呢？</p>
+<figure class="highlight objectivec"><table><tr><td class="code"><pre><div class="line">- (<span class="keyword">void</span>)touchesBegan:(<span class="built_in">NSSet</span>&lt;<span class="built_in">UITouch</span> *&gt; *)touches withEvent:(<span class="built_in">UIEvent</span> *)event</div><div class="line">&#123;</div><div class="line">  [<span class="keyword">super</span> touchesBegan:touches withEvent:event];</div><div class="line"></div><div class="line">  _coalescingKey++;</div><div class="line">  <span class="comment">// "start" has to record new touches before extracting the event.</span></div><div class="line">  <span class="comment">// "end"/"cancel" needs to remove the touch *after* extracting the event.</span></div><div class="line">  [<span class="keyword">self</span> _recordNewTouches:touches];</div><div class="line">  <span class="keyword">if</span> (_dispatchedInitialTouches) &#123;</div><div class="line">    [<span class="keyword">self</span> _updateAndDispatchTouches:touches eventName:<span class="string">@"touchStart"</span> originatingTime:event.timestamp];</div><div class="line">    <span class="keyword">self</span>.state = <span class="built_in">UIGestureRecognizerStateChanged</span>;</div><div class="line">  &#125; <span class="keyword">else</span> &#123;</div><div class="line">    <span class="keyword">self</span>.state = <span class="built_in">UIGestureRecognizerStateBegan</span>;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)touchesMoved:(<span class="built_in">NSSet</span>&lt;<span class="built_in">UITouch</span> *&gt; *)touches withEvent:(<span class="built_in">UIEvent</span> *)event</div><div class="line">&#123;</div><div class="line">  [<span class="keyword">super</span> touchesMoved:touches withEvent:event];</div><div class="line"></div><div class="line">  <span class="keyword">if</span> (_dispatchedInitialTouches) &#123;</div><div class="line">    [<span class="keyword">self</span> _updateAndDispatchTouches:touches eventName:<span class="string">@"touchMove"</span> originatingTime:event.timestamp];</div><div class="line">    <span class="keyword">self</span>.state = <span class="built_in">UIGestureRecognizerStateChanged</span>;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)touchesEnded:(<span class="built_in">NSSet</span>&lt;<span class="built_in">UITouch</span> *&gt; *)touches withEvent:(<span class="built_in">UIEvent</span> *)event</div><div class="line">&#123;</div><div class="line">  [<span class="keyword">super</span> touchesEnded:touches withEvent:event];</div><div class="line"></div><div class="line">  _coalescingKey++;</div><div class="line">  <span class="keyword">if</span> (_dispatchedInitialTouches) &#123;</div><div class="line">    [<span class="keyword">self</span> _updateAndDispatchTouches:touches eventName:<span class="string">@"touchEnd"</span> originatingTime:event.timestamp];</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (RCTAllTouchesAreCancelledOrEnded(event.allTouches)) &#123;</div><div class="line">      <span class="keyword">self</span>.state = <span class="built_in">UIGestureRecognizerStateEnded</span>;</div><div class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (RCTAnyTouchesChanged(event.allTouches)) &#123;</div><div class="line">      <span class="keyword">self</span>.state = <span class="built_in">UIGestureRecognizerStateChanged</span>;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  [<span class="keyword">self</span> _recordRemovedTouches:touches];</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="keyword">void</span>)touchesCancelled:(<span class="built_in">NSSet</span>&lt;<span class="built_in">UITouch</span> *&gt; *)touches withEvent:(<span class="built_in">UIEvent</span> *)event</div><div class="line">&#123;</div><div class="line">  [<span class="keyword">super</span> touchesCancelled:touches withEvent:event];</div><div class="line"></div><div class="line">  _coalescingKey++;</div><div class="line">  <span class="keyword">if</span> (_dispatchedInitialTouches) &#123;</div><div class="line">    [<span class="keyword">self</span> _updateAndDispatchTouches:touches eventName:<span class="string">@"touchCancel"</span> originatingTime:event.timestamp];</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (RCTAllTouchesAreCancelledOrEnded(event.allTouches)) &#123;</div><div class="line">      <span class="keyword">self</span>.state = <span class="built_in">UIGestureRecognizerStateCancelled</span>;</div><div class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (RCTAnyTouchesChanged(event.allTouches)) &#123;</div><div class="line">      <span class="keyword">self</span>.state = <span class="built_in">UIGestureRecognizerStateChanged</span>;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  [<span class="keyword">self</span> _recordRemovedTouches:touches];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上面的代码是 RCTTouchHandler 对手势变化状态时的相应操作，可以看到其实 RCTTouchHandler 并没有对哪种状态进行特殊的判断或者处理，而是记录每次状态，最后把他包装成<code>RCTTouchEvent</code>发送给 RN 端对应的组件：</p>
+<figure class="highlight objectivec"><table><tr><td class="code"><pre><div class="line">- (<span class="keyword">void</span>)_updateAndDispatchTouches:(<span class="built_in">NSSet</span>&lt;<span class="built_in">UITouch</span> *&gt; *)touches</div><div class="line">                        eventName:(<span class="built_in">NSString</span> *)eventName</div><div class="line">                  originatingTime:(__unused <span class="built_in">CFTimeInterval</span>)originatingTime</div><div class="line">&#123;</div><div class="line">  <span class="comment">// Update touches</span></div><div class="line">  <span class="built_in">NSMutableArray</span>&lt;<span class="built_in">NSNumber</span> *&gt; *changedIndexes = [<span class="built_in">NSMutableArray</span> new];</div><div class="line">  <span class="keyword">for</span> (<span class="built_in">UITouch</span> *touch <span class="keyword">in</span> touches) &#123;</div><div class="line">    <span class="built_in">NSInteger</span> index = [_nativeTouches indexOfObject:touch];</div><div class="line">    <span class="keyword">if</span> (index == <span class="built_in">NSNotFound</span>) &#123;</div><div class="line">      <span class="keyword">continue</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    [<span class="keyword">self</span> _updateReactTouchAtIndex:index];</div><div class="line">    [changedIndexes addObject:@(index)];</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="keyword">if</span> (changedIndexes.count == <span class="number">0</span>) &#123;</div><div class="line">    <span class="keyword">return</span>;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="comment">// Deep copy the touches because they will be accessed from another thread</span></div><div class="line">  <span class="comment">// <span class="doctag">TODO:</span> would it be safer to do this in the bridge or executor, rather than trusting caller?</span></div><div class="line">  <span class="built_in">NSMutableArray</span>&lt;<span class="built_in">NSDictionary</span> *&gt; *reactTouches =</div><div class="line">    [[<span class="built_in">NSMutableArray</span> alloc] initWithCapacity:_reactTouches.count];</div><div class="line">  <span class="keyword">for</span> (<span class="built_in">NSDictionary</span> *touch <span class="keyword">in</span> _reactTouches) &#123;</div><div class="line">    [reactTouches addObject:[touch <span class="keyword">copy</span>]];</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  RCTTouchEvent *event = [[RCTTouchEvent alloc] initWithEventName:eventName</div><div class="line">                                                         reactTag:<span class="keyword">self</span>.view.reactTag</div><div class="line">                                                     reactTouches:reactTouches</div><div class="line">                                                   changedIndexes:changedIndexes</div><div class="line">                                                    coalescingKey:_coalescingKey];</div><div class="line">  [_eventDispatcher sendEvent:event];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>中间的过程由于要介绍的话需要太多篇幅就暂时不讲了，流程图大致是这样的：</p>
+<img src="/2017/07/02/ReactNative-gesture-conflict/RCTTouchHandler2.png" alt="RCTTouchHandler2.png" title="">
+<p>从手势触摸开始直到 RN 端在 JS 线程上执行代码整个过程的调用栈如图：</p>
+<img src="/2017/07/02/ReactNative-gesture-conflict/RCTTouchHandler3.png" alt="RCTTouchHandler3.png" title="">
+<h1 id="冲突原因"><a href="#冲突原因" class="headerlink" title="冲突原因"></a>冲突原因</h1><p>了解了 RN 手势识别器实现的大致原理，再回到我们起冲突的地方，我们可以大致思考一下，既然 RN 用的是自定义的原生手势识别器，那么为什么会出现手势冲突的原因呢。最关键的代码在这里：</p>
+<figure class="highlight objectivec"><table><tr><td class="code"><pre><div class="line">- (<span class="built_in">BOOL</span>)canPreventGestureRecognizer:(__unused <span class="built_in">UIGestureRecognizer</span> *)preventedGestureRecognizer</div><div class="line">&#123;</div><div class="line">  <span class="keyword">return</span> <span class="literal">NO</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line">- (<span class="built_in">BOOL</span>)canBePreventedByGestureRecognizer:(__unused <span class="built_in">UIGestureRecognizer</span> *)preventingGestureRecognizer</div><div class="line">&#123;</div><div class="line">  <span class="keyword">return</span> <span class="literal">NO</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里 RCTTouchHandler 实现了两个原生手势的代理，即他设置了当其他手势被识别时他既不去阻止其他手势，也不关心其他手势，就因为他什么都不做，这就导致了要是其他手势被识别后，他并不能去阻止其他手势被识别，这就造成了我们之前出现的情景。</p>
+<p>我在 Hook 了 <code>UIGestureRecognizerState</code>这一属性后打印了所有手势的状态，有关 UIScrollView 及 RN 手势识别的状态变化大致是这样的：</p>
+<img src="/2017/07/02/ReactNative-gesture-conflict/RCTTouchHandler4.png" alt="RCTTouchHandler4.png" title="">
+<p>这就能大致找到了手势冲突的根源。</p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>既然有了问题就必须有解决方案，但是其实当目前为止我也还没有想出来最佳的解决方案，要是有我都能跟 RN 提个 PR 了🌚</p>
+<p>以下是几种避免冲突的方法：</p>
+<p>1.在 RN 端操作：在 PanResponder onGrant 和 onRelease 时设置 UIScrollView 的滚动状态</p>
+<p>2.在原生端操作：可以创建一个自定义的 UIScrollView 子类，实现</p>
+<figure class="highlight objectivec"><table><tr><td class="code"><pre><div class="line">-(<span class="built_in">BOOL</span>)gestureRecognizer:(<span class="built_in">UIGestureRecognizer</span> *)gestureRecognizer shouldRequireFailureOfGestureRecognizer:(<span class="built_in">UIGestureRecognizer</span> *)otherGestureRecognizer</div></pre></td></tr></table></figure>
+<p>代理方法，当接收到 RCTTouchHandler 手势时，让 UIScrollView 的手势失败。</p>
+<p>3.最简单的方法—使用 ScrollView 代替 PanResponder（只针对指定场景，比如这个 Banner 组件我就是这么做的。。。）</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Objective-C/" rel="tag"># Objective-C</a>
+          
+            <a href="/tags/React-Native/" rel="tag"># React Native</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/14/ProtocolCourier/" rel="next" title="基于NSProxy的中间件-ProtocolCourier">
+                <i class="fa fa-chevron-left"></i> 基于NSProxy的中间件-ProtocolCourier
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpeg"
+               alt="GuYi" />
+          <p class="site-author-name" itemprop="name">GuYi</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/gxq93" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#场景"><span class="nav-number">1.</span> <span class="nav-text">场景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RN手势识别器原理"><span class="nav-number">2.</span> <span class="nav-text">RN手势识别器原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#冲突原因"><span class="nav-number">3.</span> <span class="nav-text">冲突原因</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#解决方案"><span class="nav-number">4.</span> <span class="nav-text">解决方案</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">GuYi</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
