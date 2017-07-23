@@ -13,7 +13,7 @@ categories: 技术
 
 首先第一步我们需要设计一下到底怎么才能做到协议转发，他需要提供哪些接口，需要哪些参数。这里我的设计思路是每个 NSProxy 对象只遵守一个协议，他可以包装所有遵守这个协议或者这个协议所包含的其他协议(譬如 UITableViewDelegate 包含 UIScrollViewDelegate)的类，在实例化每个代理对象后作为例如 TabView 的 delegate  对象，从而起到转发这些代理方法的作用。因此我的头文件是这样定义的：
 
-``` objective-c
+``` objectivec
 #define CreateProtocolCourier(__protocol__, ...) ((ProtocolCourier<__protocol__>*)[ProtocolCourier packageForProtocol:@protocol(__protocol__) withObjects:((NSArray *)[NSArray arrayWithObjects:__VA_ARGS__,nil])])
 
 @interface ProtocolCourier : NSProxy
@@ -34,7 +34,7 @@ categories: 技术
 
 接下来就来着手实现这个功能。首先初始化过程必然需要判断添加的真正需要执行代码的对象是否是包含这个协议。
 
-``` objective-c
+``` objectivec
 - (BOOL)object:(id)object conformsProtocolOrAdoptedByProtocol:(Protocol*)protocol {
     if ([object conformsToProtocol:protocol]) {
         return YES;
@@ -65,7 +65,7 @@ categories: 技术
 
 这个首先判断这个对象是否响应这个协议，如果不是这个协议则通过``protocol_copyProtocolList``获取这个协议所包含的协议列表进行递归查询时候有包含任何这个"协议链"中任何一个协议，如果一个都不符合则抛异常。
 
-```objective-c
+```objectivec
 + (instancetype)packageForProtocol:(Protocol *)protocol withObjects:(NSArray *)objects {
     ProtocolCourier *courier = [[super alloc] initWithProtocol:protocol objects:objects];
     return courier;
@@ -104,7 +104,7 @@ categories: 技术
 
 首先是找到满足我们需要转发的协议或者代理方法是我们的代理类能够响应。
 
-``` objective-c
+``` objectivec
 - (BOOL)respondsToSelector:(SEL)selector {
     BOOL responds = NO;
     BOOL isRequired = NO;
@@ -134,7 +134,7 @@ categories: 技术
 
 这里有一个很关键需要实现的也是找到这个方法是否是在这个"协议链"中的，并且我特意将``required``的协议方法特殊处理，必须要经过代理类并且代理类必须要实现这些 required 方法，否则会抛异常。
 
-``` objective-c
+``` objectivec
 - (struct objc_method_description)methodDescriptionForSelector:(SEL)selector isRequired:(BOOL *)isRequired {
     struct objc_method_description method = {NULL, NULL};
 
@@ -182,7 +182,7 @@ categories: 技术
 
 能正确判断实现对象包含这个协议并且能拿到方法描述后我们就能准确的将这些方法转发给实际实现的对象了。
 
-``` objective-c
+``` objectivec
 - (void)forwardInvocation:(NSInvocation *)anInvocation {
     SEL selector = [anInvocation selector];
 
@@ -226,7 +226,7 @@ categories: 技术
 
 虽然这个中间件只有200多行代码，但是使用起来还是挺有意思的，比如一个 ViewController 上有一个 UITableView，我们需要实现 UIScrollViewDelegate，UITableViewDelegate，UITableViewDataSource，我们就可以这样使用:
 
-``` objective-c
+``` objectivec
 @interface ViewController ()
 @property (nonatomic, strong) IBOutlet UILabel *offsetLabel;
 @property (nonatomic, strong) IBOutlet UITableView *tableView;
@@ -257,7 +257,7 @@ categories: 技术
 
 这三个实现协议的对象是这样的:
 
-``` objective-c
+``` objectivec
 @interface GYTableViewDelegate : NSObject<UITableViewDelegate>
 @end
 @interface GYTableViewDataSource : NSObject<UITableViewDataSource>
