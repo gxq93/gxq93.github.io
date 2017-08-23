@@ -9,7 +9,7 @@ categories: 技术
 <!--more-->
 
 # GCD
-因为用到线程锁肯定会用到GCD，就简单先写一点GCD相关的一些东西。简单暴力介绍，上代码和图。
+因为用到线程锁肯定会用到 GCD，就简单先写一点 GCD 相关的一些东西。简单暴力介绍，上代码和图。
 界面布局：
 ```objc
 static NSString * const urlStr = @"http://cdn.nshipster.com/images/the-nshipster-fake-book-cover@2x.png";
@@ -89,7 +89,7 @@ static NSInteger const limitCount = 7;
 
 ![](http://www.z4a.net/images/2016/05/09/fa59e219154607ea.gif)
 ￼
-然后把加载图片的async异步任务改成sync同步任务
+然后把加载图片的 async 异步任务改成 sync 同步任务
 
 ```objc
 - (void)syncTap {
@@ -106,8 +106,8 @@ static NSInteger const limitCount = 7;
 ￼![](http://www.z4a.net/images/2016/05/09/sync.gif)
 
 # 线程锁
-下面主要介绍一下iOS的线程锁
-个人理解使用线程锁的目的就是为了保护资源，防止当前线程上的资源被其他线程抢占，相当于抢红包10个红包20个人抢，不进行保护的话因为速度差不多就可能发生资源分配错乱，而在iOS中线程锁的使用方式其实有很多种。
+下面主要介绍一下 iOS 的线程锁
+个人理解使用线程锁的目的就是为了保护资源，防止当前线程上的资源被其他线程抢占，相当于抢红包10个红包20个人抢，不进行保护的话因为速度差不多就可能发生资源分配错乱，而在 iOS 中线程锁的使用方式其实有很多种。
 ```objc
 /* 如果只要显示9张图片 */
 - (void)unlockTap {
@@ -134,9 +134,9 @@ static NSInteger const limitCount = 7;
 ￼![](http://www.z4a.net/images/2016/05/09/22cf0414115ce3b8.gif)
 ￼
 ## NSLock
-使用NSLock把需要加锁的代码（以后暂时称这段代码为”加锁代码“）放到NSLock的``lock``和``unlock``之间，一个线程A进入加锁代码之后由于已经加锁，另一个线程B就无法访问，只有等待前一个线程A执行完加锁代码后解锁，B线程才能访问加锁代码。另外，demo中数组imageName定义成了成员变量，这么做其实是不明智的，应该定义为“原子属性”。对于被抢占资源来说将其定义为原子属性是一个很好的习惯，因为有时候很难保证同一个资源不在别处读取和修改。``nonatomic``属性读取的是内存数据（寄存器计算好的结果），而``atomic``就保证直接读取寄存器的数据，这样一来就不会出现一个线程正在修改数据，而另一个线程读取了修改之前（存储在内存中）的数据，永远保证同时只有一个线程在访问一个属性。
+使用 NSLock 把需要加锁的代码（以后暂时称这段代码为”加锁代码“）放到 NSLock 的``lock``和``unlock``之间，一个线程 A 进入加锁代码之后由于已经加锁，另一个线程 B 就无法访问，只有等待前一个线程 A 执行完加锁代码后解锁，B 线程才能访问加锁代码。另外，demo 中数组 imageName 定义成了成员变量，这么做其实是不明智的，应该定义为“原子属性”。对于被抢占资源来说将其定义为原子属性是一个很好的习惯，因为有时候很难保证同一个资源不在别处读取和修改。``nonatomic``属性读取的是内存数据（寄存器计算好的结果），而``atomic``就保证直接读取寄存器的数据，这样一来就不会出现一个线程正在修改数据，而另一个线程读取了修改之前（存储在内存中）的数据，永远保证同时只有一个线程在访问一个属性。
 
-初始化NSLock
+初始化 NSLock
 ```objc
 NSLock *lock = [[NSLock alloc]init];
 ```
@@ -165,10 +165,10 @@ NSLock *lock = [[NSLock alloc]init];
 
 ￼![](http://www.z4a.net/images/2016/05/09/74853d81c8d3f6e0.gif)
 ￼
-但是不可忽视的是多线程中很容易发生死锁，如递归。可以使用NSRecursiveLock替换NSLock，它实际上定义的是一个递归锁，这个锁可以被同一线程多次请求，而不会引起死锁。这主要是用在循环或递归操作中。
+但是不可忽视的是多线程中很容易发生死锁，如递归。可以使用 NSRecursiveLock 替换 NSLock，它实际上定义的是一个递归锁，这个锁可以被同一线程多次请求，而不会引起死锁。这主要是用在循环或递归操作中。
 
 ## GCD信号量
-GCD中也已经提供了一种信号机制，使用它我们也可以来构建一把“锁”(从本质意义上讲，信号量与锁是有区别，具体差异为信号量与互斥锁之间的区别):
+GCD 中也已经提供了一种信号机制，使用它我们也可以来构建一把“锁”(从本质意义上讲，信号量与锁是有区别，具体差异为信号量与互斥锁之间的区别):
 ```objc
 dispatch_semaphore_t semaphore = dispatch_semaphore_create(1);
 ```
@@ -191,10 +191,10 @@ dispatch_semaphore_t semaphore = dispatch_semaphore_create(1);
 }
 ```
 
-最后实现的结果和使用NSLock相同
+最后实现的结果和使用 NSLock 相同
 ## OSSpinLock
 
-iOS中效率最高的线程锁应该是OSSpinLock，但是这篇文章中有指出它的一些问题[spinlock is unsafe in ios](http://blog.ibireme.com/2016/01/16/spinlock_is_unsafe_in_ios/?utm_source=tuicool&utm_medium=referral)，它的使用方法与普通线程锁大同小异。
+iOS 中效率最高的线程锁应该是 OSSpinLock，但是这篇文章中有指出它的一些问题[spinlock is unsafe in ios](http://blog.ibireme.com/2016/01/16/spinlock_is_unsafe_in_ios/?utm_source=tuicool&utm_medium=referral)，它的使用方法与普通线程锁大同小异。
 
 ```objc
 OSSpinLock spinlock = OS_SPINLOCK_INIT;

@@ -5,7 +5,7 @@ tags: [Swift,CocoaPods]
 categories: 技术
 ---
 
-起因是因为无聊，突然想提高一下我那可怜的github的提交数，所以随便拿了个Swift3.0写的轮播图组件打算传到Cocoapods上。写完podspec(这个项目叫GYBanner🙈)然后由于才刚升级Swift3.0的原因，Cocoapods也没有做好很贴心的适配，于是踩了一些坑～
+起因是因为无聊，突然想提高一下我那可怜的 github 的提交数，所以随便拿了个 Swift3.0 写的轮播图组件打算传到 Cocoapods 上。写完 podspec(这个项目叫 GYBanner 🙈)然后由于才刚升级 Swift3.0 的原因，Cocoapods 也没有做好很贴心的适配，于是踩了一些坑～
 
 <!--more-->
 
@@ -29,11 +29,11 @@ pod lib lint GYBanner.podspec --verbose
 作者也说明了：
 > Will default to SWIFT_VERSION = 2.3, but will check for a .swift-version file and use the version specified there if present.
 
-所以现在swift版本默认跑的是2.3的，要想检查swift3.0的项目，需创建一个.swift-version的文件，在文件中输入3.0。好吧，虽然有点奇怪，但项目就是swift3.0写的，所以还是照着做吧，先升级一下cocoapods
+所以现在 swift 版本默认跑的是2.3的，要想检查 swift3.0 的项目，需创建一个 .swift-version 的文件，在文件中输入3.0。好吧，虽然有点奇怪，但项目就是 swift3.0 写的，所以还是照着做吧，先升级一下 cocoapods
 ```
 sudo gem install cocoapods --pre
 pod --version
 1.1.0.beta.2
 ```
-一看，奇了怪了为啥更新后的cocoapods是1.1.0.beta.2版的，最新的不应该是1.1.0.rc.2吗，于是在cocoapods issue中找啊找终于发现原来是Chinese的痛，很多我大天朝的人想必都把ruby源替换成了淘宝的镜像，而我之前也不知道啥时候换成了阿里云的镜像。。。居然因为这个原因更新不到最新版。后来找到一个不错的镜像``https://gems.ruby-china.org``替换了一下，终于上传成功了。
-写这篇文章也纯属无聊，可能之后cocoapods也会把swift版本的控制配置在podspec中吧，这样这篇文章也没有什么意义了，不过who care: )
+一看，奇了怪了为啥更新后的 cocoapods 是 1.1.0.beta.2 版的，最新的不应该是 1.1.0.rc.2 吗，于是在 cocoapods issue 中找啊找终于发现原来是 Chinese 的痛，很多我大天朝的人想必都把 ruby 源替换成了淘宝的镜像，而我之前也不知道啥时候换成了阿里云的镜像。。。居然因为这个原因更新不到最新版。后来找到一个不错的镜像``https://gems.ruby-china.org``替换了一下，终于上传成功了。
+写这篇文章也纯属无聊，可能之后 cocoapods 也会把 swift 版本的控制配置在 podspec 中吧，这样这篇文章也没有什么意义了，不过 who care: )

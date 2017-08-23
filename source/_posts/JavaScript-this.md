@@ -4,19 +4,19 @@ date: 2016-11-22 14:21:41
 tags: [JavaScript]
 categories: 技术
 ---
-最近在学JavaScript，就记录一些学习的心得吧。
+最近在学 JavaScript，就记录一些学习的心得吧。
 # this
-开始了解JavaScript的时候，对于this理解很费劲，毕竟在ES6之前没有class，习惯了普通面向对象语言的人就很不习惯，虽然现在网上资料很多，但是有时候资料多也不是什么好事，看了[MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this)的文档，觉得上面的描述清晰多了，接下来本文主要大致的描述一下this的使用场景。
+开始了解 JavaScript 的时候，对于 this 理解很费劲，毕竟在 ES6 之前没有 class，习惯了普通面向对象语言的人就很不习惯，虽然现在网上资料很多，但是有时候资料多也不是什么好事，看了[MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this)的文档，觉得上面的描述清晰多了，接下来本文主要大致的描述一下 this 的使用场景。
 
 <!--more-->
 
-首先this作为函数关键字和其他语言不太一样，而对他自己来说，在严格模式和非严格模式中意义也不同。
+首先 this 作为函数关键字和其他语言不太一样，而对他自己来说，在严格模式和非严格模式中意义也不同。
 
-this的指向在函数定义的时候是确定不了的，只有函数执行的时候才能确定this到底指向谁，实际上this的最终指向的是那个调用它的对象，而每次函数调用时这个this的值也可能是不一样的。ES5使用bind方法来设置this的值无论这个函数什么时候调用,ECMAScript 2015中引入箭头函数来决定this的词法作用域(它设置this的值在封闭的执行上下文中)。
+this 的指向在函数定义的时候是确定不了的，只有函数执行的时候才能确定 this 到底指向谁，实际上 this 的最终指向的是那个调用它的对象，而每次函数调用时这个 this 的值也可能是不一样的。ES5 使用 bind 方法来设置 this 的值无论这个函数什么时候调用,ECMAScript 2015 中引入箭头函数来决定 this 的词法作用域(它设置 this 的值在封闭的执行上下文中)。
 
 ## 全局上下文
-在全局上下文中不管是不是严格模式，this都表示全局对象。
-在严格版中的默认的this不再是window，而是undefined。
+在全局上下文中不管是不是严格模式，this 都表示全局对象。
+在严格版中的默认的 this 不再是 window，而是 undefined。
 ``` js
 console.log(this.document === document); /* true */
 
@@ -27,7 +27,7 @@ this.a = 37;
 console.log(window.a); /* 37 */
 ```
 ## 函数上下文
-在函数中，this的值取决于这个函数是怎么调用的。
+在函数中，this 的值取决于这个函数是怎么调用的。
 ### 简单的调用
 ``` js
 function f1() {
@@ -40,7 +40,7 @@ f1() === window; /* the window is the global object in browsers */
 f1() === global
 ```
 ### 对象方法
-如果this作为一个对象方法，他指向调用方法的对象。
+如果 this 作为一个对象方法，他指向调用方法的对象。
 ``` js
 var o = {
   prop: 37,
@@ -51,7 +51,7 @@ var o = {
 
 console.log(o.f()); /* logs 37 */
 ```
-注意,这种行为是不受或者函数是如何定义的。在前面的示例中,我们定义了内联函数f在o的定义。然而,我们可以简单地定义了函数在对象外,后来将它连接到o.f.这样做结果相同:
+注意,这种行为是不受或者函数是如何定义的。在前面的示例中,我们定义了内联函数 f 在 o 的定义。然而,我们可以简单地定义了函数在对象外,后来将它连接到 o.f. 这样做结果相同:
 ``` js
 var o = {prop: 37};
 
@@ -77,8 +77,8 @@ p.b = 4;
 
 console.log(p.f()); /* 5 */
 ```
-只要记住this就是指向函数调用对象就行。
-同样，在setter和getter方法中原理也是一样的：
+只要记住 this 就是指向函数调用对象就行。
+同样，在 setter 和 getter 方法中原理也是一样的：
 ``` js
 function sum() {
   return this.a + this.b + this.c;
@@ -99,7 +99,7 @@ Object.defineProperty(o, 'sum', {
 console.log(o.average, o.sum); /* logs 2, 6 */
 ```
 ### 构造函数
-当一个函数作为构造函数(new关键字)，this会被绑定到构造的新对象。
+当一个函数作为构造函数(new 关键字)，this 会被绑定到构造的新对象。
 ``` js
 function C() {
   this.a = 37;
@@ -118,19 +118,19 @@ o = new C2();
 console.log(o.a); /* logs 38 */
 ```
 ### 作为DOM事件处理者
-如果函数作为DOM事件的处理者，this指向执行的元素。
+如果函数作为 DOM 事件的处理者，this 指向执行的元素。
 ``` js
 <button onclick="alert(this.tagName.toLowerCase());">
   Show this
 </button>
 ```
-这里的this指的时button这个元素
+这里的 this 指的时 button 这个元素
 ``` js
 <button onclick="alert((function(){return this})());">
   Show inner this
 </button>
 ```
-在这里，因为没有设置this的值，所以this指向全局对象(window)
+在这里，因为没有设置 this 的值，所以 this 指向全局对象(window)
 
 # call函数
 ``` js
@@ -143,7 +143,7 @@ var o1 = {
 var o2 = o1.fn;
 o2(); /*undefined */
 ```
-在上述情况下你会发现o2函数中的this已经不是指向o1的a，这很好理解，因为函数调用对象不是o1，但是有时候我们不得不将这个对象保存到另外的一个变量中，那么就可以通过以下方法：
+在上述情况下你会发现 o2 函数中的 this 已经不是指向 o1 的 a，这很好理解，因为函数调用对象不是 o1，但是有时候我们不得不将这个对象保存到另外的一个变量中，那么就可以通过以下方法：
 ``` js
 var o1 = {
     a: 3,
@@ -154,9 +154,9 @@ var o1 = {
 var o2 = o1.fn;
 o2.call(o1);
 ```
-通过在call方法中给第一个参数添加要把b添加到哪个环境中，简单来说，this就会指向那个对象。
+通过在 call 方法中给第一个参数添加要把 b 添加到哪个环境中，简单来说，this 就会指向那个对象。
 
-call方法除了第一个参数以外还可以添加多个参数，如下：
+call 方法除了第一个参数以外还可以添加多个参数，如下：
 ``` js
 var o1 = {
     a: 3,
@@ -169,7 +169,7 @@ var o2 = o1.fn;
 o2.call(o1,1,2);
 ```
 # apply函数
-apply方法和call方法有些相似，它也可以改变this的指向：
+apply 方法和 call 方法有些相似，它也可以改变 this 的指向：
 ``` js
 var o1 = {
     a: 3,
@@ -180,7 +180,7 @@ var o1 = {
 var o2 = o1.fn;
 o2.apply(o1);
 ```
-同样apply也可以有多个参数，但是不同的是，第二个参数必须是一个数组，如下：
+同样 apply 也可以有多个参数，但是不同的是，第二个参数必须是一个数组，如下：
 ``` js
 var o1 = {
     a: 3,
@@ -192,12 +192,12 @@ var o1 = {
 var o2 = o1.fn;
 o2.apply(o1,[1,2]]);
 ```
-**注意如果call和apply的第一个参数写的是null，那么this指向的是window对象**
+**注意如果 call 和 apply 的第一个参数写的是 null，那么 this 指向的是 window 对象**
 
-**call和apply的区别只在于这两个函数接受的参数形式不同。**
+**call 和 apply 的区别只在于这两个函数接受的参数形式不同。**
 
 # bind函数
-bind方法和call、apply方法有些不同，实际上bind方法返回的是一个修改过后的函数
+bind 方法和 call、apply 方法有些不同，实际上 bind 方法返回的是一个修改过后的函数
 ``` js
 var o1 = {
     a: 3,
@@ -220,7 +220,7 @@ var o2 = o1.fn;
 var o3 = o2.bind(o1);
 o3();
 ```
-同样bind也可以有多个参数，并且参数可以执行的时候再次添加，但是要注意的是，参数是按照形参的顺序进行的。
+同样 bind 也可以有多个参数，并且参数可以执行的时候再次添加，但是要注意的是，参数是按照形参的顺序进行的。
 ``` js
 var o1 = {
     a: 3,
@@ -233,10 +233,10 @@ var o2 = o1.fn;
 var o3 = o2.bind(o1,1);
 o3(2,3);
 ```
-call和apply都是改变上下文中的this并立即执行这个函数，bind方法可以让对应的函数想什么时候调就什么时候调用，并且可以将参数在执行的时候添加，这是它们的区别，根据自己的实际情况来选择使用。
+call 和 apply 都是改变上下文中的 this 并立即执行这个函数，bind 方法可以让对应的函数想什么时候调就什么时候调用，并且可以将参数在执行的时候添加，这是它们的区别，根据自己的实际情况来选择使用。
 
 # 胖箭头函数
-胖箭头函数(Fat arrow functions)，又称箭头函数，是一个来自ECMAScript 2015(又称ES6)的全新特性。有传闻说，箭头函数的语法=>，是受到了CoffeeScript的影响，并且它与CoffeeScript中的=>语法一样，共享this上下文。
+胖箭头函数(Fat arrow functions)，又称箭头函数，是一个来自 ECMAScript 2015(又称ES6) 的全新特性。有传闻说，箭头函数的语法 =>，是受到了 CoffeeScript 的影响，并且它与 CoffeeScript 中的 => 语法一样，共享 this 上下文。
 >反正我就觉得他只是闭包的另一种写法
 
 举个例子：
@@ -259,14 +259,14 @@ function getVerifiedToken(selector) {
     .catch(err => log(err.stack));
 }
 ```
-这个就有点像swift的闭包了，就是把in换做了=>。
+这个就有点像 swift 的闭包了，就是把 in 换做了 =>。
 
 以下是值得注意的几个要点：
-* function和{}都消失了，所有的回调函数都只出现在了一行里。
-* 当只有一个参数时，()也消失了（rest参数是一个例外，如(...args) => ...）。
-* 当{}消失后，return关键字也跟着消失了。单行的箭头函数会提供一个隐式的return（这样的函数在其他编程语言中常被成为lamda函数）。
+* function 和 {} 都消失了，所有的回调函数都只出现在了一行里。
+* 当只有一个参数时，() 也消失了（rest 参数是一个例外，如 (...args) => ...）。
+* 当 {} 消失后，return 关键字也跟着消失了。单行的箭头函数会提供一个隐式的 return（这样的函数在其他编程语言中常被成为 lamda 函数）。
 
-这里再着重强调一下上述的最后一个要求。仅仅当箭头函数为单行的形式时，才会出现隐式的return。当箭头函数伴随着{}被声明，那么即使它是单行的，它也不会有隐式return：
+这里再着重强调一下上述的最后一个要求。仅仅当箭头函数为单行的形式时，才会出现隐式的 return。当箭头函数伴随着 {} 被声明，那么即使它是单行的，它也不会有隐式 return：
 ``` js
 const getVerifiedToken = selector => {
   return getUsers()
@@ -276,7 +276,7 @@ const getVerifiedToken = selector => {
     .catch(err => log(err.stack));
 }
 ```
-不幸的是，空对象{}和空白函数代码块{}长得一模一样。。以上的例子中，emptyObject的{}会被解释为一个空白函数代码块，所以emptyObject()会返回undefined。如果要在箭头函数中明确地返回一个空对象，则你不得不将{}包含在一对圆括号中({})：
+不幸的是，空对象 {} 和空白函数代码块 {} 长得一模一样。。以上的例子中，emptyObject 的 {} 会被解释为一个空白函数代码块，所以 emptyObject() 会返回 undefined。如果要在箭头函数中明确地返回一个空对象，则你不得不将 {} 包含在一对圆括号中 ({})：
 ``` js
 const emptyObject = () => ({});
 emptyObject(); /* {} */
@@ -303,10 +303,10 @@ function () { return arguments[0]; }
 () => ({}) /* {} */
 ```
 
-**箭头函数没有属于自己的this和arguments**
+**箭头函数没有属于自己的 this 和 arguments**
 
-因此箭头函数就不需要担心this的上下文问题，不管嵌套多少层，箭头函数中的this总能指向正确的上下文，因为函数体内的this指向的对象，就是定义时所在的对象，而不是使用时所在的对象。
+因此箭头函数就不需要担心 this 的上下文问题，不管嵌套多少层，箭头函数中的 this 总能指向正确的上下文，因为函数体内的 this 指向的对象，就是定义时所在的对象，而不是使用时所在的对象。
 
-**箭头函数不能作为generator函数使用。**
+**箭头函数不能作为 generator 函数使用。**
 
-最后注意，React class中的this指向组件本身，因此在事件绑定中应该将this绑定到事件函数中。
+最后注意，React class 中的 this 指向组件本身，因此在事件绑定中应该将 this 绑定到事件函数中。

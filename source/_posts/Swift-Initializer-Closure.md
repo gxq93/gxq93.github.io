@@ -4,7 +4,7 @@ date: 2016-10-08 14:42:26
 tags: [Swift]
 categories: 技术
 ---
-对于swift一般控件的初始化，相信大部分都还是习惯这样声明：
+对于 swift 一般控件的初始化，相信大部分都还是习惯这样声明：
 ``` swift
 lazy var customView:UIView = {
     let view:UIView = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
@@ -30,5 +30,5 @@ var _:UIView = {
     return $0
 }(UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 100)))
 ```
-当你的同事在viewDidLoad中看到这样一坨东西，是不是黑人问号，一脸懵逼这他妈是哪个东西。
+当你的同事在 viewDidLoad 中看到这样一坨东西，是不是黑人问号，一脸懵逼这他妈是哪个东西。
 当然这些只是玩笑而已，毕竟这么写可能过个几天，这坨东西你自己可能都不认识了😃
