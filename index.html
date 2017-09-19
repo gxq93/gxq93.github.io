@@ -777,7 +777,7 @@
 
       
         
-          <p>这篇文章主要介绍解决JavaScript异步编程中callback hell问题的两种方案，而这两种方案也都包含了函数式编程的思想在里面。</p>
+          <p>这篇文章主要介绍解决 JavaScript 异步编程中 callback hell 问题的两种方案，而这两种方案也都包含了函数式编程的思想在里面。</p>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2016/12/16/JavaScript-Promise-Thunk/" rel="contents">
@@ -915,7 +915,7 @@
 
       
         
-          <p>JavaScript虽然有些地方跟其他语言不同，但是他仍然是面向对象语言，因此对象的使用是整个体系的基础。本文列举了几种JavaScript创建对象的方式，并讲讲ES6中class的概念。</p>
+          <p>JavaScript 虽然有些地方跟其他语言不同，但是他仍然是面向对象语言，因此对象的使用是整个体系的基础。本文列举了几种 JavaScript 创建对象的方式，并讲讲 ES6 中 class 的概念。</p>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2016/11/28/JavaScript-class/" rel="contents">
@@ -1053,8 +1053,8 @@
 
       
         
-          <p>最近在学JavaScript，就记录一些学习的心得吧。</p>
-<h1 id="this"><a href="#this" class="headerlink" title="this"></a>this</h1><p>开始了解JavaScript的时候，对于this理解很费劲，毕竟在ES6之前没有class，习惯了普通面向对象语言的人就很不习惯，虽然现在网上资料很多，但是有时候资料多也不是什么好事，看了<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this">MDN</a>的文档，觉得上面的描述清晰多了，接下来本文主要大致的描述一下this的使用场景。</p>
+          <p>最近在学 JavaScript，就记录一些学习的心得吧。</p>
+<h1 id="this"><a href="#this" class="headerlink" title="this"></a>this</h1><p>开始了解 JavaScript 的时候，对于 this 理解很费劲，毕竟在 ES6 之前没有 class，习惯了普通面向对象语言的人就很不习惯，虽然现在网上资料很多，但是有时候资料多也不是什么好事，看了<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this">MDN</a>的文档，觉得上面的描述清晰多了，接下来本文主要大致的描述一下 this 的使用场景。</p>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2016/11/22/JavaScript-this/" rel="contents">
@@ -1192,7 +1192,7 @@
 
       
         
-          <p><strong>首先说明一下这个方案只能应用于UIWebview，因为WKWebView不支持NSURLProtocol。</strong><br>本文主要介绍通过NSURLProtocol和NSURLSession对Web页面进行缓存，其中还有一些地方还没完善，如读取缓存的条件，清理缓存时间，网页异步加载问题和跳转问题，之后有空再研究。<br>方案的流程图：</p>
+          <p><strong>首先说明一下这个方案只能应用于UI Webview，因为 WKWebView 不支持 NSURLProtocol。</strong><br>本文主要介绍通过 NSURLProtocol 和 NSURLSession 对 Web 页面进行缓存，其中还有一些地方还没完善，如读取缓存的条件，清理缓存时间，网页异步加载问题和跳转问题，之后有空再研究。<br>方案的流程图：</p>
 <img src="/2016/11/09/WebView-NSURLProtocol/flow.png" alt="flow.png" title="">
           <!--noindex-->
           <div class="post-button text-center">
@@ -1331,7 +1331,7 @@
 
       
         
-          <p>对于swift一般控件的初始化，相信大部分都还是习惯这样声明：<br><figure class="highlight swift"><table><tr><td class="code"><pre><div class="line"><span class="built_in">lazy</span> <span class="keyword">var</span> customView:<span class="type">UIView</span> = &#123;</div><div class="line">    <span class="keyword">let</span> view:<span class="type">UIView</span> = <span class="type">UIView</span>(frame: <span class="type">CGRect</span>(x: <span class="number">0</span>, y: <span class="number">0</span>, width: <span class="number">100</span>, height: <span class="number">100</span>))</div><div class="line">    view.backgroundColor = <span class="type">UIColor</span>.yellow</div><div class="line">    <span class="keyword">return</span> view</div><div class="line">&#125;()</div></pre></td></tr></table></figure></p>
+          <p>对于 swift 一般控件的初始化，相信大部分都还是习惯这样声明：<br><figure class="highlight swift"><table><tr><td class="code"><pre><div class="line"><span class="built_in">lazy</span> <span class="keyword">var</span> customView:<span class="type">UIView</span> = &#123;</div><div class="line">    <span class="keyword">let</span> view:<span class="type">UIView</span> = <span class="type">UIView</span>(frame: <span class="type">CGRect</span>(x: <span class="number">0</span>, y: <span class="number">0</span>, width: <span class="number">100</span>, height: <span class="number">100</span>))</div><div class="line">    view.backgroundColor = <span class="type">UIColor</span>.yellow</div><div class="line">    <span class="keyword">return</span> view</div><div class="line">&#125;()</div></pre></td></tr></table></figure></p>
 <p>今天发现了一个新的写法（也仅仅只是一种写法而已。。。）<br><figure class="highlight swift"><table><tr><td class="code"><pre><div class="line"><span class="built_in">lazy</span> <span class="keyword">var</span> customView:<span class="type">UIView</span> = &#123;</div><div class="line">    $<span class="number">0</span>.backgroundColor = <span class="type">UIColor</span>.yellow</div><div class="line">    <span class="keyword">return</span> $<span class="number">0</span></div><div class="line">&#125;(<span class="type">UIView</span>(frame: <span class="type">CGRect</span>(x: <span class="number">0</span>, y: <span class="number">0</span>, width: <span class="number">100</span>, height: <span class="number">100</span>)))</div></pre></td></tr></table></figure></p>
           <!--noindex-->
           <div class="post-button text-center">
@@ -1470,7 +1470,7 @@
 
       
         
-          <p>起因是因为无聊，突然想提高一下我那可怜的github的提交数，所以随便拿了个Swift3.0写的轮播图组件打算传到Cocoapods上。写完podspec(这个项目叫GYBanner🙈)然后由于才刚升级Swift3.0的原因，Cocoapods也没有做好很贴心的适配，于是踩了一些坑～</p>
+          <p>起因是因为无聊，突然想提高一下我那可怜的 github 的提交数，所以随便拿了个 Swift3.0 写的轮播图组件打算传到 Cocoapods 上。写完 podspec(这个项目叫 GYBanner 🙈)然后由于才刚升级 Swift3.0 的原因，Cocoapods 也没有做好很贴心的适配，于是踩了一些坑～</p>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2016/09/30/CocoaPods-Swift3/" rel="contents">
@@ -1538,7 +1538,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2016/09/08/opensource-houseloan/" itemprop="url">一款基于RAC的“房贷计算器”应用</a></h1>
+                <a class="post-title-link" href="/2016/09/08/opensource-houseloan/" itemprop="url">RAC使用心得</a></h1>
         
 
         <div class="post-meta">
@@ -1608,7 +1608,7 @@
 
       
         
-          <h1 id="Intro"><a href="#Intro" class="headerlink" title="Intro"></a>Intro</h1><p>最近公司要求开发一个小应用“房贷计算器”来引流，由于要求需要一礼拜内完成开发上线，因此时间有点仓促所以没有仔细构思就开始开发了，所以其实很多地方设计的极其不合理，后期也懒得再修改维护了，就开源一下，有问题的地方看客看了笑笑就好。附上<a href="https://github.com/gxq93/HouseloanCalculator">github地址</a><br>响应式编程似乎很符合计算器的特点，因此项目导入了ReactiveCocoa2.5框架，接下来纪录一些自己对RAC的使用心得。</p>
+          <h1 id="Intro"><a href="#Intro" class="headerlink" title="Intro"></a>Intro</h1><p>最近公司要求开发一个小应用“房贷计算器”来引流，由于要求需要一礼拜内完成开发上线，因此时间有点仓促所以没有仔细构思就开始开发了，所以其实很多地方设计的极其不合理，后期也懒得再修改维护了，就开源一下，有问题的地方看客看了笑笑就好。附上<a href="https://github.com/gxq93/HouseloanCalculator">github地址</a><br>响应式编程似乎很符合计算器的特点，因此项目导入了 ReactiveCocoa2.5 框架，接下来纪录一些自己对 RAC 的使用心得。</p>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2016/09/08/opensource-houseloan/" rel="contents">

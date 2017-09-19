@@ -93,16 +93,16 @@
 
 
 
-<meta name="description" content="对于swift一般控件的初始化，相信大部分都还是习惯这样声明：lazy var customView:UIView = &amp;#123;    let view:UIView = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))    view.backgroundColor = UIColor.yellow    return vi">
+<meta name="description" content="对于 swift 一般控件的初始化，相信大部分都还是习惯这样声明：lazy var customView:UIView = &amp;#123;    let view:UIView = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))    view.backgroundColor = UIColor.yellow    return">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Swift闭包形式的初始化方法">
 <meta property="og:url" content="http://yoursite.com/2016/10/08/Swift-Initializer-Closure/index.html">
 <meta property="og:site_name" content="Grommash">
-<meta property="og:description" content="对于swift一般控件的初始化，相信大部分都还是习惯这样声明：lazy var customView:UIView = &amp;#123;    let view:UIView = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))    view.backgroundColor = UIColor.yellow    return vi">
-<meta property="og:updated_time" content="2017-05-29T10:46:40.000Z">
+<meta property="og:description" content="对于 swift 一般控件的初始化，相信大部分都还是习惯这样声明：lazy var customView:UIView = &amp;#123;    let view:UIView = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))    view.backgroundColor = UIColor.yellow    return">
+<meta property="og:updated_time" content="2017-08-25T12:09:49.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Swift闭包形式的初始化方法">
-<meta name="twitter:description" content="对于swift一般控件的初始化，相信大部分都还是习惯这样声明：lazy var customView:UIView = &amp;#123;    let view:UIView = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))    view.backgroundColor = UIColor.yellow    return vi">
+<meta name="twitter:description" content="对于 swift 一般控件的初始化，相信大部分都还是习惯这样声明：lazy var customView:UIView = &amp;#123;    let view:UIView = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))    view.backgroundColor = UIColor.yellow    return">
 
 
 
@@ -362,11 +362,11 @@
       
 
       
-        <p>对于swift一般控件的初始化，相信大部分都还是习惯这样声明：<br><figure class="highlight swift"><table><tr><td class="code"><pre><div class="line"><span class="built_in">lazy</span> <span class="keyword">var</span> customView:<span class="type">UIView</span> = &#123;</div><div class="line">    <span class="keyword">let</span> view:<span class="type">UIView</span> = <span class="type">UIView</span>(frame: <span class="type">CGRect</span>(x: <span class="number">0</span>, y: <span class="number">0</span>, width: <span class="number">100</span>, height: <span class="number">100</span>))</div><div class="line">    view.backgroundColor = <span class="type">UIColor</span>.yellow</div><div class="line">    <span class="keyword">return</span> view</div><div class="line">&#125;()</div></pre></td></tr></table></figure></p>
+        <p>对于 swift 一般控件的初始化，相信大部分都还是习惯这样声明：<br><figure class="highlight swift"><table><tr><td class="code"><pre><div class="line"><span class="built_in">lazy</span> <span class="keyword">var</span> customView:<span class="type">UIView</span> = &#123;</div><div class="line">    <span class="keyword">let</span> view:<span class="type">UIView</span> = <span class="type">UIView</span>(frame: <span class="type">CGRect</span>(x: <span class="number">0</span>, y: <span class="number">0</span>, width: <span class="number">100</span>, height: <span class="number">100</span>))</div><div class="line">    view.backgroundColor = <span class="type">UIColor</span>.yellow</div><div class="line">    <span class="keyword">return</span> view</div><div class="line">&#125;()</div></pre></td></tr></table></figure></p>
 <p>今天发现了一个新的写法（也仅仅只是一种写法而已。。。）<br><figure class="highlight swift"><table><tr><td class="code"><pre><div class="line"><span class="built_in">lazy</span> <span class="keyword">var</span> customView:<span class="type">UIView</span> = &#123;</div><div class="line">    $<span class="number">0</span>.backgroundColor = <span class="type">UIColor</span>.yellow</div><div class="line">    <span class="keyword">return</span> $<span class="number">0</span></div><div class="line">&#125;(<span class="type">UIView</span>(frame: <span class="type">CGRect</span>(x: <span class="number">0</span>, y: <span class="number">0</span>, width: <span class="number">100</span>, height: <span class="number">100</span>)))</div></pre></td></tr></table></figure></p>
 <a id="more"></a>
 <p>最终达到的效果是一样的，当然了，实现的原理也仅仅只是调用闭包将对象返回作为变量，第一种的闭包不传参数返回自定义的对象，而第二种先将该对象进行初始化并作为闭包的参数传入进行其它的一些业务逻辑绑定。对于写无聊了第一种方法可以用用第二种来装装逼: )<br>或者再恶心一点，对于初始化完不需要其它操作的控件，可以这样：<br><figure class="highlight swift"><table><tr><td class="code"><pre><div class="line"><span class="keyword">var</span> <span class="number">_</span>:<span class="type">UIView</span> = &#123;</div><div class="line">    $<span class="number">0</span>.backgroundColor = <span class="type">UIColor</span>.yellow</div><div class="line">    view.addSubview($<span class="number">0</span>)</div><div class="line">    <span class="keyword">return</span> $<span class="number">0</span></div><div class="line">&#125;(<span class="type">UIView</span>(frame: <span class="type">CGRect</span>(x: <span class="number">0</span>, y: <span class="number">0</span>, width: <span class="number">100</span>, height: <span class="number">100</span>)))</div></pre></td></tr></table></figure></p>
-<p>当你的同事在viewDidLoad中看到这样一坨东西，是不是黑人问号，一脸懵逼这他妈是哪个东西。<br>当然这些只是玩笑而已，毕竟这么写可能过个几天，这坨东西你自己可能都不认识了😃</p>
+<p>当你的同事在 viewDidLoad 中看到这样一坨东西，是不是黑人问号，一脸懵逼这他妈是哪个东西。<br>当然这些只是玩笑而已，毕竟这么写可能过个几天，这坨东西你自己可能都不认识了😃</p>
 
       
     </div>
