@@ -1,98 +1,368 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8">
-    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
-    <meta name="keywords" content="hexo, autumn">
-    <title>
-        Grommash
-    </title>
-    <!-- favicon -->
-    
-    <link rel="icon" href="http://osly086qe.bkt.clouddn.com/favicon.ico">
-    
-    <link rel="stylesheet" href="/css/style.css">
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
-    <!-- highlight -->
-    <link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.12.0/styles/github-gist.min.css">
-    <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script>
-    <script>
-        hljs.initHighlightingOnLoad()
-    </script>
-    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="http://osly086qe.bkt.clouddn.com/hexo-infinite-scroll-v1.0.1.min.css">
-    <script src="http://osly086qe.bkt.clouddn.com/hexo-infinite-scroll-v1.0.3.min.js"></script>
-    <script>
-        infiniteScroll()
 
-        // for mobile menu
-        $(function() {
-            $('.social-button').click(function() {
-                if ($('.social-links').hasClass('hide-links')) {
-                    $('.social-links').removeClass('hide-links')
-                } else {
-                    $('.social-links').addClass('hide-links')
-                }
-            })
-        })
-    </script>
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Objective-C," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="接着上篇文章我们现在把NSProxy应用到一个更实际的例子中，首先介绍一下ProtocolCourier是一款设计初衷为了简化一些遵守了很多协议而造成代码量大的类的中间件，他的目的是为了减少一些文件的代码量，把单独每个协议的代码抽离出来。接下来我们大致介绍一下如何实现这个”协议快递员”。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于NSProxy的中间件-ProtocolCourier">
+<meta property="og:url" content="http://yoursite.com/2017/05/14/ProtocolCourier/index.html">
+<meta property="og:site_name" content="Grommash">
+<meta property="og:description" content="接着上篇文章我们现在把NSProxy应用到一个更实际的例子中，首先介绍一下ProtocolCourier是一款设计初衷为了简化一些遵守了很多协议而造成代码量大的类的中间件，他的目的是为了减少一些文件的代码量，把单独每个协议的代码抽离出来。接下来我们大致介绍一下如何实现这个”协议快递员”。">
+<meta property="og:updated_time" content="2017-07-02T07:58:08.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="基于NSProxy的中间件-ProtocolCourier">
+<meta name="twitter:description" content="接着上篇文章我们现在把NSProxy应用到一个更实际的例子中，首先介绍一下ProtocolCourier是一款设计初衷为了简化一些遵守了很多协议而造成代码量大的类的中间件，他的目的是为了减少一些文件的代码量，把单独每个协议的代码抽离出来。接下来我们大致介绍一下如何实现这个”协议快递员”。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/05/14/ProtocolCourier/"/>
+
+
+
+
+
+  <title>基于NSProxy的中间件-ProtocolCourier | Grommash</title>
 </head>
 
-    <body style="background: url(http://osly086qe.bkt.clouddn.com/button-bg.png) #f3f3f3">
-        <div class="container">
-            <header class="header">
-    <h1 class="title">
-        <a href="/" class="logo">
-            Grommash
-        </a>
-    </h1>
-    <h2 class="desc">
-        null
-    </h2>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
-    <nav class="links">
-        <button class="social-button">
-            menu
-        </button>
-        <ul class="social-links hide-links">
-            
-                <li>
-                    <a href="https://github.com/FrontendSophie">
-                        Github
-                    </a>
-                </li>
-                
-                <li>
-                    <a href="https://www.linkedin.com/in/frontendsophie/">
-                        LinkedIn
-                    </a>
-                </li>
-                
-        </ul>
-    </nav>
-</header>
-                <main class="main">
-                    <article class="post">
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
     
-        <h4 class="post-cat">
-            <a href="/categories/技术/">
-                技术
-            </a>
-        </h4>
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Grommash</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
         
-            <h2 class="post-title">
-                基于NSProxy的中间件-ProtocolCourier
-            </h2>
-            <ul class="post-date">
-                <li>
-                    2017-05-14
-                </li>
-                <li>
-                    GuYi
-                </li>
-            </ul>
-            <div class="post-content">
-                <p>接着上篇文章我们现在把<code>NSProxy</code>应用到一个更实际的例子中，首先介绍一下<code>ProtocolCourier</code>是一款设计初衷为了简化一些遵守了很多协议而造成代码量大的类的中间件，他的目的是为了减少一些文件的代码量，把单独每个协议的代码抽离出来。接下来我们大致介绍一下如何实现这个”协议快递员”。</p>
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/14/ProtocolCourier/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="GuYi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Grommash">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">基于NSProxy的中间件-ProtocolCourier</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-14T21:33:10+08:00">
+                2017-05-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>接着上篇文章我们现在把<code>NSProxy</code>应用到一个更实际的例子中，首先介绍一下<code>ProtocolCourier</code>是一款设计初衷为了简化一些遵守了很多协议而造成代码量大的类的中间件，他的目的是为了减少一些文件的代码量，把单独每个协议的代码抽离出来。接下来我们大致介绍一下如何实现这个”协议快递员”。</p>
 <a id="more"></a>
 <h1 id="设计"><a href="#设计" class="headerlink" title="设计"></a>设计</h1><p>首先第一步我们需要设计一下到底怎么才能做到协议转发，他需要提供哪些接口，需要哪些参数。这里我的设计思路是每个 NSProxy 对象只遵守一个协议，他可以包装所有遵守这个协议或者这个协议所包含的其他协议(譬如 UITableViewDelegate 包含 UIScrollViewDelegate)的类，在实例化每个代理对象后作为例如 TabView 的 delegate  对象，从而起到转发这些代理方法的作用。因此我的头文件是这样定义的：</p>
 <figure class="highlight objectivec"><table><tr><td class="code"><pre><div class="line"><span class="meta">#define CreateProtocolCourier(__protocol__, ...) ((ProtocolCourier<span class="meta-string">&lt;__protocol__&gt;</span>*)[ProtocolCourier packageForProtocol:@protocol(__protocol__) withObjects:((NSArray *)[NSArray arrayWithObjects:__VA_ARGS__,nil])])</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">ProtocolCourier</span> : <span class="title">NSProxy</span></span></div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">strong</span>, <span class="keyword">readonly</span>) Protocol *protocol;</div><div class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">strong</span>, <span class="keyword">readonly</span>) <span class="built_in">NSArray</span> *attachedObjects;</div><div class="line"></div><div class="line">+ (<span class="keyword">instancetype</span>)packageForProtocol:(Protocol*)protocol withObjects:(<span class="built_in">NSArray</span>*)objects;</div><div class="line"></div><div class="line"><span class="keyword">@end</span></div></pre></td></tr></table></figure>
@@ -123,33 +393,380 @@
 <p>这里有个问题就是虽然我们这样确实是抽离了很多的 ViewController 的代码，但是很多情况下我们可能需要一些状态是 ViewController 和代理对象共享的，比如上述例子中的 offsetLabel，如果把这些需要共享的控件或者状态也通过 ProtocolCourier 传递过来我觉得有点多余了，所以我就是做了简单的对象赋值，可能不算优美，之后再考虑有没有别的好方法。另外还有一个问题不可避免的就是过度使用的话可能会造成一个”类爆炸”的情况，类太多了有时候可能阅读起来会比较费力，因此需要适当使用。当然了这只是个简单的实现，可能还不能具体应用到工程中，不过就当作学习理解消息转发这个过程吧。</p>
 <p>最后这个中间件的代码在<a href="https://github.com/gxq93/ProtocolCourier" target="_blank" rel="external">这里</a>。</p>
 
-            </div>
-</article>
-                </main>
-                <aside class="aside">
-                    <section class="aside-section">
-                        
-    <h1>Categories</h1>
+      
+    </div>
 
-    <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/技术/">技术</a></li></ul>
+    <div>
+      
+        
 
-                    </section>
-                    <section class="aside-section">
-                        
-    <h1>Archives</h1>
+      
+    </div>
 
-    <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017 . 07</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017 . 05</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017 . 02</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016 . 12</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016 . 11</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016 . 10</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016 . 09</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016 . 04</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016 . 03</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016 . 02</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015 . 12</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015 . 11</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015 . 09</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015 . 08</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015 . 07</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015 . 06</a></li></ul>
+    <div>
+      
+        
 
-                    </section>
-                    <section class="aside-section tag">
-                        
-    <h1>Tags</h1>
+      
+    </div>
 
-    <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CocoaPods/">CocoaPods</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/">Hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Objective-C/">Objective-C</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React-Native/">React Native</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Runtime/">Runtime</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Swift/">Swift</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebView/">WebView</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/响应式编程/">响应式编程</a></li></ul>
+    <div>
+      
+        
 
-                    </section>
-                </aside>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Objective-C/" rel="tag"># Objective-C</a>
+          
         </div>
-    </body>
+      
 
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/04/NSProxy/" rel="next" title="NSProxy浅谈">
+                <i class="fa fa-chevron-left"></i> NSProxy浅谈
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/02/ReactNative-gesture-conflict/" rel="prev" title="ReactNative与原生手势的冲突">
+                ReactNative与原生手势的冲突 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpeg"
+               alt="GuYi" />
+          <p class="site-author-name" itemprop="name">GuYi</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/gxq93" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#设计"><span class="nav-number">1.</span> <span class="nav-text">设计</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实现"><span class="nav-number">2.</span> <span class="nav-text">实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化"><span class="nav-number">2.1.</span> <span class="nav-text">初始化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#转发消息"><span class="nav-number">2.2.</span> <span class="nav-text">转发消息</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用"><span class="nav-number">3.</span> <span class="nav-text">使用</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">GuYi</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
 </html>
