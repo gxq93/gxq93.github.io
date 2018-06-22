@@ -1,371 +1,98 @@
-<!doctype html>
-
-
-
-  
-
-
-<html class="theme-next pisces use-motion" lang="zh-Hans">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-
-
-
-
-
-
-
-
-
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
-  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
-
-
-
-
-  
-  
-  
-  
-
-  
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+    <meta name="keywords" content="hexo, autumn">
+    <title>
+        Grommash
+    </title>
+    <!-- favicon -->
     
+    <link rel="icon" href="http://osly086qe.bkt.clouddn.com/favicon.ico">
     
-  
+    <link rel="stylesheet" href="/css/style.css">
 
-  
+    <!-- highlight -->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.12.0/styles/github-gist.min.css">
+    <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script>
+    <script>
+        hljs.initHighlightingOnLoad()
+    </script>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="http://osly086qe.bkt.clouddn.com/hexo-infinite-scroll-v1.0.1.min.css">
+    <script src="http://osly086qe.bkt.clouddn.com/hexo-infinite-scroll-v1.0.3.min.js"></script>
+    <script>
+        infiniteScroll()
 
-  
-
-  
-
-  
-
-  
-    
-    
-    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
-  
-
-
-
-
-
-
-<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
-
-<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
-
-
-  <meta name="keywords" content="Objective-C,响应式编程," />
-
-
-
-
-
-
-
-
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
-
-
-
-
-
-
-<meta name="description" content="Intro最近公司要求开发一个小应用“房贷计算器”来引流，由于要求需要一礼拜内完成开发上线，因此时间有点仓促所以没有仔细构思就开始开发了，所以其实很多地方设计的极其不合理，后期也懒得再修改维护了，就开源一下，有问题的地方看客看了笑笑就好。附上github地址响应式编程似乎很符合计算器的特点，因此项目导入了 ReactiveCocoa2.5 框架，接下来纪录一些自己对 RAC 的使用心得。">
-<meta property="og:type" content="article">
-<meta property="og:title" content="RAC使用心得">
-<meta property="og:url" content="http://yoursite.com/2016/09/08/opensource-houseloan/index.html">
-<meta property="og:site_name" content="Grommash">
-<meta property="og:description" content="Intro最近公司要求开发一个小应用“房贷计算器”来引流，由于要求需要一礼拜内完成开发上线，因此时间有点仓促所以没有仔细构思就开始开发了，所以其实很多地方设计的极其不合理，后期也懒得再修改维护了，就开源一下，有问题的地方看客看了笑笑就好。附上github地址响应式编程似乎很符合计算器的特点，因此项目导入了 ReactiveCocoa2.5 框架，接下来纪录一些自己对 RAC 的使用心得。">
-<meta property="og:image" content="http://yoursite.com/2016/09/08/opensource-houseloan/segment.png">
-<meta property="og:image" content="http://yoursite.com/2016/09/08/opensource-houseloan/pickView.png">
-<meta property="og:updated_time" content="2017-08-25T12:09:49.000Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="RAC使用心得">
-<meta name="twitter:description" content="Intro最近公司要求开发一个小应用“房贷计算器”来引流，由于要求需要一礼拜内完成开发上线，因此时间有点仓促所以没有仔细构思就开始开发了，所以其实很多地方设计的极其不合理，后期也懒得再修改维护了，就开源一下，有问题的地方看客看了笑笑就好。附上github地址响应式编程似乎很符合计算器的特点，因此项目导入了 ReactiveCocoa2.5 框架，接下来纪录一些自己对 RAC 的使用心得。">
-<meta name="twitter:image" content="http://yoursite.com/2016/09/08/opensource-houseloan/segment.png">
-
-
-
-<script type="text/javascript" id="hexo.configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    root: '/',
-    scheme: 'Pisces',
-    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
-    fancybox: true,
-    motion: true,
-    duoshuo: {
-      userId: '0',
-      author: '博主'
-    },
-    algolia: {
-      applicationID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    }
-  };
-</script>
-
-
-
-  <link rel="canonical" href="http://yoursite.com/2016/09/08/opensource-houseloan/"/>
-
-
-
-
-
-  <title>RAC使用心得 | Grommash</title>
+        // for mobile menu
+        $(function() {
+            $('.social-button').click(function() {
+                if ($('.social-links').hasClass('hide-links')) {
+                    $('.social-links').removeClass('hide-links')
+                } else {
+                    $('.social-links').addClass('hide-links')
+                }
+            })
+        })
+    </script>
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+    <body style="background: url(http://osly086qe.bkt.clouddn.com/button-bg.png) #f3f3f3">
+        <div class="container">
+            <header class="header">
+    <h1 class="title">
+        <a href="/" class="logo">
+            Grommash
+        </a>
+    </h1>
+    <h2 class="desc">
+        null
+    </h2>
 
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
-    
-  
-
-  <div class="container sidebar-position-left page-post-detail ">
-    <div class="headband"></div>
-
-    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-wrapper">
-  <div class="site-meta ">
-    
-
-    <div class="custom-logo-site-title">
-      <a href="/"  class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Grommash</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
-    </div>
-      
-        <p class="site-subtitle"></p>
-      
-  </div>
-
-  <div class="site-nav-toggle">
-    <button>
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-    </button>
-  </div>
-</div>
-
-<nav class="site-nav">
-  
-
-  
-    <ul id="menu" class="menu">
-      
-        
-        <li class="menu-item menu-item-home">
-          <a href="/" rel="section">
+    <nav class="links">
+        <button class="social-button">
+            menu
+        </button>
+        <ul class="social-links hide-links">
             
-              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
-            
-            首页
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-archives">
-          <a href="/archives/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
-            
-            归档
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-categories">
-          <a href="/categories/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
-            
-            分类
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-tags">
-          <a href="/tags/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
-            
-            标签
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-about">
-          <a href="/about/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
-            
-            关于
-          </a>
-        </li>
-      
-
-      
-    </ul>
-  
-
-  
-</nav>
-
-
-
- </div>
-    </header>
-
-    <main id="main" class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          <div id="content" class="content">
-            
-
-  <div id="posts" class="posts-expand">
-    
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/09/08/opensource-houseloan/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="GuYi">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/uploads/avatar.jpeg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Grommash">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">RAC使用心得</h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-09-08T13:46:24+08:00">
-                2016-09-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/技术/" itemprop="url" rel="index">
-                    <span itemprop="name">技术</span>
-                  </a>
-                </span>
-
+                <li>
+                    <a href="https://github.com/FrontendSophie">
+                        Github
+                    </a>
+                </li>
                 
+                <li>
+                    <a href="https://www.linkedin.com/in/frontendsophie/">
+                        LinkedIn
+                    </a>
+                </li>
                 
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
+        </ul>
+    </nav>
+</header>
+                <main class="main">
+                    <article class="post">
     
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        <h1 id="Intro"><a href="#Intro" class="headerlink" title="Intro"></a>Intro</h1><p>最近公司要求开发一个小应用“房贷计算器”来引流，由于要求需要一礼拜内完成开发上线，因此时间有点仓促所以没有仔细构思就开始开发了，所以其实很多地方设计的极其不合理，后期也懒得再修改维护了，就开源一下，有问题的地方看客看了笑笑就好。附上<a href="https://github.com/gxq93/HouseloanCalculator" target="_blank" rel="external">github地址</a><br>响应式编程似乎很符合计算器的特点，因此项目导入了 ReactiveCocoa2.5 框架，接下来纪录一些自己对 RAC 的使用心得。</p>
+        <h4 class="post-cat">
+            <a href="/categories/技术/">
+                技术
+            </a>
+        </h4>
+        
+            <h2 class="post-title">
+                RAC使用心得
+            </h2>
+            <ul class="post-date">
+                <li>
+                    2016-09-08
+                </li>
+                <li>
+                    GuYi
+                </li>
+            </ul>
+            <div class="post-content">
+                <h1 id="Intro"><a href="#Intro" class="headerlink" title="Intro"></a>Intro</h1><p>最近公司要求开发一个小应用“房贷计算器”来引流，由于要求需要一礼拜内完成开发上线，因此时间有点仓促所以没有仔细构思就开始开发了，所以其实很多地方设计的极其不合理，后期也懒得再修改维护了，就开源一下，有问题的地方看客看了笑笑就好。附上<a href="https://github.com/gxq93/HouseloanCalculator" target="_blank" rel="external">github地址</a><br>响应式编程似乎很符合计算器的特点，因此项目导入了 ReactiveCocoa2.5 框架，接下来纪录一些自己对 RAC 的使用心得。</p>
 <a id="more"></a>
 <h1 id="Tip1-RACCommand传达信号"><a href="#Tip1-RACCommand传达信号" class="headerlink" title="Tip1 RACCommand传达信号"></a>Tip1 RACCommand传达信号</h1><p>当要做如下图的小组件时，我个人的做法是放三个 button 上去，最后暴露出一个<code>signal</code>，每当点击到其中一个 button 时，把 index 发送出来。其实如果不用 RAC 的套路做，只要写个代理方法或者 block 就能很好的完成需求，但是既然要用 RAC，就要按照响应式的思路来。</p>
 <img src="/2016/09/08/opensource-houseloan/segment.png" alt="segment.png" title="">
@@ -386,389 +113,33 @@
 <h1 id="Tip5-重复订阅问题"><a href="#Tip5-重复订阅问题" class="headerlink" title="Tip5 重复订阅问题"></a>Tip5 重复订阅问题</h1><p>其实整个项目最失败最蠢的设计就是我把每个 cell 上的信号 combine 在了一起从而进行计算。。。其实这是非常不合理的，因为不显示在屏幕上的 cell 都是懒加载的所以我就必须很蠢的把所有 cell 都加载到才能进行计算，这种设计是极不规范的，但是因为刚开始已经开始做了，并且没有时间修改了，所以只能将错就错。<strong>其实应该让计算从一个数据源去取，而让 cell 和数据源绑定在一起</strong>。<br>而因为我这不合理的设计，导致了我的信号订阅得在 tableView 创建的方法中执行，而这个方法众所周知是不停调用的，这就导致了重复订阅的问题，而我想出来的方法是定义一个全局的 disposable 对象<code>@property(nonatomic,strong)RACDisposable *caculateDisposable;</code>，在每次调用方法开始时先取消之前的订阅再次进行订阅。<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="keyword">if</span> (<span class="keyword">self</span>.caculateDisposable) &#123;</div><div class="line">    [<span class="keyword">self</span>.caculateDisposable dispose];</div><div class="line">&#125;</div><div class="line">@weakify(<span class="keyword">self</span>)</div><div class="line"><span class="keyword">self</span>.caculateDisposable = [[RACSignal combineLatest:<span class="keyword">self</span>.signalArray] subscribeNext:^(RACTuple *tuple) &#123;</div><div class="line">    @strongify(<span class="keyword">self</span>)</div><div class="line">    HCHeaderCell *headerCell = (HCHeaderCell*)tableView.visibleCells[<span class="number">0</span>];</div><div class="line">    [headerCell configCellContentWithRACTuple:tuple withType:<span class="keyword">self</span>.loadnType];</div><div class="line">&#125;];</div></pre></td></tr></table></figure></p>
 <p>看着就很别扭，但是暂时就这样吧。</p>
 
-      
-    </div>
-
-    <div>
-      
-        
-
-      
-    </div>
-
-    <div>
-      
-        
-
-      
-    </div>
-
-    <div>
-      
-        
-
-      
-    </div>
-
-    <footer class="post-footer">
-      
-        <div class="post-tags">
-          
-            <a href="/tags/Objective-C/" rel="tag"># Objective-C</a>
-          
-            <a href="/tags/响应式编程/" rel="tag"># 响应式编程</a>
-          
-        </div>
-      
-
-      
-      
-      
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/2016/04/13/link-programming-in-Objective-C/" rel="next" title="Link Programming in Objective-C">
-                <i class="fa fa-chevron-left"></i> Link Programming in Objective-C
-              </a>
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/09/30/CocoaPods-Swift3/" rel="prev" title="CocoaPods Trunk上传Swift3.0项目">
-                CocoaPods Trunk上传Swift3.0项目 <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
-      
-
-      
-      
-    </footer>
-  </article>
-
-
-
-    <div class="post-spread">
-      
-    </div>
-  </div>
-
-
-          </div>
-          
-
-
-          
-  <div class="comments" id="comments">
-    
-  </div>
-
-
-        </div>
-        
-          
-  
-  <div class="sidebar-toggle">
-    <div class="sidebar-toggle-line-wrap">
-      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
-    </div>
-  </div>
-
-  <aside id="sidebar" class="sidebar">
-    <div class="sidebar-inner">
-
-      
-
-      
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview">
-            站点概览
-          </li>
-        </ul>
-      
-
-      <section class="site-overview sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-          <img class="site-author-image" itemprop="image"
-               src="/uploads/avatar.jpeg"
-               alt="GuYi" />
-          <p class="site-author-name" itemprop="name">GuYi</p>
-           
-              <p class="site-description motion-element" itemprop="description"></p>
-          
-        </div>
-        <nav class="site-state motion-element">
-
-          
-            <div class="site-state-item site-state-posts">
-              <a href="/archives/">
-                <span class="site-state-item-count">20</span>
-                <span class="site-state-item-name">日志</span>
-              </a>
             </div>
-          
+</article>
+                </main>
+                <aside class="aside">
+                    <section class="aside-section">
+                        
+    <h1>Categories</h1>
 
-          
-            
-            
-            <div class="site-state-item site-state-categories">
-              <a href="/categories/index.html">
-                <span class="site-state-item-count">1</span>
-                <span class="site-state-item-name">分类</span>
-              </a>
-            </div>
-          
+    <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/技术/">技术</a></li></ul>
 
-          
-            
-            
-            <div class="site-state-item site-state-tags">
-              <a href="/tags/index.html">
-                <span class="site-state-item-count">9</span>
-                <span class="site-state-item-name">标签</span>
-              </a>
-            </div>
-          
+                    </section>
+                    <section class="aside-section">
+                        
+    <h1>Archives</h1>
 
-        </nav>
+    <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017 . 07</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017 . 05</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017 . 02</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016 . 12</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016 . 11</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016 . 10</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016 . 09</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016 . 04</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016 . 03</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016 . 02</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015 . 12</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015 . 11</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015 . 09</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015 . 08</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015 . 07</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015 . 06</a></li></ul>
 
-        
+                    </section>
+                    <section class="aside-section tag">
+                        
+    <h1>Tags</h1>
 
-        <div class="links-of-author motion-element">
-          
-            
-              <span class="links-of-author-item">
-                <a href="https://github.com/gxq93" target="_blank" title="GitHub">
-                  
-                    <i class="fa fa-fw fa-github"></i>
-                  
-                  GitHub
-                </a>
-              </span>
-            
-          
+    <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CocoaPods/">CocoaPods</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/">Hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Objective-C/">Objective-C</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React-Native/">React Native</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Runtime/">Runtime</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Swift/">Swift</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebView/">WebView</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/响应式编程/">响应式编程</a></li></ul>
+
+                    </section>
+                </aside>
         </div>
+    </body>
 
-        
-        
-
-        
-        
-
-        
-
-
-      </section>
-
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Intro"><span class="nav-number">1.</span> <span class="nav-text">Intro</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Tip1-RACCommand传达信号"><span class="nav-number">2.</span> <span class="nav-text">Tip1 RACCommand传达信号</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Tip2-rac-sequence的线程问题"><span class="nav-number">3.</span> <span class="nav-text">Tip2 rac_sequence的线程问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Tip3-RACCommand代替acticon"><span class="nav-number">4.</span> <span class="nav-text">Tip3 RACCommand代替acticon</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Tip4-协议信号注意点"><span class="nav-number">5.</span> <span class="nav-text">Tip4 协议信号注意点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Tip5-重复订阅问题"><span class="nav-number">6.</span> <span class="nav-text">Tip5 重复订阅问题</span></a></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
-      
-
-      
-
-    </div>
-  </aside>
-
-
-        
-      </div>
-    </main>
-
-    <footer id="footer" class="footer">
-      <div class="footer-inner">
-        <div class="copyright" >
-  
-  &copy;  2015 - 
-  <span itemprop="copyrightYear">2017</span>
-  <span class="with-love">
-    <i class="fa fa-heart"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">GuYi</span>
-</div>
-
-
-<div class="powered-by">
-  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
-</div>
-
-<div class="theme-info">
-  主题 -
-  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
-    NexT.Pisces
-  </a>
-</div>
-
-
-        
-
-        
-      </div>
-    </footer>
-
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
-    
-
-  </div>
-
-  
-
-<script type="text/javascript">
-  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
-    window.Promise = null;
-  }
-</script>
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
-
-  
-  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
-
-  
-  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
-
-  
-  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
-
-  
-  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
-
-  
-  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
-
-
-  
-
-
-  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
-
-  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
-
-
-
-  
-  
-
-
-  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
-
-  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
-
-
-
-  
-  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
-<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
-
-
-
-  
-
-
-  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
-
-
-
-  
-
-
-  
-
-
-
-
-	
-
-
-
-
-
-  
-
-
-
-
-
-  
-
-
-
-
-
-  
-
-
-
-
-
-
-  
-
-
-
-
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-</body>
 </html>

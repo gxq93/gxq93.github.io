@@ -1,844 +1,386 @@
-<!doctype html>
-
-
-
-  
-
-
-<html class="theme-next pisces use-motion" lang="zh-Hans">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-
-
-
-
-
-
-
-
-
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
-  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
-
-
-
-
-  
-  
-  
-  
-
-  
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+    <meta name="keywords" content="hexo, autumn">
+    <title>
+        Grommash
+    </title>
+    <!-- favicon -->
     
+    <link rel="icon" href="http://osly086qe.bkt.clouddn.com/favicon.ico">
     
-  
+    <link rel="stylesheet" href="/css/style.css">
 
-  
+    <!-- highlight -->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/highlight.js/9.12.0/styles/github-gist.min.css">
+    <script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script>
+    <script>
+        hljs.initHighlightingOnLoad()
+    </script>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="http://osly086qe.bkt.clouddn.com/hexo-infinite-scroll-v1.0.1.min.css">
+    <script src="http://osly086qe.bkt.clouddn.com/hexo-infinite-scroll-v1.0.3.min.js"></script>
+    <script>
+        infiniteScroll()
 
-  
-
-  
-
-  
-
-  
-    
-    
-    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
-  
-
-
-
-
-
-
-<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
-
-<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
-
-
-  <meta name="keywords" content="Hello World" />
-
-
-
-
-
-
-
-
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
-
-
-
-
-
-
-<meta property="og:type" content="website">
-<meta property="og:title" content="Grommash">
-<meta property="og:url" content="http://yoursite.com/categories/技术/page/2/index.html">
-<meta property="og:site_name" content="Grommash">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Grommash">
-
-
-
-<script type="text/javascript" id="hexo.configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    root: '/',
-    scheme: 'Pisces',
-    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
-    fancybox: true,
-    motion: true,
-    duoshuo: {
-      userId: '0',
-      author: '博主'
-    },
-    algolia: {
-      applicationID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    }
-  };
-</script>
-
-
-
-  <link rel="canonical" href="http://yoursite.com/categories/技术/page/2/"/>
-
-
-
-
-
-  <title>分类: 技术 | Grommash</title>
+        // for mobile menu
+        $(function() {
+            $('.social-button').click(function() {
+                if ($('.social-links').hasClass('hide-links')) {
+                    $('.social-links').removeClass('hide-links')
+                } else {
+                    $('.social-links').addClass('hide-links')
+                }
+            })
+        })
+    </script>
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+    <body style="background: url(http://osly086qe.bkt.clouddn.com/button-bg.png) #f3f3f3">
+        <div class="container">
+            <header class="header">
+    <h1 class="title">
+        <a href="/" class="logo">
+            Grommash
+        </a>
+    </h1>
+    <h2 class="desc">
+        null
+    </h2>
 
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
-    
-  
-
-  <div class="container sidebar-position-left  ">
-    <div class="headband"></div>
-
-    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-wrapper">
-  <div class="site-meta ">
-    
-
-    <div class="custom-logo-site-title">
-      <a href="/"  class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Grommash</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
-    </div>
-      
-        <p class="site-subtitle"></p>
-      
-  </div>
-
-  <div class="site-nav-toggle">
-    <button>
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-    </button>
-  </div>
-</div>
-
-<nav class="site-nav">
-  
-
-  
-    <ul id="menu" class="menu">
-      
-        
-        <li class="menu-item menu-item-home">
-          <a href="/" rel="section">
+    <nav class="links">
+        <button class="social-button">
+            menu
+        </button>
+        <ul class="social-links hide-links">
             
-              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+                <li>
+                    <a href="https://github.com/FrontendSophie">
+                        Github
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="https://www.linkedin.com/in/frontendsophie/">
+                        LinkedIn
+                    </a>
+                </li>
+                
+        </ul>
+    </nav>
+</header>
+                <main class="main">
+                    <section class="posts">
+    
+        <article class="post">
             
-            首页
-          </a>
-        </li>
-      
+                <h4 class="post-cat">
+                    <a href="/categories/技术/">
+                        技术
+                    </a>
+                </h4>
+                
+                    <h1 class="post-title">
+                        <a href="/2016/04/13/link-programming-in-Objective-C/">
+                            Link Programming in Objective-C
+                        </a>
+                    </h1>
+
+                    <ul class="post-date">
+                        <li>
+                            April 13, 2016
+                        </li>
+                        <li>
+                            GuYi
+                        </li>
+                    </ul>
+                    <div class="post-content ">
+                        <p>在oc中方法的调用大部分都是通过<code>[ ]</code>，这与其他很多语言有很大的差异，而有些开发框架如<code>Masonry</code>则采用了链式编程的思想，这大大增加了代码的可读性和简洁性。今天有空就对这种思想简单的实践一下。</p>
+                            <a href="/2016/04/13/link-programming-in-Objective-C/" class="more-link">Continue reading</a>
+                    </div>
+        </article>
         
-        <li class="menu-item menu-item-archives">
-          <a href="/archives/" rel="section">
+        <article class="post">
             
-              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+                <h4 class="post-cat">
+                    <a href="/categories/技术/">
+                        技术
+                    </a>
+                </h4>
+                
+                    <h1 class="post-title">
+                        <a href="/2016/03/23/thread-lock/">
+                            线程锁在iOS中的应用
+                        </a>
+                    </h1>
+
+                    <ul class="post-date">
+                        <li>
+                            March 23, 2016
+                        </li>
+                        <li>
+                            GuYi
+                        </li>
+                    </ul>
+                    <div class="post-content ">
+                        <p>在项目中做到线程安全是十分重要的事情，有时候简单的上个线程锁就能很好的完成需求，而给线程上锁的方法有很多，本文大致介绍了几种线程锁的使用。</p>
+                            <a href="/2016/03/23/thread-lock/" class="more-link">Continue reading</a>
+                    </div>
+        </article>
+        
+        <article class="post">
             
-            归档
-          </a>
-        </li>
-      
+                <h4 class="post-cat">
+                    <a href="/categories/技术/">
+                        技术
+                    </a>
+                </h4>
+                
+                    <h1 class="post-title">
+                        <a href="/2016/02/04/WKWebView-Tips/">
+                            WKWebView使用注意事项
+                        </a>
+                    </h1>
+
+                    <ul class="post-date">
+                        <li>
+                            February 4, 2016
+                        </li>
+                        <li>
+                            GuYi
+                        </li>
+                    </ul>
+                    <div class="post-content ">
+                        <p>WKWebView 是现代 WebKit API 在 iOS8 和 OS X Yosemite 应用中的核心部分。它代替了 UIKit 中的 UIWebView 和 AppKit 中的 WebView，提供了统一的跨双平台 API。他自诩拥有 60fps 滚动刷新率、内置手势、高效的 app 和 web 信息交换通道、和 Safari 相同的 JavaScript 引擎，而其将 UIWebViewDelegate 与 UIWebView 重构成了14类与3个协议</p>
+<p>本文记录了一些 WKWebView 使用的相关注意事项</p>
+                            <a href="/2016/02/04/WKWebView-Tips/" class="more-link">Continue reading</a>
+                    </div>
+        </article>
         
-        <li class="menu-item menu-item-categories">
-          <a href="/categories/" rel="section">
+        <article class="post">
             
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+                <h4 class="post-cat">
+                    <a href="/categories/技术/">
+                        技术
+                    </a>
+                </h4>
+                
+                    <h1 class="post-title">
+                        <a href="/2015/12/28/runtime-6/">
+                            Objective-C内部实现浅谈-KVC和KVO
+                        </a>
+                    </h1>
+
+                    <ul class="post-date">
+                        <li>
+                            December 28, 2015
+                        </li>
+                        <li>
+                            GuYi
+                        </li>
+                    </ul>
+                    <div class="post-content ">
+                        <p>本文主要介绍了 KVC 和 KVO 相关的内部实现。</p>
+                            <a href="/2015/12/28/runtime-6/" class="more-link">Continue reading</a>
+                    </div>
+        </article>
+        
+        <article class="post">
             
-            分类
-          </a>
-        </li>
-      
+                <h4 class="post-cat">
+                    <a href="/categories/技术/">
+                        技术
+                    </a>
+                </h4>
+                
+                    <h1 class="post-title">
+                        <a href="/2015/11/26/runtime-5/">
+                            Objective-C内部实现浅谈-通知
+                        </a>
+                    </h1>
+
+                    <ul class="post-date">
+                        <li>
+                            November 26, 2015
+                        </li>
+                        <li>
+                            GuYi
+                        </li>
+                    </ul>
+                    <div class="post-content ">
+                        <h1 id="简述"><a href="#简述" class="headerlink" title="简述"></a>简述</h1><p>对于 NSNotification 的实现，苹果并没有公布，但是既然是基于观察者模式实现的，除去优化的问题，大致也可以用 block 来进行通信实现。本文大致模拟了通知的实现。</p>
+                            <a href="/2015/11/26/runtime-5/" class="more-link">Continue reading</a>
+                    </div>
+        </article>
         
-        <li class="menu-item menu-item-tags">
-          <a href="/tags/" rel="section">
+        <article class="post">
             
-              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+                <h4 class="post-cat">
+                    <a href="/categories/技术/">
+                        技术
+                    </a>
+                </h4>
+                
+                    <h1 class="post-title">
+                        <a href="/2015/09/04/runtime-4/">
+                            Objective-C内部实现浅谈-协议和类目
+                        </a>
+                    </h1>
+
+                    <ul class="post-date">
+                        <li>
+                            September 4, 2015
+                        </li>
+                        <li>
+                            GuYi
+                        </li>
+                    </ul>
+                    <div class="post-content ">
+                        <p>本文主要介绍了 runtime 中协议和类目内部相关的实现。</p>
+                            <a href="/2015/09/04/runtime-4/" class="more-link">Continue reading</a>
+                    </div>
+        </article>
+        
+        <article class="post">
             
-            标签
-          </a>
-        </li>
-      
+                <h4 class="post-cat">
+                    <a href="/categories/技术/">
+                        技术
+                    </a>
+                </h4>
+                
+                    <h1 class="post-title">
+                        <a href="/2015/08/22/runtime-3/">
+                            Objective-C内部实现浅谈-Block
+                        </a>
+                    </h1>
+
+                    <ul class="post-date">
+                        <li>
+                            August 22, 2015
+                        </li>
+                        <li>
+                            GuYi
+                        </li>
+                    </ul>
+                    <div class="post-content ">
+                        <h1 id="Block"><a href="#Block" class="headerlink" title="Block"></a>Block</h1><p>在 OC 中闭包的语法看上去特别别扭，但他实际上是作为最普通的 C 语言源代码来处理的，在实际编译时无法转换成我们能够理解的源代码，因此通过 clang (LLVM 编译器)先将代码进行转化成 C++ 代码。在这里我们将能看到我们想要的信息。接下去本文主要介绍一下 block 的实现原理。</p>
+                            <a href="/2015/08/22/runtime-3/" class="more-link">Continue reading</a>
+                    </div>
+        </article>
         
-        <li class="menu-item menu-item-about">
-          <a href="/about/" rel="section">
+        <article class="post">
             
-              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+                <h4 class="post-cat">
+                    <a href="/categories/技术/">
+                        技术
+                    </a>
+                </h4>
+                
+                    <h1 class="post-title">
+                        <a href="/2015/08/06/runtime-2/">
+                            Objective-C内部实现浅谈-方法
+                        </a>
+                    </h1>
+
+                    <ul class="post-date">
+                        <li>
+                            August 6, 2015
+                        </li>
+                        <li>
+                            GuYi
+                        </li>
+                    </ul>
+                    <div class="post-content ">
+                        <h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><p>Objective-C 最重要的一个特性就是“消息传递”，消息有名称(name)和选择器(selector)，可以接受参数并可能有返回值。本文主要介绍了消息传递的一些原理。</p>
+                            <a href="/2015/08/06/runtime-2/" class="more-link">Continue reading</a>
+                    </div>
+        </article>
+        
+        <article class="post">
             
-            关于
-          </a>
-        </li>
-      
+                <h4 class="post-cat">
+                    <a href="/categories/技术/">
+                        技术
+                    </a>
+                </h4>
+                
+                    <h1 class="post-title">
+                        <a href="/2015/07/13/runtime-1/">
+                            Objective-C内部实现浅谈-类和对象
+                        </a>
+                    </h1>
 
-      
-    </ul>
-  
-
-  
-</nav>
-
-
-
- </div>
-    </header>
-
-    <main id="main" class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          <div id="content" class="content">
+                    <ul class="post-date">
+                        <li>
+                            July 13, 2015
+                        </li>
+                        <li>
+                            GuYi
+                        </li>
+                    </ul>
+                    <div class="post-content ">
+                        <p>这篇文章主要介绍了 runtime 中对象和类所扮演的角色。</p>
+                            <a href="/2015/07/13/runtime-1/" class="more-link">Continue reading</a>
+                    </div>
+        </article>
+        
+        <article class="post">
             
+                <h4 class="post-cat">
+                    <a href="/categories/技术/">
+                        技术
+                    </a>
+                </h4>
+                
+                    <h1 class="post-title">
+                        <a href="/2015/06/07/Intro/">
+                            基于Hexo的个人博客
+                        </a>
+                    </h1>
 
-  <section id="posts" class="posts-collapse">
-    <div class="collection-title">
-      <h1>技术<small>分类</small>
-      </h1>
-    </div>
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
+                    <ul class="post-date">
+                        <li>
+                            June 7, 2015
+                        </li>
+                        <li>
+                            GuYi
+                        </li>
+                    </ul>
+                    <div class="post-content ">
+                        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在硬盘进水丢了所有博客的文章之后终于又折腾回来了！想想似乎从 Jkyll 到 Octopress 再到 Hexo 已经搭了三次环境了，每次步骤还得再去网上查，这次干脆就把流程也记一下，防止以后忘记了。</p>
+                            <a href="/2015/06/07/Intro/" class="more-link">Continue reading</a>
+                    </div>
+        </article>
         
-            <a class="post-title-link" href="/2016/04/13/link-programming-in-Objective-C/" itemprop="url">
-              
-                <span itemprop="name">Link Programming in Objective-C</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-04-13T13:34:02+08:00"
-              content="2016-04-13" >
-          04-13
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2016/03/23/thread-lock/" itemprop="url">
-              
-                <span itemprop="name">线程锁在iOS中的应用</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-03-23T13:18:04+08:00"
-              content="2016-03-23" >
-          03-23
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2016/02/04/WKWebView-Tips/" itemprop="url">
-              
-                <span itemprop="name">WKWebView使用注意事项</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2016-02-04T13:00:14+08:00"
-              content="2016-02-04" >
-          02-04
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2015/12/28/runtime-6/" itemprop="url">
-              
-                <span itemprop="name">Objective-C内部实现浅谈-KVC和KVO</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2015-12-28T15:46:58+08:00"
-              content="2015-12-28" >
-          12-28
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2015/11/26/runtime-5/" itemprop="url">
-              
-                <span itemprop="name">Objective-C内部实现浅谈-通知</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2015-11-26T15:46:53+08:00"
-              content="2015-11-26" >
-          11-26
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2015/09/04/runtime-4/" itemprop="url">
-              
-                <span itemprop="name">Objective-C内部实现浅谈-协议和类目</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2015-09-04T15:32:45+08:00"
-              content="2015-09-04" >
-          09-04
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2015/08/22/runtime-3/" itemprop="url">
-              
-                <span itemprop="name">Objective-C内部实现浅谈-Block</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2015-08-22T11:05:55+08:00"
-              content="2015-08-22" >
-          08-22
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2015/08/06/runtime-2/" itemprop="url">
-              
-                <span itemprop="name">Objective-C内部实现浅谈-方法</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2015-08-06T10:47:11+08:00"
-              content="2015-08-06" >
-          08-06
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2015/07/13/runtime-1/" itemprop="url">
-              
-                <span itemprop="name">Objective-C内部实现浅谈-类和对象</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2015-07-13T10:32:00+08:00"
-              content="2015-07-13" >
-          07-13
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2015/06/07/Intro/" itemprop="url">
-              
-                <span itemprop="name">基于Hexo的个人博客</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2015-06-07T10:57:51+08:00"
-              content="2015-06-07" >
-          06-07
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-    
-  </section>
-
-  
-  <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/categories/技术/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/categories/技术/">1</a><span class="page-number current">2</span>
-  </nav>
-
-
-
-
-          </div>
-          
-
-
-          
-
+</section>
+                </main>
+                <aside class="aside">
+                    <section class="aside-section">
+                        
+    <h1>Categories</h1>
+
+    <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/技术/">技术</a></li></ul>
+
+                    </section>
+                    <section class="aside-section">
+                        
+    <h1>Archives</h1>
+
+    <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017 . 07</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017 . 05</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/">2017 . 02</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016 . 12</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016 . 11</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016 . 10</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016 . 09</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016 . 04</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016 . 03</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016 . 02</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015 . 12</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015 . 11</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015 . 09</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015 . 08</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015 . 07</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/">2015 . 06</a></li></ul>
+
+                    </section>
+                    <section class="aside-section tag">
+                        
+    <h1>Tags</h1>
+
+    <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CocoaPods/">CocoaPods</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/">Hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Objective-C/">Objective-C</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/React-Native/">React Native</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Runtime/">Runtime</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Swift/">Swift</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebView/">WebView</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/响应式编程/">响应式编程</a></li></ul>
+
+                    </section>
+                </aside>
         </div>
-        
-          
-  
-  <div class="sidebar-toggle">
-    <div class="sidebar-toggle-line-wrap">
-      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
-    </div>
-  </div>
+    </body>
 
-  <aside id="sidebar" class="sidebar">
-    <div class="sidebar-inner">
-
-      
-
-      
-
-      <section class="site-overview sidebar-panel sidebar-panel-active">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-          <img class="site-author-image" itemprop="image"
-               src="/uploads/avatar.jpeg"
-               alt="GuYi" />
-          <p class="site-author-name" itemprop="name">GuYi</p>
-           
-              <p class="site-description motion-element" itemprop="description"></p>
-          
-        </div>
-        <nav class="site-state motion-element">
-
-          
-            <div class="site-state-item site-state-posts">
-              <a href="/archives/">
-                <span class="site-state-item-count">20</span>
-                <span class="site-state-item-name">日志</span>
-              </a>
-            </div>
-          
-
-          
-            
-            
-            <div class="site-state-item site-state-categories">
-              <a href="/categories/index.html">
-                <span class="site-state-item-count">1</span>
-                <span class="site-state-item-name">分类</span>
-              </a>
-            </div>
-          
-
-          
-            
-            
-            <div class="site-state-item site-state-tags">
-              <a href="/tags/index.html">
-                <span class="site-state-item-count">9</span>
-                <span class="site-state-item-name">标签</span>
-              </a>
-            </div>
-          
-
-        </nav>
-
-        
-
-        <div class="links-of-author motion-element">
-          
-            
-              <span class="links-of-author-item">
-                <a href="https://github.com/gxq93" target="_blank" title="GitHub">
-                  
-                    <i class="fa fa-fw fa-github"></i>
-                  
-                  GitHub
-                </a>
-              </span>
-            
-          
-        </div>
-
-        
-        
-
-        
-        
-
-        
-
-
-      </section>
-
-      
-
-      
-
-    </div>
-  </aside>
-
-
-        
-      </div>
-    </main>
-
-    <footer id="footer" class="footer">
-      <div class="footer-inner">
-        <div class="copyright" >
-  
-  &copy;  2015 - 
-  <span itemprop="copyrightYear">2017</span>
-  <span class="with-love">
-    <i class="fa fa-heart"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">GuYi</span>
-</div>
-
-
-<div class="powered-by">
-  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
-</div>
-
-<div class="theme-info">
-  主题 -
-  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
-    NexT.Pisces
-  </a>
-</div>
-
-
-        
-
-        
-      </div>
-    </footer>
-
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
-    
-
-  </div>
-
-  
-
-<script type="text/javascript">
-  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
-    window.Promise = null;
-  }
-</script>
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
-
-  
-  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
-
-  
-  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
-
-  
-  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
-
-  
-  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
-
-  
-  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
-
-
-  
-
-
-  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
-
-  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
-
-
-
-  
-  
-
-
-  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
-
-  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
-
-
-
-  
-    <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
-<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
-
-  
-
-  
-
-
-  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
-
-
-
-  
-
-
-  
-
-
-
-
-	
-
-
-
-
-
-  
-
-
-
-
-
-  
-
-
-
-
-
-  
-
-
-
-
-
-
-  
-
-
-
-
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-</body>
 </html>
