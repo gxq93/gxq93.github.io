@@ -1,0 +1,164 @@
+---
+title: appium实践
+date: 2018-07-22 14:45:58
+tags:
+---
+
+# 前言
+前段时间公司要求推动落地自动化 UI 测试，因此按照老板的需求调研了市面上的 UI 自动化测试框架，最后选择了 facebook 的``appium``作为我们业务线使用的自动化测试框架，这篇文章并不是介绍 appium 的使用姿势及原理，而是主要介绍一下个人设计的结合公司业务的自动化测试工程，后续可能还会再写一篇 appium 的使用及原理。
+
+<!--more-->
+
+# Retail-UI-auto
+## Requirements
+首先使用
+``` nodejs
+appium-doctor
+```
+检查一遍 appium 的安装环境。
+
+这个工程是基于 nodejs 环境搭建，因此搭过 appium 环境之后就不需要什么多余操作了，只需要再安装一个 node 的测试框架 ``mocha`` 即可：
+``` nodejs
+npm install --global mocha
+```
+
+## Get started
+clone 工程后执行
+``` nodejs
+npm install
+```
+安装相关三方依赖，如果想使用相应提供的 CLI 工具，可以执行
+``` nodejs
+npm link
+```
+由于此工程暂时还没有做成 npm 包，因此暂时先使用 link 的方式将 bin 链接到全局执行环境，接着就可以使用 ``retail-auto``这个命令来执行我们的测试用例了。
+
+可以使用
+``` nodejs
+retail-auto --help
+```
+来查看 ``retail-auto``支持的参数
+
+{% asset_img help.png %}
+
+介绍完我们的 CLI 工具后，我们来看看如何编写我们的测试用例。
+
+首先在``cases``目录下创建并编写我们的 case 文件
+``` js
+const {
+  setup,
+  driver
+} = require("../config/setup")
+
+const xpath = require("../config/xpath")
+
+describe("开单交易自动化测试", function () {
+
+    setup();
+
+    it("应该点到商品tab", function () {
+      return driver
+        .elementByXPath(xpath.button("商品"))
+        .click()
+        .sleep(1000)
+        .pointAt({x: 466, y: 230})
+        .elementByXPath(xpath.button("收款"))
+        .click()
+        .sleep(2000)
+        .elementByXPath(xpath.button("现金支付"))
+        .click()
+        .elementByXPath(xpath.button("8"))
+        .click()
+        .elementByXPath(xpath.button("0"))
+        .click()
+        .elementByXPath(xpath.button("xxxxx"))
+        .click()
+        .sleep(1000)
+     });
+});
+
+```
+所有测试用例的配置逻辑都交给``config/setup.js``来处理了，在我们的 case 中只需要调用
+``setupConfig()``这个函数即可。当然你也可以不使用默认的配置逻辑，自己实现，但是并没有太大的必要，因为我们提供了两种方法来帮你灵活进行配置并运行测试脚本：
+
+**方法一**：在 ``setup.js``中提供了默认的 capability 的配置
+
+``` js 
+//-----------------修改配置------------------
+var serverConfig = servers.local;
+var appConfig = caps.iPadConfig;
+var app = apps.iPad180;
+//------------------------------------------
+```
+
+你可以手动修改它，然后只要直接运行
+
+``` shell
+retail-auto --case xxx
+```
+
+即可（PS：case 不需要指定路径名，比如``/cases/ios-login.js``，只需要执行``--case ios-login``）
+
+**方法二**：可以使用 CLI 工具来动态配置 appium 的 capability 并运行用例，如：
+
+```shell
+retail-auto --case xxx --app iPad180 --cap iPadConfig --server local
+```
+
+另外``retail-auto``还提供连续运行多个 case 的功能，你可以在``config/cases.js``文件中添加多个case，如：
+
+``` js
+//ipad所有测试用例
+exports.ipad = ['ipad-login', 'ipad-create-order'];
+```
+
+接着只要运行
+
+``` shell
+retail-auto --all ipad
+```
+
+就能一次性运行多个case。
+
+测试用例执行后结果会生成一份报告在``mochawesome-report/mochawesome.html``中，你可以在上面直观的看到出错的原因：
+
+{% asset_img report.png %}
+
+### One more thing
+``retail-auto``现在支持使用 ``--useMacaca``支持使用``macaca``框架来运行测试用例，后续功能还在不断完善中
+
+## Design
+这个工程的主要结构如下：
+
+{% asset_img retail-auto.png %}
+
+* **bin**：即``retail-auto``脚本的执行代码，里面处理了 CLI 中参数的逻辑，最后实际调用的是类似：``mocha ./cases/ipad-login.js --reporter mochawesome``
+
+* **actions**：这里主要负责封装一些通用动作，包括与业务相关的 ``login`` ``back`` 之类的操作，或一些与业务无关的 ``swipe`` ``zoom`` 的动作，得益于``wd.js``中提供的灵活添加调用链扩展方法``addPromiseChainMethod``，我们只要实现一个函数并注册到 wd 中，就能直接链式调用 ``driver.login()``
+
+* **app**：负责放本地的 app 包，后续可优化，无需放在本地
+
+* **config**：
+ * **apps**：对应本地 app 包名，例如：**exports.iPhone170 = "Retail-v1.7-iOS.app"**
+ * **caps**：capability 设置，例如：**exports.iPadSim= {platformName: 'iOS', platformVersion: '10.3', deviceName: 'iPad Air'}**
+ * **severs**：服务端口设置，例如：**exports.local = {host: 'localhost', port: 4723}**
+ * **cases**：测试用例集合，配合``retail-auto --all``使用，例如：**exports.ipad = ['ipad-login', 'ipad-create-order']**
+ * **setup**：配置入口文件，case 中调用
+ * **register**：注册自定义动作
+ * **xpath**：封装一些常用的 xpath 字符串
+
+* **cases**：测试用例
+
+## Why nodejs
+appium 支持很多语言，包括我们之前实现的 java 版本，那么为什么我还要重新使用 nodejs 来实现一套自动化测试方案呢，主要原因有一下几点：
+* **测试风格**：UI 自动化测试属于 BDD 测试的范畴，我们通过行为驱动开发，而之前 java 实现的版本将每个页面都剥离出来，封装每个页面自己的行为，这样子做会十分繁琐，而且多了个页面的概念，有一种将一个操作分成了好几段的感觉。对于 UI 自动化测试来说，其实我们并不关心页面，只要能够定义一个操作流，能够顺利跑完这个操作流就可以，即使要封装，我们也只是封装一个操作流，类似登陆操作就可以，而不用去关心他是属于哪个页面。而 node 的测试框架 ``mocha`` 则支持 BDD 风格，因此基于 mocha 写的测试用例十分直观，并且符合 BDD 的测试风格。
+* **语言支持**：appium 本身基于 webdriver 实现，相对的来说 js 栈的东西更适合这个框架，包括同样原理的阿里框架 ``macaca``也是官方推荐使用 noodejs 版本，相对来说 node 版本获得的支持会更多一点，而且我们不需要再去搭建其他的环境，就像开头说的，这个工程几乎不用再去搭建其他的环境，使用更方便。
+* **语言特性**：``wd.js``所支持的链式调用及链式扩展都十分好用，相比与其他语言，js 更加轻量，node 对于文件/模块的概念也十分清晰，对于 appium 本身需要的许多配置，使用 js 来实现可阅读性更强，并且编写 case 也不用去学习很多的 js 知识，只需要依样画瓢即可。
+* **工具**：npm 所支持的 link 功能可以很方便的实现 CLI 工具，并且 node 也能很好的实现一个 CLI 工具，不需要额外的工程去编写，而之后不论是跑 jenkins 或者 node 自己起定时服务都可以很好的满足需求。
+* **趋势**：跟着大前端的浪潮学习 js 😂
+
+## What's more 
+后续 action:
+* 并行：到时候可以支持并行跑多个模拟器，不过因为机器可能是 mac mini，所以需要试一下具体能并行跑多少个终端。
+* 定时任务：到时候不管是 jenkins 还是 node 定时服务实现，都需要实现自动化。
+

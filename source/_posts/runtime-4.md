@@ -1,80 +1,17 @@
 ---
-title: Objective-C内部实现浅谈-协议和类目
+title: Objective-C内部实现浅谈-类目
 date: 2015-09-04 15:32:45
 tags: [Objective-C,Runtime]
 categories: 技术
 ---
-本文主要介绍了 runtime 中协议和类目内部相关的实现。
+本文主要介绍了 runtime 中类目内部相关的实现。
 
 <!--more-->
 
-# 协议
-## 数据结构
-``` objc
-typedef struct objc_object Protocol;
-```
-其实协议就是一个对象结构体
-## 操作函数
-### **objc_**:
-``` objc
-/* 返回指定的协议 */
-Protocol * objc_getProtocol ( const char *name );
-/* 获取运行时所知道的所有协议的数组 */
-Protocol ** objc_copyProtocolList ( unsigned int *outCount );
-/* 创建新的协议实例 */
-Protocol * objc_allocateProtocol ( const char *name );
-/* 在运行时中注册新创建的协议 */
-void objc_registerProtocol ( Protocol *proto );
-```
-### **protocol_**:
-**get**： 协议，属性
-``` objc
-/* 返回协议名 */
-const char * protocol_getName ( Protocol *p );
-
-/* 获取协议的指定属性 */
-objc_property_t protocol_getProperty ( Protocol *proto, const char *name, BOOL isRequiredProperty, BOOL isInstanceProperty );
-```
-**copy**：协议列表，属性列表
-``` objc
-/* 获取协议中的属性列表 */
-objc_property_t * protocol_copyPropertyList ( Protocol *proto, unsigned int *outCount );
-/* 获取协议采用的协议 */
-Protocol ** protocol_copyProtocolList ( Protocol *proto, unsigned int *outCount );
-```
-**add**：属性，方法，协议
-``` objc
-/* 为协议添加方法 */
-void protocol_addMethodDescription ( Protocol *proto, SEL name, const char *types, BOOL isRequiredMethod, BOOL isInstanceMethod );
-
-/* 添加一个已注册的协议到协议中 */
-void protocol_addProtocol ( Protocol *proto, Protocol *addition );
-
-/* 为协议添加属性 */
-void protocol_addProperty ( Protocol *proto, const char *name, const objc_property_attribute_t *attributes, unsigned int attributeCount, BOOL isRequiredProperty, BOOL isInstanceProperty );
-```
-**isEqual**：判断两协议等同
-``` objc
-/* 测试两个协议是否相等 */
-BOOL protocol_isEqual ( Protocol *proto, Protocol *other );
-```
-**comform**：判断是否遵循协议
-``` objc
-/* 查看协议是否采用了另一个协议 */
-BOOL protocol_conformsToProtocol ( Protocol *proto, Protocol *other );
-```
 # 类目
+和 Category 语法很相似的还有 Extension，二者的区别在于，Extension 在编译期就直接和原类编译在一起，而 Category 是在运行时动态添加到原类中的。
+
 ``` objc
-typedef struct objc_category *Category;
-
-struct objc_category {
-    char *category_name     OBJC2_UNAVAILABLE; /* 分类名 */
-    char *class_name        OBJC2_UNAVAILABLE; /* 分类所属的类名 */
-    struct objc_method_list *instance_methods    OBJC2_UNAVAILABLE; /* 实例方法列表 */
-    struct objc_method_list *class_methods       OBJC2_UNAVAILABLE; /* 类方法列表 */
-    struct objc_protocol_list *protocols         OBJC2_UNAVAILABLE; /* 分类所实现的协议列表 */
-}  
-
 /* objc-runtime-new.h中定义：*/
 
 struct category_t {
@@ -86,8 +23,147 @@ struct category_t {
     struct property_list_t *instanceProperties;  
 }
 ```
-category 就是定义方法的结构体，instance_methods 列表是 objc_class 中方法列表的一个子集，class_methods 列表是元类方法列表的一个子集。由其结构成员可知，category 为什么不能添加成员变量(可添加属性，只有 setter/getter 方法)。
 
-给 category 添加方法后，category_list 会生成 method list。这个方法列表是倒序添加的，也就是说，新生成的category 的方法会先于旧的 category 的方法插入。category 的方法会优先于类方法执行。
+## 原理
+在``_read_images``函数中会执行一个循环嵌套，外部循环遍历所有类，并取出当前类对应 Category 数组。内部循环会遍历取出的 Category 数组，将每个``category_t``对象取出，最终执行``addUnattachedCategoryForClass``函数添加到 Category 哈希表中。
+
+``` c
+// 将category_t添加到list中，并通过NXMapInsert函数，更新所属类的Category列表
+static void addUnattachedCategoryForClass(category_t *cat, Class cls, 
+                                          header_info *catHeader)
+{
+    // 获取到未添加的Category哈希表
+    NXMapTable *cats = unattachedCategories();
+    category_list *list;
+
+    // 获取到buckets中的value，并向value对应的数组中添加category_t
+    list = (category_list *)NXMapGet(cats, cls);
+    if (!list) {
+        list = (category_list *)
+            calloc(sizeof(*list) + sizeof(list->list[0]), 1);
+    } else {
+        list = (category_list *)
+            realloc(list, sizeof(*list) + sizeof(list->list[0]) * (list->count + 1));
+    }
+    // 替换之前的list字段
+    list->list[list->count++] = (locstamped_category_t){cat, catHeader};
+    NXMapInsert(cats, cls, list);
+}
+```
+
+Category 维护了一个名为``category_map``的哈希表，哈希表存储所有 category_t 对象。
+
+``` c
+// 获取未添加到Class中的category哈希表
+static NXMapTable *unattachedCategories(void)
+{
+    // 未添加到Class中的category哈希表
+    static NXMapTable *category_map = nil;
+
+    if (category_map) return category_map;
+
+    // fixme initial map size
+    category_map = NXCreateMapTable(NXPtrValueMapPrototype, 16);
+
+    return category_map;
+}
+```
+
+上面只是完成了向 Category 哈希表中添加的操作，这时候哈希表中存储了所有 category_t 对象。然后需要调用``remethodizeClass``函数，向对应的 Class 中添加 Category 的信息。
+
+在``remethodizeClass``函数中会查找传入的 Class 参数对应的 Category 数组，然后将数组传给``attachCategories``函数，执行具体的添加操作。
+
+``` c
+// 将Category的信息添加到Class，包含method、property、protocol
+static void remethodizeClass(Class cls)
+{
+    category_list *cats;
+    bool isMeta;
+    isMeta = cls->isMetaClass();
+
+    // 从Category哈希表中查找category_t对象，并将已找到的对象从哈希表中删除
+    if ((cats = unattachedCategoriesForClass(cls, false/*not realizing*/))) {
+        attachCategories(cls, cats, true /*flush caches*/);        
+        free(cats);
+    }
+}
+```
+
+在``attachCategories``函数中，查找到 Category 的方法列表、属性列表、协议列表，然后通过对应的``attachLists``函数，添加到 Class 对应的``class_rw_t``结构体中。
+
+``` c
+// 获取到Category的Protocol list、Property list、Method list，然后通过attachLists函数添加到所属的类中
+static void attachCategories(Class cls, category_list *cats, bool flush_caches)
+{
+    if (!cats) return;
+    if (PrintReplacedMethods) printReplacements(cls, cats);
+
+    bool isMeta = cls->isMetaClass();
+
+    // 按照Category个数，分配对应的内存空间
+    method_list_t **mlists = (method_list_t **)
+        malloc(cats->count * sizeof(*mlists));
+    property_list_t **proplists = (property_list_t **)
+        malloc(cats->count * sizeof(*proplists));
+    protocol_list_t **protolists = (protocol_list_t **)
+        malloc(cats->count * sizeof(*protolists));
+
+    int mcount = 0;
+    int propcount = 0;
+    int protocount = 0;
+    int i = cats->count;
+    bool fromBundle = NO;
+    
+    // 循环查找出Protocol list、Property list、Method list
+    while (i--) {
+        auto& entry = cats->list[i];
+
+        method_list_t *mlist = entry.cat->methodsForMeta(isMeta);
+        if (mlist) {
+            mlists[mcount++] = mlist;
+            fromBundle |= entry.hi->isBundle();
+        }
+
+        property_list_t *proplist = 
+            entry.cat->propertiesForMeta(isMeta, entry.hi);
+        if (proplist) {
+            proplists[propcount++] = proplist;
+        }
+
+        protocol_list_t *protolist = entry.cat->protocols;
+        if (protolist) {
+            protolists[protocount++] = protolist;
+        }
+    }
+
+    auto rw = cls->data();
+
+    // 执行添加操作
+    prepareMethodLists(cls, mlists, mcount, NO, fromBundle);
+    rw->methods.attachLists(mlists, mcount);
+    free(mlists);
+    if (flush_caches  &&  mcount > 0) flushCaches(cls);
+
+    rw->properties.attachLists(proplists, propcount);
+    free(proplists);
+
+    rw->protocols.attachLists(protolists, protocount);
+    free(protolists);
+}
+```
+
+这个过程就是将 Category 中的信息，添加到对应的 Class 中，一个类的 Category 可能不只有一个，在这个过程中会将所有 Category 的信息都合并到 Class 中。
+
+## 方法覆盖
+
+{% asset_img category.jpg %}
+
+在进行方法调用的时候，会优先遍历 Category 的方法，并且后面被添加到项目里的 Category，会被优先调用。上面的例子调用顺序就是Category3 -> Category2 -> Category1 -> TestObject。如果从方法列表中找到方法后，就不会继续向后查找，这就是类方法被 Category ”覆盖”的原因。
+
 ## 类目为什么不能添加属性
 类目并不是不能添加属性，从上面类目的结构体中可以看到他拥有一个 property_list，分类其实是不能添加 Ivar,因为他本身并不是一个类，他不拥有自己的 isa 指针，因此这些 properties 并不会自动生成 Ivar，也就是不会有 @synthesize 的作用，dyld 加载的期间，这些 categories 会被加载并 patch 到相应的类中。
+
+## Load方法
+附加 Category 到类的工作会先于 +load 方法的执行，因此可以在 load 方法中调用分类方法。
+
++load 的执行顺序是先类，后 Category，而 Category 的 +load 执行顺序是根据编译顺序决定的。
