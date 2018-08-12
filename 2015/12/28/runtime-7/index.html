@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Objective-C内部实现浅谈-Load方法 | Grommash</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="本文主要介绍了 Load方法 相关的内部实现。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Objective-C内部实现浅谈-Load方法">
+<meta property="og:url" content="http://yoursite.com/2015/12/28/runtime-7/index.html">
+<meta property="og:site_name" content="Grommash">
+<meta property="og:description" content="本文主要介绍了 Load方法 相关的内部实现。">
+<meta property="og:updated_time" content="2018-08-12T13:08:39.747Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Objective-C内部实现浅谈-Load方法">
+<meta name="twitter:description" content="本文主要介绍了 Load方法 相关的内部实现。">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <div class="outer">
+        <section id="main"><article id="post-runtime-7" class="article article-type-post" itemscope itemprop="blogPost">
+  
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Objective-C内部实现浅谈-Load方法
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2015/12/28/runtime-7/" class="article-date">
+  <time datetime="2015-12-28T07:46:58.000Z" itemprop="datePublished">2015-12-28</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/技术/">技术</a>
+  </div>
+
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文主要介绍了 Load方法 相关的内部实现。</p>
+<a id="more"></a>
+<p><code>+ load</code>作为 Objective-C 中的一个方法，与其它方法有很大的不同。它只是一个在整个文件被加载到运行时，在 main 函数调用之前被 ObjC 运行时调用的钩子方法。其中关键字有这么几个：</p>
+<ul>
+<li>文件刚加载</li>
+<li>main 函数之前</li>
+<li>钩子方法</li>
+</ul>
+<p>当一个类的 load 方法调用时，调用栈大概是这样的：<br><figure class="highlight objc"><table><tr><td class="code"><pre><div class="line"><span class="number">0</span>  +[XXObject load]</div><div class="line"><span class="number">1</span>  call_class_loads()</div><div class="line"><span class="number">2</span>  call_load_methods</div><div class="line"><span class="number">3</span>  load_images</div><div class="line"><span class="number">4</span>  dyld::notifySingle(dyld_image_states, ImageLoader <span class="keyword">const</span>*)</div><div class="line"><span class="number">11</span> _dyld_start</div></pre></td></tr></table></figure></p>
+<h2 id="准备-load-方法"><a href="#准备-load-方法" class="headerlink" title="准备 + load 方法"></a>准备 + load 方法</h2><p>在加载镜像时，会执行<br><figure class="highlight c"><table><tr><td class="code"><pre><div class="line"><span class="keyword">for</span> (<span class="keyword">uint32_t</span> i = <span class="number">0</span>; i &lt; infoCount; i++) &#123;</div><div class="line">    <span class="keyword">if</span> (hasLoadMethods((<span class="keyword">const</span> headerType *)infoList[i].imageLoadAddress)) &#123;</div><div class="line">        found = <span class="literal">true</span>;</div><div class="line">        <span class="keyword">break</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>就会进入 load_images_nolock 来查找 load 方法：<br><figure class="highlight c"><table><tr><td class="code"><pre><div class="line"><span class="function"><span class="keyword">bool</span> <span class="title">load_images_nolock</span><span class="params">(<span class="keyword">enum</span> dyld_image_states state,<span class="keyword">uint32_t</span> infoCount,</span></span></div><div class="line">                   <span class="keyword">const</span> <span class="keyword">struct</span> dyld_image_info infoList[])</div><div class="line">&#123;</div><div class="line">    <span class="keyword">bool</span> found = NO;</div><div class="line">    <span class="keyword">uint32_t</span> i;</div><div class="line">    i = infoCount;</div><div class="line">    <span class="keyword">while</span> (i--) &#123;</div><div class="line">        <span class="keyword">const</span> headerType *mhdr = (headerType*)infoList[i].imageLoadAddress;</div><div class="line">        <span class="keyword">if</span> (!hasLoadMethods(mhdr)) <span class="keyword">continue</span>;</div><div class="line">        prepare_load_methods(mhdr);</div><div class="line">        found = YES;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> found;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>调用 prepare_load_methods 对 load 方法的调用进行准备（将需要调用 load 方法的类添加到一个列表中，后面的小节中会介绍）：<br><figure class="highlight c"><table><tr><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">prepare_load_methods</span><span class="params">(<span class="keyword">const</span> headerType *mhdr)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">size_t</span> count, i;</div><div class="line">    runtimeLock.assertWriting();</div><div class="line">    <span class="keyword">classref_t</span> *classlist = </div><div class="line">        _getObjc2NonlazyClassList(mhdr, &amp;count);</div><div class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; count; i++) &#123;</div><div class="line">        schedule_class_load(remapClass(classlist[i]));</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">category_t</span> **categorylist = _getObjc2NonlazyCategoryList(mhdr, &amp;count);</div><div class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; count; i++) &#123;</div><div class="line">        <span class="keyword">category_t</span> *cat = categorylist[i];</div><div class="line">        Class cls = remapClass(cat-&gt;cls);</div><div class="line">        <span class="keyword">if</span> (!cls) <span class="keyword">continue</span>;  <span class="comment">// category for ignored weak-linked class</span></div><div class="line">        realizeClass(cls);</div><div class="line">        assert(cls-&gt;ISA()-&gt;isRealized());</div><div class="line">        add_category_to_loadable_list(cat);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>通过 _getObjc2NonlazyClassList 获取所有的类的列表之后，会通过 remapClass 获取类对应的指针，然后调用 schedule_class_load 递归地安排当前类和没有调用 + load 父类进入列表。<br><figure class="highlight c"><table><tr><td class="code"><pre><div class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">schedule_class_load</span><span class="params">(Class cls)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">if</span> (!cls) <span class="keyword">return</span>;</div><div class="line">    assert(cls-&gt;isRealized());</div><div class="line">    <span class="keyword">if</span> (cls-&gt;data()-&gt;flags &amp; RW_LOADED) <span class="keyword">return</span>;</div><div class="line">    schedule_class_load(cls-&gt;superclass);</div><div class="line">    add_class_to_loadable_list(cls);</div><div class="line">    cls-&gt;setInfo(RW_LOADED); </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>执行 add_class_to_loadable_list(cls) 将当前类加入加载列表之前，会先把父类加入待加载的列表，保证父类在子类前调用 load 方法。</p>
+<h2 id="调用-load-方法"><a href="#调用-load-方法" class="headerlink" title="调用 + load 方法"></a>调用 + load 方法</h2><p>在将镜像加载到运行时、对 load 方法的准备就绪之后，执行 call_load_methods，开始调用 load 方法：<br><figure class="highlight c"><table><tr><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">call_load_methods</span><span class="params">(<span class="keyword">void</span>)</span></span></div><div class="line">&#123;</div><div class="line">    ...</div><div class="line">    <span class="keyword">do</span> &#123;</div><div class="line">        <span class="keyword">while</span> (loadable_classes_used &gt; <span class="number">0</span>) &#123;</div><div class="line">            call_class_loads();</div><div class="line">        &#125;</div><div class="line">        more_categories = call_category_loads();</div><div class="line">    &#125; <span class="keyword">while</span> (loadable_classes_used &gt; <span class="number">0</span>  ||  more_categories);</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>其中 call_class_loads 会从一个待加载的类列表 loadable_classes 中寻找对应的类，然后找到 @selector(load) 的实现并执行。<br><figure class="highlight c"><table><tr><td class="code"><pre><div class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">call_class_loads</span><span class="params">(<span class="keyword">void</span>)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">int</span> i;</div><div class="line">    <span class="keyword">struct</span> loadable_class *classes = loadable_classes;</div><div class="line">    <span class="keyword">int</span> used = loadable_classes_used;</div><div class="line">    loadable_classes = nil;</div><div class="line">    loadable_classes_allocated = <span class="number">0</span>;</div><div class="line">    loadable_classes_used = <span class="number">0</span>;</div><div class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; used; i++) &#123;</div><div class="line">        Class cls = classes[i].cls;</div><div class="line">        <span class="keyword">load_method_t</span> load_method = (<span class="keyword">load_method_t</span>)classes[i].method;</div><div class="line">        <span class="keyword">if</span> (!cls) <span class="keyword">continue</span>;</div><div class="line">        (*load_method)(cls, SEL_load);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span> (classes) <span class="built_in">free</span>(classes);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这行 (*load_method)(cls, SEL_load) 代码就会调用 +[XXObject load] 方法。</p>
+<p>Q：load 方法是如何被调用的？</p>
+<p>A：当 Objective-C 运行时初始化的时候，会通过 dyld_register_image_state_change_handler 在每次有新的镜像加入运行时的时候，进行回调。执行 load_images 将所有包含 load 方法的文件加入列表 loadable_classes ，然后从这个列表中找到对应的 load 方法的实现，调用 load 方法。</p>
+<h2 id="生成-loadable-class"><a href="#生成-loadable-class" class="headerlink" title="生成 loadable_class"></a>生成 loadable_class</h2><p>在调用 load_images -&gt; load_images_nolock -&gt; prepare_load_methods -&gt; schedule_class_load -&gt; add_class_to_loadable_list 的时候会将未加载的类添加到 loadable_classes 数组中：<br><figure class="highlight c"><table><tr><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">add_class_to_loadable_list</span><span class="params">(Class cls)</span></span></div><div class="line">&#123;</div><div class="line">    IMP method;</div><div class="line">    loadMethodLock.assertLocked();</div><div class="line">    method = cls-&gt;getLoadMethod();</div><div class="line">    <span class="keyword">if</span> (!method) <span class="keyword">return</span>;</div><div class="line">    <span class="keyword">if</span> (loadable_classes_used == loadable_classes_allocated) &#123;</div><div class="line">        loadable_classes_allocated = loadable_classes_allocated*<span class="number">2</span> + <span class="number">16</span>;</div><div class="line">        loadable_classes = (<span class="keyword">struct</span> loadable_class *)</div><div class="line">            <span class="built_in">realloc</span>(loadable_classes,</div><div class="line">                              loadable_classes_allocated *</div><div class="line">                              <span class="keyword">sizeof</span>(<span class="keyword">struct</span> loadable_class));</div><div class="line">    &#125;</div><div class="line">    loadable_classes[loadable_classes_used].cls = cls;</div><div class="line">    loadable_classes[loadable_classes_used].method = method;</div><div class="line">    loadable_classes_used++;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>方法刚被调用时：</p>
+<ul>
+<li>会从 class 中获取 load 方法： method = cls-&gt;getLoadMethod();</li>
+<li>判断当前 loadable_classes 这个数组是否已经被全部占用了：loadable_classes_used == loadable_classes_allocated</li>
+<li>在当前数组的基础上扩大数组的大小：realloc</li>
+<li>把传入的 class 以及对应的方法的实现加到列表中</li>
+</ul>
+<p>另外一个用于保存分类的列表 loadable_categories 也有一个类似的方法 add_category_to_loadable_list。<br><figure class="highlight c"><table><tr><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">add_category_to_loadable_list</span><span class="params">(Category cat)</span></span></div><div class="line">&#123;</div><div class="line">    IMP method;</div><div class="line">    loadMethodLock.assertLocked();</div><div class="line">    method = _category_getLoadMethod(cat);</div><div class="line">    <span class="keyword">if</span> (!method) <span class="keyword">return</span>;</div><div class="line">    <span class="keyword">if</span> (loadable_categories_used == loadable_categories_allocated) &#123;</div><div class="line">        loadable_categories_allocated = loadable_categories_allocated*<span class="number">2</span> + <span class="number">16</span>;</div><div class="line">        loadable_categories = (<span class="keyword">struct</span> loadable_category *)</div><div class="line">            <span class="built_in">realloc</span>(loadable_categories,</div><div class="line">                              loadable_categories_allocated *</div><div class="line">                              <span class="keyword">sizeof</span>(<span class="keyword">struct</span> loadable_category));</div><div class="line">    &#125;</div><div class="line">    loadable_categories[loadable_categories_used].cat = cat;</div><div class="line">    loadable_categories[loadable_categories_used].method = method;</div><div class="line">    loadable_categories_used++;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>实现几乎与 add_class_to_loadable_list 完全相同。</p>
+<h2 id="调用-loadable-class"><a href="#调用-loadable-class" class="headerlink" title="调用 loadable_class"></a>调用 loadable_class</h2><p>调用 load 方法的过程：load_images -&gt; call_load_methods -&gt; call_class_loads 会从 loadable_classes 中取出对应类和方法，执行 load。<br><figure class="highlight c"><table><tr><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">call_load_methods</span><span class="params">(<span class="keyword">void</span>)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">static</span> <span class="keyword">bool</span> loading = NO;</div><div class="line">    <span class="keyword">bool</span> more_categories;</div><div class="line">    loadMethodLock.assertLocked();</div><div class="line">    <span class="keyword">if</span> (loading) <span class="keyword">return</span>;</div><div class="line">    loading = YES;</div><div class="line">    <span class="keyword">void</span> *pool = objc_autoreleasePoolPush();</div><div class="line">    <span class="keyword">do</span> &#123;</div><div class="line">        <span class="keyword">while</span> (loadable_classes_used &gt; <span class="number">0</span>) &#123;</div><div class="line">            call_class_loads();</div><div class="line">        &#125;</div><div class="line">        more_categories = call_category_loads();</div><div class="line">    &#125; <span class="keyword">while</span> (loadable_classes_used &gt; <span class="number">0</span>  ||  more_categories);</div><div class="line">    objc_autoreleasePoolPop(pool);</div><div class="line">    loading = NO;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>上述方法对所有在 loadable_classes 以及 loadable_categories 中的类以及分类执行 load 方法。<br><figure class="highlight c"><table><tr><td class="code"><pre><div class="line"><span class="keyword">do</span> &#123;</div><div class="line">    <span class="keyword">while</span> (loadable_classes_used &gt; <span class="number">0</span>) &#123;</div><div class="line">        call_class_loads();</div><div class="line">    &#125;</div><div class="line">    more_categories = call_category_loads();</div><div class="line">&#125; <span class="keyword">while</span> (loadable_classes_used &gt; <span class="number">0</span>  ||  more_categories);</div></pre></td></tr></table></figure></p>
+<p>调用顺序如下：</p>
+<ul>
+<li>不停调用类的 + load 方法，直到 loadable_classes 为空</li>
+<li>调用一次 call_category_loads 加载分类</li>
+<li>如果有 loadable_classes 或者更多的分类，继续调用 load 方法</li>
+</ul>
+<p>相比于类 load 方法的调用，分类中 load 方法的调用就有些复杂了：<br><figure class="highlight c"><table><tr><td class="code"><pre><div class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">bool</span> <span class="title">call_category_loads</span><span class="params">(<span class="keyword">void</span>)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">int</span> i, shift;</div><div class="line">    <span class="keyword">bool</span> new_categories_added = NO;</div><div class="line">    <span class="comment">// 1. 获取当前可以加载的分类列表</span></div><div class="line">    <span class="keyword">struct</span> loadable_category *cats = loadable_categories;</div><div class="line">    <span class="keyword">int</span> used = loadable_categories_used;</div><div class="line">    <span class="keyword">int</span> allocated = loadable_categories_allocated;</div><div class="line">    loadable_categories = nil;</div><div class="line">    loadable_categories_allocated = <span class="number">0</span>;</div><div class="line">    loadable_categories_used = <span class="number">0</span>;</div><div class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; used; i++) &#123;</div><div class="line">        Category cat = cats[i].cat;</div><div class="line">        <span class="keyword">load_method_t</span> load_method = (<span class="keyword">load_method_t</span>)cats[i].method;</div><div class="line">        Class cls;</div><div class="line">        <span class="keyword">if</span> (!cat) <span class="keyword">continue</span>;</div><div class="line">        cls = _category_getClass(cat);</div><div class="line">        <span class="keyword">if</span> (cls  &amp;&amp;  cls-&gt;isLoadable()) &#123;</div><div class="line">            <span class="comment">// 2. 如果当前类是可加载的 `cls  &amp;&amp;  cls-&gt;isLoadable()` 就会调用分类的 load 方法</span></div><div class="line">            (*load_method)(cls, SEL_load);</div><div class="line">            cats[i].cat = nil;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="comment">// 3. 将所有加载过的分类移除 `loadable_categories` 列表</span></div><div class="line">    shift = <span class="number">0</span>;</div><div class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; used; i++) &#123;</div><div class="line">        <span class="keyword">if</span> (cats[i].cat) &#123;</div><div class="line">            cats[i-shift] = cats[i];</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            shift++;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    used -= shift;</div><div class="line">    <span class="comment">// 4. 为 `loadable_categories` 重新分配内存，并重新设置它的值</span></div><div class="line">    new_categories_added = (loadable_categories_used &gt; <span class="number">0</span>);</div><div class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; loadable_categories_used; i++) &#123;</div><div class="line">        <span class="keyword">if</span> (used == allocated) &#123;</div><div class="line">            allocated = allocated*<span class="number">2</span> + <span class="number">16</span>;</div><div class="line">            cats = (<span class="keyword">struct</span> loadable_category *)</div><div class="line">                <span class="built_in">realloc</span>(cats, allocated *</div><div class="line">                                  <span class="keyword">sizeof</span>(<span class="keyword">struct</span> loadable_category));</div><div class="line">        &#125;</div><div class="line">        cats[used++] = loadable_categories[i];</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span> (loadable_categories) <span class="built_in">free</span>(loadable_categories);</div><div class="line">    <span class="keyword">if</span> (used) &#123;</div><div class="line">        loadable_categories = cats;</div><div class="line">        loadable_categories_used = used;</div><div class="line">        loadable_categories_allocated = allocated;</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        <span class="keyword">if</span> (cats) <span class="built_in">free</span>(cats);</div><div class="line">        loadable_categories = nil;</div><div class="line">        loadable_categories_used = <span class="number">0</span>;</div><div class="line">        loadable_categories_allocated = <span class="number">0</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> new_categories_added;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这个方法有些长，我们来分步解释方法的作用：</p>
+<ul>
+<li>获取当前可以加载的分类列表</li>
+<li>如果当前类是可加载的 cls &amp;&amp; cls-&gt;isLoadable() 就会调用分类的 load 方法</li>
+<li>将所有加载过的分类移除 loadable_categories 列表</li>
+<li>为 loadable_categories 重新分配内存，并重新设置它的值</li>
+</ul>
+<h2 id="调用的顺序"><a href="#调用的顺序" class="headerlink" title="调用的顺序"></a>调用的顺序</h2><p>你过去可能会听说过，对于 load 方法的调用顺序有两条规则：</p>
+<ul>
+<li>父类先于子类调用</li>
+<li>类先于分类调用</li>
+</ul>
+<p>第一条规则是由于 schedule_class_load 有如下的实现：<br><figure class="highlight c"><table><tr><td class="code"><pre><div class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">schedule_class_load</span><span class="params">(Class cls)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">if</span> (!cls) <span class="keyword">return</span>;</div><div class="line">    assert(cls-&gt;isRealized());</div><div class="line">    <span class="keyword">if</span> (cls-&gt;data()-&gt;flags &amp; RW_LOADED) <span class="keyword">return</span>;</div><div class="line">    schedule_class_load(cls-&gt;superclass);</div><div class="line">    add_class_to_loadable_list(cls);</div><div class="line">    cls-&gt;setInfo(RW_LOADED); </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里通过这行代码 schedule_class_load(cls-&gt;superclass) 总是能够保证没有调用 load 方法的父类先于子类加入 loadable_classes 数组，从而确保其调用顺序的正确性。</p>
+<p>类与分类中 load 方法的调用顺序主要在 call_load_methods 中实现：<br><figure class="highlight c"><table><tr><td class="code"><pre><div class="line"><span class="keyword">do</span> &#123;</div><div class="line">    <span class="keyword">while</span> (loadable_classes_used &gt; <span class="number">0</span>) &#123;</div><div class="line">        call_class_loads();</div><div class="line">    &#125;</div><div class="line">    more_categories = call_category_loads();</div><div class="line">&#125; <span class="keyword">while</span> (loadable_classes_used &gt; <span class="number">0</span>  ||  more_categories);</div></pre></td></tr></table></figure></p>
+<p>上面的 do while 语句能够在一定程度上确保，类的 load 方法会先于分类调用。但是这里不能完全保证调用顺序的正确。</p>
+<p>如果分类的镜像在类的镜像之前加载到运行时，上面的代码就没法保证顺序的正确了，所以，我们还需要在 call_category_loads 中判断类是否已经加载到内存中（调用 load 方法）：<br><figure class="highlight c"><table><tr><td class="code"><pre><div class="line"><span class="keyword">if</span> (cls  &amp;&amp;  cls-&gt;isLoadable()) &#123;</div><div class="line">    (*load_method)(cls, SEL_load);</div><div class="line">    cats[i].cat = nil;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里，检查了类是否存在并且是否可以加载，如果都为真，那么就可以调用分类的 load 方法了。</p>
+
+      
+
+      
+        
+    </div>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/12/28/runtime-6/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Objective-C内部实现浅谈-KVC和KVO
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/11/26/runtime-5/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Objective-C内部实现浅谈-通知</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        <aside id="sidebar">
+  <nav class="menus">
+  	<ul>
+  		<li><a href="/"><i class="icon icon-home"></i></a></li>
+  		
+			<li><a href="/archives"><i class="icon icon-fenlei"></i></a></li>
+  		
+  		
+			<li><a href="/tags"><i class="icon icon-tag"></i></a></li>
+  		
+  		
+  			<li><a href="https://github.com/gxq93" target="_blank"><i class="icon icon-github"></i></a></li>
+  		
+  	</ul>
+  </nav>
+  <a id="go-top" href="#"><i class="icon icon-up"></i></a>
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+	<div id="footer-info" class="inner">
+	  &copy; 2018 GuYi 
+	  - Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+	  - Theme <a href="https://github.com/hejianxian/hexo-theme-jane/" target="_blank">Jane</a>
+	</div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/tags" class="mobile-nav-link">Tag</a>
+  
+    <a href="https://github.com/gxq93" class="mobile-nav-link">Github</a>
+  
+</nav>
+    
+
+<script src="//cdn.bootcss.com/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
